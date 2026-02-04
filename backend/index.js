@@ -36,8 +36,11 @@ const allowedOrigins = [
   ADMIN_URL,
   BACKEND_URL,
   "https://airless-spray.rubyshop.co.th",
+  "http://airless-spray.rubyshop.co.th",
   "https://admin-airless-spray.rubyshop.co.th",
+  "http://admin-airless-spray.rubyshop.co.th",
   "https://api-airless-spray.rubyshop.co.th",
+  "http://api-airless-spray.rubyshop.co.th",
   "http://localhost:5001",
   "http://localhost:5002",
 ].filter(Boolean);
