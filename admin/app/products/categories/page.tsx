@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { backendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 
 const API_URL = backendBaseUrl;
@@ -193,7 +193,7 @@ export default function CategoriesManager() {
         ? new Set([categoryForm.id, ...getDescendantIds(categoryForm.id)])
         : new Set<string>();
 
-    const renderParentOptions = (items: ProductCategory[], level: number): JSX.Element[] =>
+    const renderParentOptions = (items: ProductCategory[], level: number): ReactNode[] =>
         items.flatMap((item) => {
             if (blockedParentIds.has(item.id)) {
                 return [];
@@ -208,7 +208,7 @@ export default function CategoriesManager() {
             ];
         });
 
-    const renderCategoryTree = (items: ProductCategory[], level: number): JSX.Element[] =>
+    const renderCategoryTree = (items: ProductCategory[], level: number): ReactNode[] =>
         items.flatMap((item) => {
             const children = childrenMap.get(item.id) || [];
             const levelBadge = `L${Math.min(level + 1, 9)}`;

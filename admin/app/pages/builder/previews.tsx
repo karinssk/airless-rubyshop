@@ -2960,7 +2960,6 @@ export function LivePreview({
               <EditableText
                 value={safeText(props.buttonText) || "LEARN MORE"}
                 onCommit={(value) => onUpdateBlock(index, { buttonText: value })}
-                style={{ color: buttonTextColor }}
               />
             </a>
           </div>
