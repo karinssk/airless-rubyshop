@@ -13,15 +13,14 @@ const backendDevelopmentUrl =
   process.env.NEXT_PUBLIC_BACKEND_DEVELOPMENT_URL || "";
 
 export const frontendBaseUrl = normalizeBaseUrl(
-  (isProduction ? frontendProductionUrl : frontendDevelopmentUrl) ||
-  frontendProductionUrl ||
-  frontendDevelopmentUrl ||
-  "http://localhost:5000"
+  isProduction
+    ? frontendProductionUrl || "https://airless-spray.rubyshop.co.th"
+    : frontendDevelopmentUrl || "http://localhost:5001"
 );
 
 export const backendBaseUrl = normalizeBaseUrl(
   isProduction
-    ? backendProductionUrl || backendDevelopmentUrl || "http://localhost:5000"
+    ? backendProductionUrl || "https://api-airless-spray.rubyshop.co.th"
     : backendDevelopmentUrl || "http://localhost:5000"
 );
 

@@ -45,11 +45,11 @@ export async function generateMetadata({
     description,
     keywords: t('keywords').split(',').map((k: string) => k.trim()),
     alternates: {
-      canonical,
+      canonical: `/${locale}`,
       languages: {
-        'th': `${baseUrl}/th`,
-        'en': `${baseUrl}/en`,
-        'x-default': `${baseUrl}/th`,
+        'th': '/th',
+        'en': '/en',
+        'x-default': '/',
       },
     },
     openGraph: {

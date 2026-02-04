@@ -11,10 +11,11 @@ const prompt = Prompt({
   variable: "--font-prompt",
 });
 
-// Get backend URL for preconnect hints
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_PRODUCTION_URL
-  || process.env.NEXT_PUBLIC_BACKEND_DEVELOPMENT_URL
-  || "";
+// Get backend URL for preconnect hints (only use production URL to avoid localhost access prompts)
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_PRODUCTION_URL || "";
+
+// Only preconnect to non-localhost URLs
+const shouldPreconnect = backendUrl && !backendUrl.includes("localhost");
 
 export default function RootLayout({
   children,
@@ -25,7 +26,7 @@ export default function RootLayout({
     <html lang="th" className={prompt.variable}>
       <head>
         {/* Preconnect to backend API for faster data fetching */}
-        {backendUrl && (
+        {shouldPreconnect && (
           <>
             <link rel="preconnect" href={backendUrl} />
             <link rel="dns-prefetch" href={backendUrl} />
