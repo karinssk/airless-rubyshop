@@ -88,12 +88,14 @@ type Block = {
   props: Record<string, any>;
 };
 
+type LocalizedString = string | Record<string, string>;
+
 type Page = {
-  title: string;
+  title: LocalizedString;
   slug: string;
   seo?: {
-    title?: string;
-    description?: string;
+    title?: LocalizedString;
+    description?: LocalizedString;
   };
   theme?: {
     background?: string;

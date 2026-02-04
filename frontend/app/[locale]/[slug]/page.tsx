@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import PageRenderer from "../../components/PageRenderer";
 import ChatWidget from "../../components/ChatWidget";
 import Navbar, { type NavItem } from "../../components/Navbar";
@@ -11,11 +11,11 @@ import { backendBaseUrl, frontendBaseUrl } from "@/lib/urls";
 const REVALIDATE_TIME = 60;
 
 type PageData = {
-  title: string;
+  title: string | Record<string, string>;
   slug: string;
   seo?: {
-    title?: string;
-    description?: string;
+    title?: string | Record<string, string>;
+    description?: string | Record<string, string>;
     image?: string;
   };
   theme?: {
@@ -24,10 +24,22 @@ type PageData = {
   layout: Array<{ type: string; props: Record<string, any> }>;
 };
 
-async function fetchPage(slug: string) {
-  const response = await fetch(`${backendBaseUrl}/pages/${slug}`, {
-    next: { revalidate: REVALIDATE_TIME },
-  });
+const getLocaleValue = (
+  value: string | Record<string, string> | undefined,
+  locale: string
+) => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value[locale] || value.th || value.en || "";
+};
+
+async function fetchPage(slug: string, locale: string) {
+  const response = await fetch(
+    `${backendBaseUrl}/pages/${slug}?locale=${encodeURIComponent(locale)}`,
+    {
+      next: { revalidate: REVALIDATE_TIME },
+    }
+  );
   if (!response.ok) return null;
   const data = await response.json();
   return data.page as PageData;
@@ -63,11 +75,13 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const page = await fetchPage(slug);
+  const { slug, locale } = await params;
+  const page = await fetchPage(slug, locale);
   if (!page) return {};
-  const title = page.seo?.title || page.title;
-  const description = page.seo?.description || "";
+  const title =
+    getLocaleValue(page.seo?.title, locale) ||
+    getLocaleValue(page.title, locale);
+  const description = getLocaleValue(page.seo?.description, locale) || "";
   const fallbackImage = frontendBaseUrl
     ? `${frontendBaseUrl}/og-aircon.jpg`
     : "/og-aircon.jpg";
@@ -101,10 +115,7 @@ export default async function Page({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  if (slug === "home") {
-    redirect("/");
-  }
-  const page = await fetchPage(slug);
+  const page = await fetchPage(slug, locale);
   if (!page) return notFound();
   const menu = await fetchMenu(locale);
   const footer = await fetchFooter();

@@ -322,7 +322,7 @@ export default function Navbar({
             {cta ? (
               <Link
                 href={cta.href}
-                className="rounded-full bg-black px-4 py-2 text-xs font-semibold text-white"
+                className="hidden rounded-full bg-black px-4 py-2 text-xs font-semibold text-white lg:inline-flex"
               >
                 {cta.label}
               </Link>

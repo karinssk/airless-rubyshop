@@ -14,11 +14,11 @@ type Block = {
 };
 
 type PageData = {
-  title: string;
+  title: string | Record<string, string>;
   slug: string;
   seo?: {
-    title?: string;
-    description?: string;
+    title?: string | Record<string, string>;
+    description?: string | Record<string, string>;
     image?: string;
   };
   theme?: {
@@ -31,8 +31,9 @@ const fallbackPage: PageData = {
   title: "Home",
   slug: "home",
   seo: {
-    title: "RUBYSHOP",
-    description: "บริการล้างแอร์ ซ่อมแอร์ ติดตั้งแอร์ แบบมืออาชีพ",
+    title: "RUBYSHOP เทคโนโลยีเครื่องมือช่าง",
+    description:
+      "ผู้นำเข้าและจัดหาเครื่องมือสำหรับช่างมืออาชีพ เครื่องพ่นสีแรงดันสูง เครื่องพ่นสีกันไฟ เครื่องพ่นปูนฉาบ เครื่องตีเส้นถนน เครื่องกรีดผนัง เครื่องเลเซอร์ระดับ เครื่องผสมสี และเครื่องปั่นหน้าปูน",
   },
   theme: { background: "" },
   layout: [],
@@ -41,9 +42,18 @@ const fallbackPage: PageData = {
 // Cache revalidation time in seconds (60 = 1 minute)
 const REVALIDATE_TIME = 60;
 
-async function fetchPage() {
+const getLocaleValue = (
+  value: string | Record<string, string> | undefined,
+  locale: string
+) => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value[locale] || value.th || value.en || "";
+};
+
+async function fetchPage(locale: string) {
   try {
-    const response = await fetch(`${backendBaseUrl}/pages/home`, {
+    const response = await fetch(`${backendBaseUrl}/pages/home?locale=${encodeURIComponent(locale)}`, {
       next: { revalidate: REVALIDATE_TIME },
     });
     if (!response.ok) return fallbackPage;
@@ -80,10 +90,17 @@ async function fetchFooter() {
   }
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const page = await fetchPage();
-  const title = page.seo?.title || page.title;
-  const description = page.seo?.description || "";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const page = await fetchPage(locale);
+  const title =
+    getLocaleValue(page.seo?.title, locale) ||
+    getLocaleValue(page.title, locale);
+  const description = getLocaleValue(page.seo?.description, locale) || "";
   const fallbackImage = frontendBaseUrl
     ? `${frontendBaseUrl}/og-aircon.jpg`
     : "/og-aircon.jpg";
@@ -123,7 +140,7 @@ export default async function Home({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const page = await fetchPage();
+  const page = await fetchPage(locale);
   const menu = await fetchMenu(locale);
   const footer = await fetchFooter();
   const faqBlock = page.layout.find((block) => block.type === "faq");
