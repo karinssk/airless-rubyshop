@@ -1,0 +1,216 @@
+[
+  {
+    "_id": "695e92567261ead0f3a107e1",
+    "name": {
+      "th": "",
+      "en": "Deluxe Room"
+    },
+    "slug": "deluxe-room",
+    "roomCode": "",
+    "status": "published",
+    "categoryId": "695e92717261ead0f3a107eb",
+    "maxGuests": 2,
+    "size": "35 Sq.m.",
+    "description": {
+      "th": "",
+      "en": "This Deluxe Room comes with a single/twin bed (as per request) and large window and scenic view of the city and surrounding area. Our hotel is the tallest building in the vicinity and hence allows you to have a terrific view around the hotel. With more than 35 sq.m. size, all rooms welcome guests with a vinyl flooring, complete with spacious closets and luggage bench. For business travellers in particular, the working space is oversized and fully equipped."
+    },
+    "shortDescription": {
+      "th": "",
+      "en": "This Deluxe Room comes with a single/twin bed (as per request) and large window and scenic view of Suvarnabhumi Airport."
+    },
+    "pricePerNight": 1999,
+    "pricePerMonth": 29999,
+    "coverImage": "/uploads/1768318075459-1767965505328-hotel2.webp",
+    "gallery": [
+      "/uploads/1767966728722-hotel3499894781.webp",
+      "/uploads/1767966728723-hotel2.webp"
+    ],
+    "videos": [],
+    "beddingOptions": [
+      {
+        "type": "2 signle",
+        "description": ""
+      }
+    ],
+    "facilities": {
+      "bathroomFeatures": [
+        "1"
+      ],
+      "climateControl": [
+        "1"
+      ],
+      "entertainment": [
+        "1"
+      ],
+      "generalAmenities": [
+        "1"
+      ],
+      "internet": [
+        "1"
+      ],
+      "kitchenFeatures": [
+        "1"
+      ],
+      "roomFeatures": []
+    },
+    "totalRooms": 1,
+    "rating": 0,
+    "reviewCount": 0,
+    "seo": {
+      "title": {
+        "th": "",
+        "en": "Deluxe Room"
+      },
+      "description": {
+        "th": "",
+        "en": "This Deluxe Room comes with a single/twin bed (as per request) and large window and scenic view of Suvarnabhumi Airport."
+      },
+      "image": "/uploads/1768318075459-1767965505328-hotel2.webp"
+    },
+    "publishedAt": "2026-01-07T17:05:26.575Z",
+    "createdAt": "2026-01-07T17:05:26.610Z",
+    "updatedAt": "2026-01-13T15:28:00.581Z"
+  },
+  {
+    "_id": "696104790847cd36cf6f9939",
+    "name": {
+      "th": "",
+      "en": "Family Suite"
+    },
+    "slug": "family-suite",
+    "roomCode": "",
+    "status": "published",
+    "categoryId": "696104290847cd36cf6f992e",
+    "maxGuests": 2,
+    "size": "70 Sq.m.",
+    "description": {
+      "th": "",
+      "en": "Family Room has a living room and 1 bedroom. The rooms are fitted 1 King Bed and 2 single beds in 2 separate rooms. The room features amenities such as minibar, working desks, fridge, in-room safety box, free WiFi, flat-screen TV, and various toilet amenities."
+    },
+    "shortDescription": {
+      "th": "",
+      "en": "Family Room has a living room and 1 bedroom. The rooms are fitted 1 King Bed and 2 single beds in 2 separate rooms. The room features amenities such as minibar, working desks, fridge, in-room safety box, free WiFi, flat-screen TV, and various toilet amenities."
+    },
+    "pricePerNight": 5990,
+    "pricePerMonth": 299900,
+    "coverImage": "/uploads/1767965797816-hotel2.webp",
+    "gallery": [
+      "/uploads/1767966744246-hotel_5images-(1).webp",
+      "/uploads/1767966744248-hotel41957b3fa3e44c6300388f1d1d9a22f87.webp"
+    ],
+    "videos": [],
+    "beddingOptions": [],
+    "facilities": {
+      "bathroomFeatures": [
+        "1"
+      ],
+      "climateControl": [
+        "2"
+      ],
+      "entertainment": [
+        "2"
+      ],
+      "generalAmenities": [
+        "4"
+      ],
+      "internet": [
+        "2"
+      ],
+      "kitchenFeatures": [
+        "5"
+      ],
+      "roomFeatures": [
+        "3"
+      ]
+    },
+    "totalRooms": 1,
+    "rating": 0,
+    "reviewCount": 0,
+    "seo": {
+      "title": {
+        "th": "",
+        "en": "Family Suite"
+      },
+      "description": {
+        "th": "",
+        "en": "Family Room has a living room and 1 bedroom. The rooms are fitted 1 King Bed and 2 single beds in 2 separate rooms. The room features amenities such as minibar, working desks, fridge, in-room safety box, free WiFi, flat-screen TV, and various toilet amenities."
+      },
+      "image": "/uploads/1767965797816-hotel2.webp"
+    },
+    "publishedAt": "2026-01-09T13:36:57.708Z",
+    "createdAt": "2026-01-09T13:36:57.715Z",
+    "updatedAt": "2026-01-09T13:52:28.291Z"
+  },
+  {
+    "_id": "69610b0a22aea2ee9c9e1498",
+    "name": {
+      "th": "",
+      "en": "Executive Suite"
+    },
+    "slug": "executive-suite",
+    "roomCode": "",
+    "status": "published",
+    "categoryId": "69610ac322aea2ee9c9e148b",
+    "maxGuests": 4,
+    "size": " 70 Sq.m.",
+    "description": {
+      "th": "",
+      "en": "Executive Suite surrounds guests with a residential feel, extraordinary amenities, and features separate two private sleeping areas and spacious living rooms. Rooms are all furnished in Thai-style classic luxury furniture and completed with indulgent marble bathrooms."
+    },
+    "shortDescription": {
+      "th": "",
+      "en": "Executive Suite surrounds guests with a residential feel, extraordinary amenities, and features separate two private sleeping areas and spacious living rooms. Rooms are all furnished in Thai-style classic luxury furniture and completed with indulgent marble bathrooms."
+    },
+    "pricePerNight": 5000,
+    "pricePerMonth": 50000,
+    "coverImage": "/uploads/1767967475745-hotel_5images-(1).webp",
+    "gallery": [
+      "/uploads/1767967482514-hotel41957b3fa3e44c6300388f1d1d9a22f87.webp",
+      "/uploads/1767967482517-hotel3499894781.webp",
+      "/uploads/1767967482521-hotel2.webp",
+      "/uploads/1767967482525-Maison-Hotel-Bangkok_Natee-Deluxe-King1-1-Large-e1700316324965.webp",
+      "/uploads/1767967482530-hotel2.webp"
+    ],
+    "videos": [],
+    "beddingOptions": [],
+    "facilities": {
+      "bathroomFeatures": [
+        "6"
+      ],
+      "climateControl": [
+        "6"
+      ],
+      "entertainment": [
+        "6"
+      ],
+      "generalAmenities": [
+        "6"
+      ],
+      "internet": [],
+      "kitchenFeatures": [
+        "6"
+      ],
+      "roomFeatures": [
+        "6"
+      ]
+    },
+    "totalRooms": 6,
+    "rating": 0,
+    "reviewCount": 0,
+    "seo": {
+      "title": {
+        "th": "",
+        "en": "Executive Suite"
+      },
+      "description": {
+        "th": "",
+        "en": "Executive Suite surrounds guests with a residential feel, extraordinary amenities, and features separate two private sleeping areas and spacious living rooms. Rooms are all furnished in Thai-style classic luxury furniture and completed with indulgent marble bathrooms."
+      },
+      "image": "/uploads/1767967475745-hotel_5images-(1).webp"
+    },
+    "publishedAt": "2026-01-09T14:04:58.052Z",
+    "createdAt": "2026-01-09T14:04:58.070Z",
+    "updatedAt": "2026-01-09T14:04:58.070Z"
+  }
+]

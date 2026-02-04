@@ -1,0 +1,91 @@
+[
+  {
+    "_id": "69567cf729179c1c4245d8b8",
+    "name": "main",
+    "items": [
+      {
+        "id": "9d28a9a7-404a-4589-9393-7229b4b8d620",
+        "label": {
+          "th": "หน้าหลัก",
+          "en": "Home"
+        },
+        "href": "/home",
+        "children": []
+      },
+      {
+        "id": "4529699f-574b-4196-9c03-b7f0766b2ac8",
+        "label": {
+          "th": "ห้องพัก",
+          "en": "Rooms"
+        },
+        "href": "/rooms",
+        "children": []
+      },
+      {
+        "id": "44d7e404-51f4-4a62-bf3b-163846cd9887",
+        "label": {
+          "th": "ฟิตเนส",
+          "en": "Fitness"
+        },
+        "href": "/fitness",
+        "children": [
+          {
+            "id": "33f46fb4-afcc-4e9d-8adc-5b38fd058118",
+            "label": {
+              "th": "Fitness",
+              "en": "Fitness"
+            },
+            "href": "/fitness"
+          }
+        ]
+      },
+      {
+        "id": "052f3be4-0b07-438b-8c83-0d04cd8bc545",
+        "label": {
+          "th": "เกี่ยวกับเรา",
+          "en": "About us"
+        },
+        "href": "/contact",
+        "children": []
+      },
+      {
+        "id": "c3bf9dc0-4a98-475a-a68e-43370314a93f",
+        "label": {
+          "th": "ติดต่อเรา",
+          "en": "Contact us"
+        },
+        "href": "/contact",
+        "children": []
+      }
+    ],
+    "createdAt": "2026-01-01T13:56:07.225Z",
+    "updatedAt": "2026-01-14T08:10:11.425Z",
+    "cta": {
+      "label": {
+        "th": "จองห้องพัก",
+        "en": ""
+      },
+      "href": "/booking"
+    },
+    "logoUrl": "/uploads/logo/rubyshop-no-bg-250pxx100px.jpg",
+    "contactBar": {
+      "enabled": false,
+      "backgroundColor": "#eeff00",
+      "textColor": "#000000",
+      "items": [
+        {
+          "id": "4eeb5736-2635-49a9-b2d9-3dbfac697466",
+          "icon": "📞",
+          "text": "0641989925",
+          "link": "0641989925"
+        },
+        {
+          "id": "a0be0d9b-3121-4822-8c56-1c7205ce23af",
+          "icon": "📞",
+          "text": "New Contact",
+          "link": ""
+        }
+      ]
+    }
+  }
+]

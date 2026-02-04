@@ -1,0 +1,74 @@
+[
+  {
+    "_id": "6961039d0847cd36cf6f9902",
+    "roomTypeId": "695e92567261ead0f3a107e1",
+    "roomNumber": "Delux 1",
+    "floor": 1,
+    "building": "main building",
+    "status": "available",
+    "notes": "",
+    "isActive": true,
+    "createdAt": "2026-01-09T13:33:17.205Z",
+    "updatedAt": "2026-01-09T13:34:00.289Z"
+  },
+  {
+    "_id": "696103ad0847cd36cf6f9908",
+    "roomTypeId": "695e92567261ead0f3a107e1",
+    "roomNumber": "delux 2",
+    "floor": 1,
+    "building": "main building",
+    "status": "available",
+    "notes": "",
+    "isActive": true,
+    "createdAt": "2026-01-09T13:33:33.589Z",
+    "updatedAt": "2026-01-09T13:34:11.523Z"
+  },
+  {
+    "_id": "696103c20847cd36cf6f990e",
+    "roomTypeId": "695e92567261ead0f3a107e1",
+    "roomNumber": "delux 3",
+    "floor": 1,
+    "building": "main building",
+    "status": "available",
+    "notes": "",
+    "isActive": true,
+    "createdAt": "2026-01-09T13:33:54.768Z",
+    "updatedAt": "2026-01-09T13:33:54.768Z"
+  },
+  {
+    "_id": "6961049a0847cd36cf6f994b",
+    "roomTypeId": "696104790847cd36cf6f9939",
+    "roomNumber": "Family Suite 101",
+    "floor": 2,
+    "building": "second building",
+    "status": "available",
+    "notes": "Family Suite",
+    "isActive": true,
+    "createdAt": "2026-01-09T13:37:30.018Z",
+    "updatedAt": "2026-01-09T13:37:30.018Z"
+  },
+  {
+    "_id": "69610b1a22aea2ee9c9e14aa",
+    "roomTypeId": "69610b0a22aea2ee9c9e1498",
+    "roomNumber": "Executive Suite 101",
+    "floor": 1,
+    "building": "",
+    "status": "available",
+    "notes": "",
+    "isActive": true,
+    "createdAt": "2026-01-09T14:05:14.148Z",
+    "updatedAt": "2026-01-09T14:05:14.148Z"
+  },
+  {
+    "_id": "69610b2522aea2ee9c9e14b1",
+    "roomTypeId": "69610b0a22aea2ee9c9e1498",
+    "roomNumber": "Executive Suite 102",
+    "floor": 1,
+    "building": "",
+    "status": "available",
+    "notes": "",
+    "isActive": true,
+    "createdAt": "2026-01-09T14:05:25.061Z",
+    "updatedAt": "2026-01-09T14:05:25.061Z"
+  }
+]

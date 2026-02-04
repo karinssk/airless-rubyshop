@@ -1,0 +1,14 @@
+[
+  {
+    "_id": "6958d2f36f241c301b518d96",
+    "name": "test",
+    "company": "test",
+    "email": "test@gmail.com",
+    "phone": "0641989925",
+    "service": "ล้างแอร์สำนักงาน",
+    "details": "test",
+    "status": "read",
+    "createdAt": "2026-01-03T08:27:31.046Z",
+    "updatedAt": "2026-01-03T08:27:40.815Z"
+  }
+]

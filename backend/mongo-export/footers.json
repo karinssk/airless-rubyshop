@@ -1,0 +1,127 @@
+[
+  {
+    "_id": "6957dfc8fca8225ef9b38629",
+    "name": "main",
+    "backgroundColor": "#000000",
+    "brand": {
+      "name": "RUBYSHOP เทคโนโลยีเครื่องมือช่าง",
+      "description": "หจก.รูบี้ช๊อปเราคือผู้นำเข้าจัดหาเครื่องมือสำหรับช่างมืออาชีพเช่น - เครื่องพ่นสีแรงดันสูง - เครื่องพ่นสีกันไฟ - เครื่องพ่นปูนฉาบ - เครื่องตีเส้นถนน - เครื่องกรีดผนัง - เครื่องเลเซอร์ระดับ - เครื่องผสมสี - เครื่องปั่นหน้าปูนและอื่นๆอีกมากมายจากต่างประเทศและสั่งผลิตสินค้าและจัดจำหน่ายทั้งปลึกและส่งลูกค้าจึงเชื่อมันกับเราได้ว่าเราสามารถจัดหาอะไหล่หรือให้คำแนะนำได้สำหรับเครื่องจักรทุกชนิดมีเครื่องให้ท่านทดลองใช้งานกับวัสดุสีของท่านก่อนซื้อ",
+      "logoUrl": "/uploads/logo/rubyshop-no-bg-250pxx100px.jpg"
+    },
+    "social": [
+      {
+        "id": "677fee6b-3b86-4bc7-89ec-3f110469f7e6",
+        "label": "Facebook",
+        "href": "https://facebook.com",
+        "icon": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/facebook.svg"
+      },
+      {
+        "id": "f7ce47a4-3205-46a4-aef0-4660861bd36c",
+        "label": "Line",
+        "href": "https://line.me",
+        "icon": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/line.svg"
+      },
+      {
+        "id": "b39ced2c-577a-44f5-973b-daa72cabcd42",
+        "label": "TikTok",
+        "href": "https://tiktok.com",
+        "icon": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/tiktok.svg"
+      },
+      {
+        "id": "cb892178-65a5-435a-8f92-814421eb27b8",
+        "label": "Instagram",
+        "href": "https://instagram.com",
+        "icon": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/instagram.svg"
+      },
+      {
+        "id": "b55a9fc5-679b-4eb7-a3ae-9000b758b303",
+        "label": "YouTube",
+        "href": "https://youtube.com",
+        "icon": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/youtube.svg"
+      }
+    ],
+    "services": [
+      {
+        "id": "6d9c30f6-a19c-409a-9485-fecb3bb0719e",
+        "label": "Stay",
+        "href": "/services/cleaning"
+      },
+      {
+        "id": "2d2c71d4-d511-4216-a161-8b13f656a47a",
+        "label": "Dine",
+        "href": "/services/installation"
+      },
+      {
+        "id": "1c48ad58-4f67-4090-a8fd-142fa1660808",
+        "label": "Events",
+        "href": "/services/repair"
+      },
+      {
+        "id": "1401563e-2b9a-41af-a346-fb67b60bf375",
+        "label": "SpaFitness",
+        "href": "/services/amc"
+      }
+    ],
+    "menu": [
+      {
+        "id": "63330eed-7c49-4039-9df2-49f763cd29b5",
+        "label": "หน้าแรก",
+        "href": "/"
+      },
+      {
+        "id": "3ea71ab4-40c0-48d4-b9df-341f567b6337",
+        "label": "บริการ",
+        "href": "/services"
+      },
+      {
+        "id": "8c6d02a8-7af3-4984-a237-f6a85a0b9e9f",
+        "label": "เกี่ยวกับเรา",
+        "href": "/about"
+      },
+      {
+        "id": "ee479153-c3d3-4d5f-b007-776e62fb800b",
+        "label": "ลูกค้าของเรา",
+        "href": "/portfolio"
+      },
+      {
+        "id": "f38156b4-a80f-4154-afa1-a169e1d67891",
+        "label": "ติดต่อเรา",
+        "href": "/contact"
+      }
+    ],
+    "contact": [
+      {
+        "id": "da1c5598-d3a9-4f26-821c-d53f98330952",
+        "label": "TH: 092-293-4488",
+        "value": "EN: 092-293-8191",
+        "href": "",
+        "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/phone.svg"
+      },
+      {
+        "id": "2dc5fec6-afee-4179-99cb-118a63a5570a",
+        "label": "บริการ 24 ชั่วโมง",
+        "value": "",
+        "href": "",
+        "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/clock.svg"
+      },
+      {
+        "id": "7a8e06a0-5d9e-44f0-a324-b626394b2962",
+        "label": "info@rubyshop.com",
+        "value": "",
+        "href": "mailto:info@rubyshop.com",
+        "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/envelope.svg"
+      },
+      {
+        "id": "e3b34b61-b436-4906-8226-4fe2ca09fd8e",
+        "label": "บริการทั่วประเทศ",
+        "value": "",
+        "href": "",
+        "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/map-pin.svg"
+      }
+    ],
+    "copyright": "© 2026 RUBYSHOP. All rights reserved.",
+    "subfooter": "RUBYSHOP เทคโนโลยีเครื่องมือช่าง",
+    "createdAt": "2026-01-02T15:10:00.557Z",
+    "updatedAt": "2026-01-11T11:21:09.297Z"
+  }
+]

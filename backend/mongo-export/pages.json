@@ -1,0 +1,862 @@
+[
+  {
+    "_id": "695a2d58c7913d8789b4860a",
+    "title": {
+      "th": "home",
+      "en": ""
+    },
+    "slug": "home",
+    "status": "published",
+    "seo": {
+      "title": {
+        "th": "",
+        "en": ""
+      },
+      "description": {
+        "th": "",
+        "en": ""
+      },
+      "image": "/uploads/logo/rubyshop-no-bg-250pxx100px.jpg"
+    },
+    "theme": {
+      "background": ""
+    },
+    "layout": {
+      "th": [
+        {
+          "type": "hero-with-available-rooms-check",
+          "props": {
+            "title": "RUBYSHOP",
+            "subtitle": "Daily & Monthly Stays",
+            "description": "Find available rooms instantly and book your stay in minutes.",
+            "backgroundImage": "/uploads/1768125755169-hotel-looby.webp",
+            "overlayTitle": "Check available rooms",
+            "overlayButtonText": "Search availability",
+            "buttonBackground": "#030303",
+            "buttonTextColor": "#ffffff"
+          }
+        },
+        {
+          "type": "our-core-services",
+          "props": {
+            "backgroundColor": "#f5f2ed",
+            "heading": "Our Booking Options",
+            "subheading": "Our Core Services",
+            "cardBackgroundColor": "#ffffff",
+            "ctaBackgroundColor": "#f5f2ed",
+            "ctaTextColor": "#111111",
+            "imageHeight": 176,
+            "cardMinHeight": 0,
+            "items": [
+              {
+                "image": "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=900&q=80",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/sparkles.svg",
+                "title": "Daily stays",
+                "subtitle": "Short-Term Booking",
+                "description": "Comfortable rooms for quick trips and weekend getaways.",
+                "ctaText": "Learn more",
+                "ctaHref": "/services/daily"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/cog-6-tooth.svg",
+                "title": "Monthly stays",
+                "subtitle": "Long-Term Booking",
+                "description": "Stable pricing and flexible terms for longer living.",
+                "ctaText": "Learn more",
+                "ctaHref": "/services/monthly"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1502005097973-6a7082348e28?auto=format&fit=crop&w=900&q=80",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/wrench-screwdriver.svg",
+                "title": "Corporate housing",
+                "subtitle": "Business Stays",
+                "description": "Comfortable rooms for teams, projects, and relocations.",
+                "ctaText": "Learn more",
+                "ctaHref": "/services/corporate"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?auto=format&fit=crop&w=900&q=80",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/clipboard-document-check.svg",
+                "title": "Group bookings",
+                "subtitle": "Multi-Room Blocks",
+                "description": "Reserve blocks of rooms for events and team travel.",
+                "ctaText": "Learn more",
+                "ctaHref": "/services/groups"
+              }
+            ]
+          }
+        },
+        {
+          "type": "our-work",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Room Collections",
+            "subheading": "Explore by stay type",
+            "description": "Curated rooms for business, leisure, and long stays.",
+            "items": [
+              {
+                "image": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "title": "CITY HOTELS",
+                "subtitle": "Daily stays"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80",
+                "title": "SERVICED APARTMENTS",
+                "subtitle": "Monthly stays"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80",
+                "title": "BUDGET STAYS",
+                "subtitle": "Smart value"
+              }
+            ]
+          }
+        },
+        {
+          "type": "our-work-gallery",
+          "props": {
+            "backgroundColor": "#f7f5f2",
+            "heading": "Stay Gallery",
+            "subheading": "Real rooms from our listings",
+            "images": [
+              {
+                "url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "caption": "Studio suite"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502005097973-6a7082348e28?auto=format&fit=crop&w=900&q=80",
+                "caption": "Lobby and lounge"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80",
+                "caption": "Rooftop view"
+              }
+            ]
+          }
+        },
+        {
+          "type": "wellness-facilities",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "items": [
+              {
+                "image": "/uploads/1768128122195-hotel-looby.webp",
+                "title": "Fitness & Workspaces",
+                "description": "Modern gyms and co-working lounges designed for productive stays.",
+                "ctaText": "See more",
+                "ctaHref": "/amenities/fitness"
+              },
+              {
+                "image": "/uploads/1768128129096-hotel-looby.webp",
+                "title": "Spa & Relaxation",
+                "description": "Unwind with wellness amenities that make long stays feel easy.",
+                "ctaText": "See more",
+                "ctaHref": "/amenities/spa"
+              }
+            ]
+          }
+        },
+        {
+          "type": "our-work-gallery",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Stay Gallery",
+            "subheading": "Real rooms from our listings",
+            "images": [
+              {
+                "url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "caption": "Studio suite"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502005097973-6a7082348e28?auto=format&fit=crop&w=900&q=80",
+                "caption": "Lobby and lounge"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80",
+                "caption": "Rooftop view"
+              }
+            ]
+          }
+        },
+        {
+          "type": "grand-events",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Grand Events",
+            "description": "Host unforgettable moments in sophisticated ballrooms and town hall spaces, designed to elevate weddings, corporate gatherings, and celebrations.",
+            "ctaText": "Explore more",
+            "ctaHref": "/events",
+            "ctaBackground": "#6b6f2d",
+            "ctaTextColor": "#ffffff",
+            "imageTop": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80",
+            "imageBottom": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=900&q=80",
+            "imageSide": "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80"
+          }
+        },
+        {
+          "type": "frequently-asked-questions",
+          "props": {
+            "backgroundColor": "#f5f2ed",
+            "title": "Frequently Asked Questions",
+            "subtitle": "Frequently Asked Questions",
+            "items": [
+              {
+                "question": "Which areas do you cover?",
+                "answer": "We cover Bangkok and major cities across Thailand through trusted partners."
+              },
+              {
+                "question": "What are the starting rates?",
+                "answer": "Rates vary by location and stay length. Contact us for the best available price."
+              },
+              {
+                "question": "What is included in a stay?",
+                "answer": "Each listing shows included amenities, utilities, and policies clearly."
+              }
+            ]
+          }
+        },
+        {
+          "type": "about-us-text",
+          "props": {
+            "backgroundColor": "#111111",
+            "heading": "About Us",
+            "subheading": "Room Reservation Services",
+            "description": "Your partner for daily and monthly room bookings.",
+            "tagline": "Stay Flexible, Stay Comfortable"
+          }
+        }
+      ],
+      "en": [
+        {
+          "type": "hero-with-available-rooms-check",
+          "props": {
+            "title": "RUBYSHOP",
+            "subtitle": "Daily & Monthly Stays",
+            "description": "Find available rooms instantly and book your stay in minutes.",
+            "backgroundImage": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1400&q=80",
+            "overlayTitle": "Check available rooms",
+            "overlayButtonText": "Search availability",
+            "titleColor": "#ffffff",
+            "subtitleColor": "#cbd5f5",
+            "descriptionColor": "#e2e8f0",
+            "buttonBackground": "#2563eb",
+            "buttonTextColor": "#ffffff"
+          }
+        },
+        {
+          "type": "our-work-gallery",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Stay Gallery",
+            "subheading": "Real rooms from our listings",
+            "images": [
+              {
+                "url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "caption": "Studio suite"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502005097973-6a7082348e28?auto=format&fit=crop&w=900&q=80",
+                "caption": "Lobby and lounge"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80",
+                "caption": "Rooftop view"
+              }
+            ]
+          }
+        },
+        {
+          "type": "grand-events",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Grand Events",
+            "description": "Host unforgettable moments in sophisticated ballrooms and town hall spaces, designed to elevate weddings, corporate gatherings, and celebrations.",
+            "ctaText": "Explore more",
+            "ctaHref": "/events",
+            "ctaBackground": "#6b6f2d",
+            "ctaTextColor": "#ffffff",
+            "imageTop": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80",
+            "imageBottom": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=900&q=80",
+            "imageSide": "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80"
+          }
+        },
+        {
+          "type": "wellness-facilities",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "items": [
+              {
+                "image": "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1200&q=80",
+                "title": "Fitness & Workspaces",
+                "description": "Modern gyms and co-working lounges designed for productive stays.",
+                "ctaText": "See more",
+                "ctaHref": "/amenities/fitness"
+              },
+              {
+                "image": "/uploads/1768128160652-hotel-looby.webp",
+                "title": "Spa & Relaxation",
+                "description": "Unwind with wellness amenities that make long stays feel easy.",
+                "ctaText": "See more",
+                "ctaHref": "/amenities/spa"
+              }
+            ]
+          }
+        },
+        {
+          "type": "gallery",
+          "props": {
+            "title": "Latest stays",
+            "backgroundColor": "",
+            "images": [
+              {
+                "url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "caption": "City studio"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "createdAt": "2026-01-04T09:05:28.558Z",
+    "updatedAt": "2026-01-15T14:35:02.069Z"
+  },
+  {
+    "_id": "695ab26490f6f791ea7e98f5",
+    "title": {
+      "th": "about",
+      "en": ""
+    },
+    "slug": "about",
+    "status": "published",
+    "seo": {
+      "title": {
+        "th": "",
+        "en": ""
+      },
+      "description": {
+        "th": "",
+        "en": ""
+      },
+      "image": ""
+    },
+    "theme": {
+      "background": ""
+    },
+    "layout": {
+      "th": [
+        {
+          "type": "hero-images",
+          "props": {
+            "backgroundColor": "",
+            "images": [
+              {
+                "image": "/uploads/1768131109367-massage-spa3.webp",
+                "title": "",
+                "subtitle": ""
+              }
+            ]
+          }
+        },
+        {
+          "type": "achievement-expreience",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "items": [
+              {
+                "value": "2,500+",
+                "label": "Bookings",
+                "sublabel": "Completed Stays",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/users.svg"
+              },
+              {
+                "value": "150+",
+                "label": "Properties",
+                "sublabel": "Verified Listings",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/briefcase.svg"
+              },
+              {
+                "value": "30+",
+                "label": "Cities",
+                "sublabel": "Across Thailand",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/trophy.svg"
+              },
+              {
+                "value": "24/7",
+                "label": "Support",
+                "sublabel": "We are here anytime",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/clock.svg"
+              }
+            ]
+          }
+        },
+        {
+          "type": "our-core-services",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Our Booking Options",
+            "subheading": "Our Core Services",
+            "cardBackgroundColor": "#ffffff",
+            "ctaBackgroundColor": "#111111",
+            "ctaTextColor": "#ffffff",
+            "imageHeight": 176,
+            "cardMinHeight": 0,
+            "items": [
+              {
+                "image": "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=900&q=80",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/sparkles.svg",
+                "title": "Daily stays",
+                "subtitle": "Short-Term Booking",
+                "description": "Comfortable rooms for quick trips and weekend getaways.",
+                "ctaText": "Learn more",
+                "ctaHref": "/services/daily"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/cog-6-tooth.svg",
+                "title": "Monthly stays",
+                "subtitle": "Long-Term Booking",
+                "description": "Stable pricing and flexible terms for longer living.",
+                "ctaText": "Learn more",
+                "ctaHref": "/services/monthly"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1502005097973-6a7082348e28?auto=format&fit=crop&w=900&q=80",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/wrench-screwdriver.svg",
+                "title": "Corporate housing",
+                "subtitle": "Business Stays",
+                "description": "Comfortable rooms for teams, projects, and relocations.",
+                "ctaText": "Learn more",
+                "ctaHref": "/services/corporate"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?auto=format&fit=crop&w=900&q=80",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/clipboard-document-check.svg",
+                "title": "Group bookings",
+                "subtitle": "Multi-Room Blocks",
+                "description": "Reserve blocks of rooms for events and team travel.",
+                "ctaText": "Learn more",
+                "ctaHref": "/services/groups"
+              }
+            ]
+          }
+        },
+        {
+          "type": "ready-for-service",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Ready to book your next stay?",
+            "description": "Share your dates and budget and we will match you with the best rooms.",
+            "primaryCtaText": "Check availability",
+            "primaryCtaHref": "/contact",
+            "primaryIcon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/document-text.svg",
+            "secondaryCtaText": "Call us: 02-000-0000",
+            "secondaryCtaHref": "tel:020000000",
+            "secondaryIcon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/phone.svg",
+            "primaryCtaBackground": "#111111",
+            "primaryCtaTextColor": "#ffffff",
+            "secondaryCtaBackground": "#111111",
+            "secondaryCtaTextColor": "#ffffff",
+            "iconColor": "#ffffff"
+          }
+        }
+      ],
+      "en": []
+    },
+    "createdAt": "2026-01-04T18:33:08.484Z",
+    "updatedAt": "2026-01-11T11:32:08.447Z"
+  },
+  {
+    "_id": "695ab30790f6f791ea7e990f",
+    "title": {
+      "th": "contact",
+      "en": ""
+    },
+    "slug": "contact",
+    "status": "published",
+    "seo": {
+      "title": {
+        "th": "",
+        "en": ""
+      },
+      "description": {
+        "th": "",
+        "en": ""
+      },
+      "image": ""
+    },
+    "theme": {
+      "background": ""
+    },
+    "layout": {
+      "th": [
+        {
+          "type": "contact-channels",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Contact Channels",
+            "subheading": "Reach us anytime for booking support",
+            "channels": [
+              {
+                "id": "channel-1",
+                "title": "Phone",
+                "subtitle": "Phone",
+                "primary": "TH: 02-000-0000",
+                "secondary": "EN: 02-000-0001",
+                "note": "Daily support 09:00 - 20:00",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/phone.svg"
+              },
+              {
+                "id": "channel-2",
+                "title": "Email",
+                "subtitle": "Email",
+                "primary": "hello@roomreserve.com",
+                "secondary": "",
+                "note": "Replies within 24 hours",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/envelope.svg"
+              },
+              {
+                "id": "channel-3",
+                "title": "Service Area",
+                "subtitle": "Service Area",
+                "primary": "Major cities across Thailand",
+                "secondary": "Nationwide partner coverage",
+                "note": "",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/map-pin.svg"
+              },
+              {
+                "id": "channel-4",
+                "title": "Working Hours",
+                "subtitle": "Working Hours",
+                "primary": "Mon - Fri: 09:00 - 18:00",
+                "secondary": "Sat - Sun: 10:00 - 16:00",
+                "note": "Emergency line available",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/clock.svg"
+              }
+            ],
+            "ctaTitle": "Need help with a booking?",
+            "ctaSubtitle": "Call or chat with our reservation team",
+            "ctaButtons": [
+              {
+                "id": "cta-1",
+                "label": "Call TH: 02-000-0000",
+                "href": "tel:020000000",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/phone.svg"
+              },
+              {
+                "id": "cta-2",
+                "label": "Call EN: 02-000-0001",
+                "href": "tel:020000001",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/phone.svg"
+              }
+            ]
+          }
+        },
+        {
+          "type": "our-work-gallery",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Stay Gallery",
+            "subheading": "Real rooms from our listings",
+            "images": [
+              {
+                "url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "caption": "Studio suite"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502005097973-6a7082348e28?auto=format&fit=crop&w=900&q=80",
+                "caption": "Lobby and lounge"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80",
+                "caption": "Rooftop view"
+              }
+            ]
+          }
+        },
+        {
+          "type": "our-work",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Room Collections",
+            "subheading": "Explore by stay type",
+            "description": "Curated rooms for business, leisure, and long stays.",
+            "items": [
+              {
+                "image": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "title": "CITY HOTELS",
+                "subtitle": "Daily stays"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80",
+                "title": "SERVICED APARTMENTS",
+                "subtitle": "Monthly stays"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80",
+                "title": "BUDGET STAYS",
+                "subtitle": "Smart value"
+              }
+            ]
+          }
+        },
+        {
+          "type": "wellness-facilities",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "items": [
+              {
+                "image": "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1200&q=80",
+                "title": "Fitness & Workspaces",
+                "description": "Modern gyms and co-working lounges designed for productive stays.",
+                "ctaText": "See more",
+                "ctaHref": "/amenities/fitness"
+              },
+              {
+                "image": "https://images.unsplash.com/photo-1501117716987-c8e1ecb21000?auto=format&fit=crop&w=1200&q=80",
+                "title": "Spa & Relaxation",
+                "description": "Unwind with wellness amenities that make long stays feel easy.",
+                "ctaText": "See more",
+                "ctaHref": "/amenities/spa"
+              }
+            ]
+          }
+        }
+      ],
+      "en": []
+    },
+    "createdAt": "2026-01-04T18:35:51.997Z",
+    "updatedAt": "2026-01-11T11:32:55.304Z"
+  },
+  {
+    "_id": "696380a720a455dd710b3eae",
+    "title": {
+      "th": "Massage-Spa",
+      "en": "Massage-Spa"
+    },
+    "slug": "massage-spa",
+    "status": "published",
+    "seo": {
+      "title": {
+        "th": "",
+        "en": ""
+      },
+      "description": {
+        "th": "",
+        "en": ""
+      }
+    },
+    "theme": {
+      "background": ""
+    },
+    "layout": {
+      "th": [
+        {
+          "type": "hero",
+          "props": {
+            "title": "Room Reservation Services – Daily & Monthly",
+            "subtitle": "Flexible stays with transparent pricing",
+            "description": "Discover verified rooms, compare locations, and book daily or monthly with ease.",
+            "primaryCtaText": "Check availability",
+            "primaryCtaHref": "#booking",
+            "secondaryCtaText": "View rooms",
+            "secondaryCtaHref": "#rooms",
+            "backgroundImage": "",
+            "backgroundColor": "",
+            "slides": [
+              {
+                "image": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "title": "Daily & monthly stays",
+                "subtitle": "Find the right room at the right price"
+              }
+            ]
+          }
+        }
+      ],
+      "en": [
+        {
+          "type": "hero-images",
+          "props": {
+            "backgroundColor": "",
+            "images": [
+              {
+                "image": "/uploads/1768128834956-massage-spa.webp",
+                "title": "",
+                "subtitle": ""
+              },
+              {
+                "image": "/uploads/1768128900728-massage-spa2.webp",
+                "title": "",
+                "subtitle": ""
+              },
+              {
+                "image": "/uploads/1768128905379-massage-spa3.webp",
+                "title": "",
+                "subtitle": ""
+              }
+            ]
+          }
+        },
+        {
+          "type": "our-work-gallery",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Stay Gallery",
+            "subheading": "Real rooms from our listings",
+            "images": [
+              {
+                "url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80",
+                "caption": "Studio suite"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502005097973-6a7082348e28?auto=format&fit=crop&w=900&q=80",
+                "caption": "Lobby and lounge"
+              },
+              {
+                "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80",
+                "caption": "Rooftop view"
+              }
+            ]
+          }
+        },
+        {
+          "type": "ready-for-service",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Ready to book your next stay?",
+            "description": "Share your dates and budget and we will match you with the best rooms.",
+            "primaryCtaText": "Check availability",
+            "primaryCtaHref": "/contact",
+            "primaryIcon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/document-text.svg",
+            "secondaryCtaText": "Call us: 02-000-0000",
+            "secondaryCtaHref": "tel:020000000",
+            "secondaryIcon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/phone.svg",
+            "primaryCtaBackground": "#111111",
+            "primaryCtaTextColor": "#ffffff",
+            "secondaryCtaBackground": "#111111",
+            "secondaryCtaTextColor": "#ffffff",
+            "iconColor": "#ffffff"
+          }
+        }
+      ]
+    },
+    "createdAt": "2026-01-11T10:51:19.365Z",
+    "updatedAt": "2026-01-11T10:55:48.289Z"
+  },
+  {
+    "_id": "696381d220a455dd710b3ecf",
+    "title": {
+      "th": "fitness",
+      "en": "fitness"
+    },
+    "slug": "fitness",
+    "status": "published",
+    "seo": {
+      "title": {
+        "th": "",
+        "en": ""
+      },
+      "description": {
+        "th": "",
+        "en": ""
+      }
+    },
+    "theme": {
+      "background": ""
+    },
+    "layout": {
+      "th": [
+        {
+          "type": "hero-images",
+          "props": {
+            "backgroundColor": "",
+            "images": [
+              {
+                "image": "/uploads/1768129012776-massage-spa2.webp",
+                "title": "",
+                "subtitle": ""
+              }
+            ]
+          }
+        },
+        {
+          "type": "why-choose-us",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "Why Choose Room Reservation Services",
+            "subheading": "Why Choose Us",
+            "cardBackgroundColor": "#ffffff",
+            "items": [
+              {
+                "title": "Verified listings",
+                "subtitle": "Trusted Rooms",
+                "description": "Every property is checked for quality, location, and accuracy.",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/bolt.svg"
+              },
+              {
+                "title": "Monthly savings",
+                "subtitle": "Better Rates",
+                "description": "Access discounted rates and flexible terms for longer stays.",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/badge-check.svg"
+              },
+              {
+                "title": "Fast booking",
+                "subtitle": "Instant Confirmation",
+                "description": "Book quickly with clear policies and responsive support.",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/clock.svg"
+              },
+              {
+                "title": "Local support",
+                "subtitle": "On-the-Ground Help",
+                "description": "We help with move-in, extensions, and any stay issues.",
+                "icon": "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/globe-alt.svg"
+              }
+            ]
+          }
+        },
+        {
+          "type": "service-process",
+          "props": {
+            "backgroundColor": "#ffffff",
+            "heading": "How Booking Works",
+            "subheading": "Booking Process",
+            "circleColor": "#111111",
+            "titleColor": "#111111",
+            "subtitleColor": "#111111",
+            "lineColor": "#e5e5e5",
+            "descriptionColor": "#111111",
+            "items": [
+              {
+                "step": "01",
+                "title": "Search stays",
+                "subtitle": "Find Your Room",
+                "description": "Choose location, dates, and stay type to see options."
+              },
+              {
+                "step": "02",
+                "title": "Compare details",
+                "subtitle": "Review Options",
+                "description": "Compare photos, amenities, policies, and pricing."
+              },
+              {
+                "step": "03",
+                "title": "Confirm booking",
+                "subtitle": "Secure Your Stay",
+                "description": "Reserve instantly with clear cancellation terms."
+              },
+              {
+                "step": "04",
+                "title": "Check in",
+                "subtitle": "Enjoy Your Stay",
+                "description": "We support you for extensions or special requests."
+              }
+            ]
+          }
+        }
+      ],
+      "en": []
+    },
+    "createdAt": "2026-01-11T10:56:18.369Z",
+    "updatedAt": "2026-01-11T10:57:09.818Z"
+  }
+]

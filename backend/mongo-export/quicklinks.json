@@ -1,0 +1,21 @@
+[
+  {
+    "_id": "69594a3caa7c598c50e080de",
+    "name": "main",
+    "whatsapp": {
+      "enabled": false,
+      "href": "https://wa.me/66922934488"
+    },
+    "line": {
+      "enabled": false,
+      "href": "https://line.me"
+    },
+    "phone": {
+      "enabled": false,
+      "href": "tel:092-293-4488",
+      "label": "092-293-4488"
+    },
+    "createdAt": "2026-01-03T16:56:28.974Z",
+    "updatedAt": "2026-01-15T14:39:45.431Z"
+  }
+]

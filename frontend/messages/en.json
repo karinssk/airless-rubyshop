@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "title": "RUBYSHOP | Daily & Monthly Room Reservations",
+    "siteName": "RUBYSHOP",
+    "description": "Book daily or monthly stays in Chinatown, Bangkok. View real-time availability, transparent pricing, and fast confirmation.",
+    "keywords": "room reservation, daily stay, monthly stay, Bangkok hotel, Chinatown hotel, RUBYSHOP, book room"
+  },
+  "nav": {
+    "home": "Home",
+    "services": "Rooms",
+    "products": "Offers",
+    "about": "About Us",
+    "contact": "Contact",
+    "blog": "Blog",
+    "calendar": "Calendar"
+  },
+  "common": {
+    "learnMore": "Learn More",
+    "contactUs": "Contact Us",
+    "requestQuote": "Request Booking",
+    "readMore": "Read More",
+    "viewAll": "View All",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "close": "Close",
+    "loading": "Loading...",
+    "search": "Search",
+    "language": "Language"
+  },
+  "hero": {
+    "title": "Daily & Monthly Room Reservations",
+    "subtitle": "Stay in the heart of Chinatown, Bangkok",
+    "cta": "Check Availability"
+  },
+  "services": {
+    "title": "Available Rooms",
+    "subtitle": "Find the right room for short stays or longer monthly bookings",
+    "installation": "Daily Stay",
+    "maintenance": "Monthly Stay",
+    "repair": "Family Stay",
+    "cleaning": "Business Stay"
+  },
+  "products": {
+    "title": "Room Packages",
+    "subtitle": "Flexible options with transparent pricing",
+    "viewDetails": "View Details",
+    "addToCart": "Reserve Now",
+    "price": "Price",
+    "contact": "Contact for Custom Quote"
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Your trusted room reservation partner",
+    "experience": "Years of Hosting",
+    "customers": "Happy Guests",
+    "projects": "Rooms Managed"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch for bookings and special requests",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
+    "sendMessage": "Send Message",
+    "address": "Address",
+    "workingHours": "Working Hours"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "followUs": "Follow Us",
+    "quickLinks": "Quick Links",
+    "contactInfo": "Contact Information"
+  },
+  "chat": {
+    "online": "Online",
+    "offline": "Offline",
+    "typeMessage": "Type a message...",
+    "send": "Send",
+    "startChat": "Start Chat"
+  }
+}

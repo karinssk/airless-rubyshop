@@ -1,0 +1,50 @@
+[
+  {
+    "_id": "695e92717261ead0f3a107eb",
+    "name": {
+      "th": "deluxe",
+      "en": "deluxe"
+    },
+    "slug": "deluxe",
+    "description": {
+      "th": "Deluxe Airport View Room",
+      "en": "Deluxe Airport View Room"
+    },
+    "order": 0,
+    "icon": "",
+    "createdAt": "2026-01-07T17:05:53.494Z",
+    "updatedAt": "2026-01-07T17:05:53.494Z"
+  },
+  {
+    "_id": "696104290847cd36cf6f992e",
+    "name": {
+      "th": "Family Suite",
+      "en": "Family Suite"
+    },
+    "slug": "family-suite",
+    "description": {
+      "th": "Family Suite",
+      "en": "Family Suite"
+    },
+    "order": 1,
+    "icon": "",
+    "createdAt": "2026-01-09T13:35:37.988Z",
+    "updatedAt": "2026-01-09T13:35:37.988Z"
+  },
+  {
+    "_id": "69610ac322aea2ee9c9e148b",
+    "name": {
+      "th": "Executive Suite",
+      "en": "Executive Suite"
+    },
+    "slug": "executive-suite",
+    "description": {
+      "th": "Executive Suite",
+      "en": "Executive Suite"
+    },
+    "order": 0,
+    "icon": "",
+    "createdAt": "2026-01-09T14:03:47.589Z",
+    "updatedAt": "2026-01-09T14:03:47.589Z"
+  }
+]

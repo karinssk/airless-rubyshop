@@ -1,0 +1,115 @@
+[
+  {
+    "_id": "6959f809aabab567286a5003",
+    "name": "main",
+    "items": [
+      {
+        "id": "4cd362e4-10e0-413c-ba3e-089ec7cc1295",
+        "label": "Pages Management",
+        "href": "",
+        "icon": "",
+        "permission": "owner-only",
+        "children": [
+          {
+            "id": "59a6b9c4-17b3-42a3-91cd-80d2a4afabe7",
+            "label": "Pages",
+            "href": "/pages"
+          },
+          {
+            "id": "960fb189-cb43-42c9-ac36-750cb7df8d5a",
+            "label": "Navbar",
+            "href": "/menu"
+          },
+          {
+            "id": "aec9f3de-9a5b-4dd5-a1cd-c581c166a9d0",
+            "label": "Footer",
+            "href": "/footer"
+          },
+          {
+            "id": "7b4dae31-72e9-4d7c-8381-25cfd7f91eec",
+            "label": "Quick Links",
+            "href": "/quick-links"
+          }
+        ]
+      },
+      {
+        "id": "86d2d18f-6586-4cc7-a506-ce1fc273f9d6",
+        "label": "Admin",
+        "href": "",
+        "icon": "",
+        "permission": "everyone",
+        "children": [
+          {
+            "id": "71032994-0427-4145-8fa3-e1429ab82292",
+            "label": "Chat",
+            "href": "/chat"
+          }
+        ]
+      },
+      {
+        "id": "a62ddf28-b909-48e5-956d-1058292739bc",
+        "label": "Settings",
+        "href": "",
+        "icon": "",
+        "permission": "owner-only",
+        "children": [
+          {
+            "id": "de27c828-d7db-470a-8113-5d832d80342d",
+            "label": "Admin Menu",
+            "href": "/admin-menu"
+          }
+        ]
+      },
+      {
+        "id": "174c8f54-668e-4fa2-9e6d-5f0bf7416009",
+        "label": "Rooms",
+        "href": "/rooms",
+        "icon": "",
+        "permission": "everyone",
+        "children": []
+      },
+      {
+        "id": "9d70afe2-90c9-433c-a139-db5761e9f623",
+        "label": "Bookings",
+        "href": "/bookings",
+        "icon": "",
+        "permission": "everyone",
+        "children": []
+      },
+      {
+        "id": "637dbd1c-3a28-457a-be2f-8eb3074586aa",
+        "label": "Calendar-reservation",
+        "href": "/calendar-reservation",
+        "icon": "",
+        "permission": "everyone",
+        "children": []
+      },
+      {
+        "id": "5fc6368d-9262-47b8-a1b0-e746ec6e498d",
+        "label": "payment-setting",
+        "href": "/payment-setting",
+        "icon": "",
+        "permission": "everyone",
+        "children": []
+      },
+      {
+        "id": "ee3b37e9-df38-40f9-a5db-ee94558f1807",
+        "label": "promo-codes",
+        "href": "/promo-codes",
+        "icon": "",
+        "permission": "everyone",
+        "children": []
+      },
+      {
+        "id": "5e5afc79-b0e2-4e9b-92b8-c4b745113926",
+        "label": "popup-image",
+        "href": "/popup-image",
+        "icon": "",
+        "permission": "everyone",
+        "children": []
+      }
+    ],
+    "createdAt": "2026-01-04T05:18:01.813Z",
+    "updatedAt": "2026-01-16T13:24:14.217Z"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "_id": "6963500ebb49724827091076",
+    "provider": "manual",
+    "createdAt": "2026-01-11T07:23:58.927Z",
+    "updatedAt": "2026-01-15T16:51:12.910Z",
+    "bankAccounts": [
+      {
+        "bankName": "nnl",
+        "accountName": "bbl",
+        "accountNumber": "1234567890",
+        "_id": "69691b009409bfc0b3f88ded"
+      }
+    ],
+    "payOnSiteEnabled": true,
+    "promptPayQrImage": ""
+  }
+]
