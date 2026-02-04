@@ -36,11 +36,6 @@ export async function generateMetadata({
   const siteName = t('siteName');
   const description = t('description');
 
-  // Build hreflang for alternate languages only (exclude current locale)
-  const alternateLanguages: Record<string, string> = {};
-  if (locale !== 'th') alternateLanguages['th'] = `${baseUrl}/th`;
-  if (locale !== 'en') alternateLanguages['en'] = `${baseUrl}/en`;
-
   return {
     metadataBase: new URL(baseUrl),
     title: {
@@ -51,7 +46,6 @@ export async function generateMetadata({
     keywords: t('keywords').split(',').map((k: string) => k.trim()),
     alternates: {
       canonical: `${baseUrl}/${locale}`,
-      languages: alternateLanguages,
     },
     openGraph: {
       title: siteName,
