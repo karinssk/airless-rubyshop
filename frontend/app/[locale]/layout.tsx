@@ -31,35 +31,39 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'metadata' });
 
+  const baseUrl = frontendBaseUrl || 'https://airless-spray.rubyshop.co.th';
+  const canonical = `${baseUrl}/${locale}`;
+  const siteName = t('siteName');
+  const description = t('description');
+
   return {
-    ...(frontendBaseUrl ? { metadataBase: new URL(frontendBaseUrl) } : {}),
+    metadataBase: new URL(baseUrl),
     title: {
       default: t('title'),
-      template: `%s | ${t('siteName')}`,
+      template: `%s | ${siteName}`,
     },
-    description: t('description'),
+    description,
     keywords: t('keywords').split(',').map((k: string) => k.trim()),
     alternates: {
-      canonical: `/${locale}`,
+      canonical,
       languages: {
-        'th': '/th',
-        'en': '/en',
-        'x-default': '/th', // Default language for users with no matching locale
+        'th': `${baseUrl}/th`,
+        'en': `${baseUrl}/en`,
+        'x-default': `${baseUrl}/th`,
       },
     },
     openGraph: {
-      title: t('siteName'),
-      description: t('description'),
-      url: `/${locale}`,
-      siteName: t('siteName'),
+      title: siteName,
+      description,
+      url: canonical,
+      siteName,
       type: "website",
       locale: locale === 'th' ? 'th_TH' : 'en_US',
-      alternateLocale: locale === 'th' ? 'en_US' : 'th_TH',
     },
     twitter: {
       card: "summary_large_image",
-      title: t('siteName'),
-      description: t('description'),
+      title: siteName,
+      description,
     },
   };
 }
