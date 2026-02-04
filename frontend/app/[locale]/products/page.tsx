@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import ChatWidget from "../../components/ChatWidget";
@@ -80,13 +81,21 @@ async function fetchFooter() {
     }
 }
 
-export const metadata = {
-    title: "สินค้าแอร์ | RUBYSHOP",
-    description: "จำหน่ายแอร์บ้าน แอร์สำนักงาน ครบทุกยี่ห้อชั้นนำ พร้อมบริการติดตั้งมาตรฐานสูง",
-    alternates: {
-        canonical: frontendBaseUrl ? `${frontendBaseUrl}/products` : "/products",
-    },
-};
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+    const { locale } = await params;
+    const canonical = frontendBaseUrl
+        ? `${frontendBaseUrl}/${locale}/products`
+        : `/${locale}/products`;
+    return {
+        title: "สินค้าแอร์ | RUBYSHOP",
+        description: "จำหน่ายแอร์บ้าน แอร์สำนักงาน ครบทุกยี่ห้อชั้นนำ พร้อมบริการติดตั้งมาตรฐานสูง",
+        alternates: { canonical },
+    };
+}
 
 export default async function ProductsPage({
     params,

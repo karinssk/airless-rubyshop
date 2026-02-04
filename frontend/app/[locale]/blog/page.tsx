@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import ChatWidget from "@/app/components/ChatWidget";
@@ -59,13 +60,21 @@ async function fetchFooter() {
   }
 }
 
-export const metadata = {
-  title: "Blog | RUBYSHOP",
-  description: "ข่าวสารและบทความเกี่ยวกับบริการระบบปรับอากาศ",
-  alternates: {
-    canonical: frontendBaseUrl ? `${frontendBaseUrl}/blog` : "/blog",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonical = frontendBaseUrl
+    ? `${frontendBaseUrl}/${locale}/blog`
+    : `/${locale}/blog`;
+  return {
+    title: "Blog | RUBYSHOP",
+    description: "ข่าวสารและบทความเกี่ยวกับบริการระบบปรับอากาศ",
+    alternates: { canonical },
+  };
+}
 
 export default async function BlogIndex({
   params,

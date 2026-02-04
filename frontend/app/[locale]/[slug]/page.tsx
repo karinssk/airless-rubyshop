@@ -87,8 +87,8 @@ export async function generateMetadata({
     : "/og-aircon.jpg";
   const image = page.seo?.image || fallbackImage;
   const canonical = frontendBaseUrl
-    ? `${frontendBaseUrl}/${page.slug}`
-    : `/${page.slug}`;
+    ? `${frontendBaseUrl}/${locale}/${page.slug}`
+    : `/${locale}/${page.slug}`;
   return {
     title,
     description,
@@ -120,8 +120,11 @@ export default async function Page({
   const menu = await fetchMenu(locale);
   const footer = await fetchFooter();
   const canonical = frontendBaseUrl
-    ? `${frontendBaseUrl}/${page.slug}`
-    : `/${page.slug}`;
+    ? `${frontendBaseUrl}/${locale}/${page.slug}`
+    : `/${locale}/${page.slug}`;
+  const homeUrl = frontendBaseUrl
+    ? `${frontendBaseUrl}/${locale}`
+    : `/${locale}`;
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -130,7 +133,7 @@ export default async function Page({
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: frontendBaseUrl ? `${frontendBaseUrl}/` : "/",
+        item: homeUrl,
       },
       {
         "@type": "ListItem",

@@ -88,7 +88,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const post = await fetchPost(slug);
   if (!post) return {};
   const title = post.seo?.title || post.title;
@@ -100,8 +100,8 @@ export async function generateMetadata({
     post.seo?.image || post.coverImage || fallbackImage
   );
   const canonical = frontendBaseUrl
-    ? `${frontendBaseUrl}/blog/${post.slug}`
-    : `/blog/${post.slug}`;
+    ? `${frontendBaseUrl}/${locale}/blog/${post.slug}`
+    : `/${locale}/blog/${post.slug}`;
   return {
     title,
     description,
@@ -146,9 +146,12 @@ export default async function BlogDetail({
     fetchOtherPosts(slug),
   ]);
 
+  const homeUrl = frontendBaseUrl
+    ? `${frontendBaseUrl}/${locale}`
+    : `/${locale}`;
   const canonical = frontendBaseUrl
-    ? `${frontendBaseUrl}/blog/${post.slug}`
-    : `/blog/${post.slug}`;
+    ? `${frontendBaseUrl}/${locale}/blog/${post.slug}`
+    : `/${locale}/blog/${post.slug}`;
 
   const coverImage = post.coverImage ? resolveUploadUrl(post.coverImage) : null;
 
@@ -164,7 +167,7 @@ export default async function BlogDetail({
     author: {
       "@type": "Organization",
       name: "RUBYSHOP เทคโนโลยีเครื่องมือช่าง",
-      url: frontendBaseUrl || "/",
+      url: homeUrl,
     },
     publisher: {
       "@type": "Organization",
@@ -189,13 +192,15 @@ export default async function BlogDetail({
         "@type": "ListItem",
         position: 1,
         name: "หน้าแรก",
-        item: frontendBaseUrl || "/",
+        item: homeUrl,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "บทความ",
-        item: frontendBaseUrl ? `${frontendBaseUrl}/blog` : "/blog",
+        item: frontendBaseUrl
+          ? `${frontendBaseUrl}/${locale}/blog`
+          : `/${locale}/blog`,
       },
       {
         "@type": "ListItem",

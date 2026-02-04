@@ -2,12 +2,23 @@ import type { Metadata } from "next";
 import { Link } from "@/lib/navigation";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import { backendBaseUrl } from "@/lib/urls";
+import { backendBaseUrl, frontendBaseUrl } from "@/lib/urls";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | RUBYSHOP",
-  description: "Privacy Policy for RUBYSHOP Hotel - Learn how we collect, use, and protect your personal information.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonical = frontendBaseUrl
+    ? `${frontendBaseUrl}/${locale}/privacy-policy`
+    : `/${locale}/privacy-policy`;
+  return {
+    title: "Privacy Policy | RUBYSHOP",
+    description: "Privacy Policy for RUBYSHOP Hotel - Learn how we collect, use, and protect your personal information.",
+    alternates: { canonical },
+  };
+}
 
 async function fetchMenu(locale: string) {
   try {

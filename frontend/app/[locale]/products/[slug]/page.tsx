@@ -94,8 +94,8 @@ export async function generateMetadata({
         product.seo?.image || product.images?.[0] || fallbackImage
     );
     const canonical = frontendBaseUrl
-        ? `${frontendBaseUrl}/products/${product.slug}`
-        : `/products/${product.slug}`;
+        ? `${frontendBaseUrl}/${locale}/products/${product.slug}`
+        : `/${locale}/products/${product.slug}`;
     return {
         title,
         description,
@@ -139,13 +139,16 @@ export default async function ProductDetail({
     ]);
 
     const canonical = frontendBaseUrl
-        ? `${frontendBaseUrl}/products/${product.slug}`
-        : `/products/${product.slug}`;
+        ? `${frontendBaseUrl}/${locale}/products/${product.slug}`
+        : `/${locale}/products/${product.slug}`;
+    const homeUrl = frontendBaseUrl
+        ? `${frontendBaseUrl}/${locale}`
+        : `/${locale}`;
 
     const categoryName = product.category?.name || "สินค้าเครื่องมือช่าง";
     const categoryHref = product.category?.slug
-        ? `/products?category=${product.category.slug}`
-        : "/products";
+        ? `/${locale}/products?category=${product.category.slug}`
+        : `/${locale}/products`;
 
     const breadcrumbSchema = {
         "@context": "https://schema.org",
@@ -155,7 +158,7 @@ export default async function ProductDetail({
                 "@type": "ListItem",
                 position: 1,
                 name: "หน้าแรก",
-                item: frontendBaseUrl || "/",
+                item: homeUrl,
             },
             {
                 "@type": "ListItem",

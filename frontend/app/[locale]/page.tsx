@@ -105,7 +105,9 @@ export async function generateMetadata({
     ? `${frontendBaseUrl}/og-aircon.jpg`
     : "/og-aircon.jpg";
   const image = page.seo?.image || fallbackImage;
-  const canonical = frontendBaseUrl ? `${frontendBaseUrl}/` : "/";
+  const canonical = frontendBaseUrl
+    ? `${frontendBaseUrl}/${locale}`
+    : `/${locale}`;
   return {
     title,
     description,
@@ -164,7 +166,10 @@ export default async function Home({
     ? `${frontendBaseUrl}/og-aircon.jpg`
     : "/og-aircon.jpg";
   const businessImage = page.seo?.image || fallbackImage;
-  const canonical = frontendBaseUrl ? `${frontendBaseUrl}/` : "/";
+  const canonical = frontendBaseUrl
+    ? `${frontendBaseUrl}/${locale}`
+    : `/${locale}`;
+  const canonicalWithSlash = canonical.endsWith("/") ? canonical : `${canonical}/`;
   const businessSchema = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -242,7 +247,7 @@ export default async function Home({
     },
     potentialAction: {
       "@type": "SearchAction",
-      target: `${canonical}products?q={search_term_string}`,
+      target: `${canonicalWithSlash}products?q={search_term_string}`,
       "query-input": "required name=search_term_string",
     },
   };
