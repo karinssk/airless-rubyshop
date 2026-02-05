@@ -172,9 +172,12 @@ export default async function ProductDetail({
         : `/${locale}`;
 
     const categoryName = product.category?.name || "สินค้าเครื่องมือช่าง";
-    const categoryHref = product.category?.slug
-        ? `/${locale}/products/category/${product.category.slug}`
-        : `/${locale}/products`;
+    const categoryPath = product.category?.slug
+        ? `/products/category/${product.category.slug}`
+        : "/products";
+    const categoryUrl = frontendBaseUrl
+        ? `${frontendBaseUrl}/${locale}${categoryPath}`
+        : `/${locale}${categoryPath}`;
 
     const breadcrumbSchema = {
         "@context": "https://schema.org",
@@ -190,9 +193,7 @@ export default async function ProductDetail({
                 "@type": "ListItem",
                 position: 2,
                 name: categoryName,
-                item: frontendBaseUrl
-                    ? `${frontendBaseUrl}${categoryHref}`
-                    : categoryHref,
+                item: categoryUrl,
             },
             {
                 "@type": "ListItem",
@@ -258,7 +259,7 @@ export default async function ProductDetail({
                             หน้าแรก
                         </Link>
                         <span className="px-1">›</span>
-                        <Link href={categoryHref} className="hover:text-slate-600">
+                        <Link href={categoryPath} className="hover:text-slate-600">
                             {categoryName}
                         </Link>
                         <span className="px-1">›</span>
@@ -463,7 +464,7 @@ export default async function ProductDetail({
                                     สินค้าอื่นๆ
                                 </h2>
                                 <Link
-                                    href={categoryHref}
+                                    href={categoryPath}
                                     className="text-xs font-semibold text-slate-500 hover:text-slate-700"
                                 >
                                     ดูเพิ่มเติม
