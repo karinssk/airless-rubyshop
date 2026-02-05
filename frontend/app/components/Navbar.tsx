@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { locales, type Locale } from "@/i18n";
@@ -139,6 +139,7 @@ export default function Navbar({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [customerEmail, setCustomerEmail] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileOpenIds, setMobileOpenIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -148,6 +149,79 @@ export default function Navbar({
       setCustomerEmail(email);
     }
   }, []);
+
+  const isActivePath = (href: string) => {
+    if (!href) return false;
+    if (pathname === href) return true;
+    if (href !== "/" && pathname?.startsWith(`${href}/`)) return true;
+    return false;
+  };
+
+  const collectActiveIds = (navItems: NavItem[]): string[] => {
+    for (const item of navItems) {
+      const childIds = item.children ? collectActiveIds(item.children) : [];
+      if (isActivePath(item.href) || childIds.length > 0) {
+        return [item.id, ...childIds];
+      }
+    }
+    return [];
+  };
+
+  const navIndex = useMemo(() => {
+    const parentById = new Map<string, string | null>();
+    const childrenById = new Map<string, string[]>();
+    const walk = (item: NavItem, parentId: string | null) => {
+      parentById.set(item.id, parentId);
+      if (item.children && item.children.length > 0) {
+        childrenById.set(
+          item.id,
+          item.children.map((child) => child.id)
+        );
+        item.children.forEach((child) => walk(child, item.id));
+      }
+    };
+    items.forEach((item) => walk(item, null));
+    return { parentById, childrenById };
+  }, [items]);
+
+  const getAncestorChain = (id: string) => {
+    const chain: string[] = [];
+    let current: string | null | undefined = id;
+    while (current) {
+      chain.unshift(current);
+      current = navIndex.parentById.get(current) || null;
+    }
+    return chain;
+  };
+
+  const getDescendantIds = (id: string) => {
+    const result: string[] = [];
+    const stack: string[] = [id];
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+      result.push(current);
+      const children = navIndex.childrenById.get(current) || [];
+      children.forEach((child) => stack.push(child));
+    }
+    return result;
+  };
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const activeIds = collectActiveIds(items);
+    if (activeIds.length === 0) return;
+    setMobileOpenIds((prev) => Array.from(new Set([...prev, ...activeIds])));
+  }, [mobileOpen, pathname, items]);
+
+  const toggleMobileSection = (id: string) => {
+    setMobileOpenIds((prev) => {
+      if (prev.includes(id)) {
+        const toRemove = new Set(getDescendantIds(id));
+        return prev.filter((entry) => !toRemove.has(entry));
+      }
+      return getAncestorChain(id);
+    });
+  };
 
   const handleLogout = () => {
     if (typeof window !== "undefined") {
@@ -435,33 +509,69 @@ export default function Navbar({
         {mobileOpen && (
           <div className="border-t border-slate-200 bg-white lg:hidden">
             <div className="mx-auto grid max-w-6xl gap-4 px-4 py-4">
-              {items.map((item) => (
-                <div key={item.id} className="grid gap-2">
-                  <Link href={item.href} className="text-sm font-semibold">
-                    {item.label}
-                  </Link>
-                  {item.children && item.children.length > 0 && (
-                    <div className="grid gap-2 border-l border-slate-200 pl-3 text-xs text-slate-600">
-                      {item.children.map((child) => (
-                        <div key={child.id} className="grid gap-1">
-                  <Link href={child.href} className="font-medium text-slate-700 whitespace-normal leading-snug">
-                    {child.label}
-                  </Link>
-                          {child.children && child.children.length > 0 && (
-                            <div className="grid gap-1 pl-3 text-[11px] text-slate-500">
-                              {child.children.map((subChild) => (
-                        <Link key={subChild.id} href={subChild.href} className="whitespace-normal leading-snug">
-                          {subChild.label}
+              {items.map((item) => {
+                const renderMobileItem = (navItem: NavItem, level = 0) => {
+                  const hasChildren = Boolean(navItem.children && navItem.children.length > 0);
+                  const isOpen = mobileOpenIds.includes(navItem.id);
+                  const isActive = isActivePath(navItem.href);
+                  const textClass =
+                    level === 0
+                      ? "text-sm font-semibold text-slate-900"
+                      : level === 1
+                        ? "text-xs font-medium text-slate-700"
+                        : "text-[11px] text-slate-500";
+                  const paddingLeft = 4 + level * 10;
+
+                  return (
+                    <div key={navItem.id} className="grid gap-1">
+                      {hasChildren ? (
+                        <button
+                          type="button"
+                          onClick={() => toggleMobileSection(navItem.id)}
+                          aria-expanded={isOpen}
+                          className="flex w-full items-center justify-between gap-2"
+                          style={{ paddingLeft }}
+                        >
+                          <span className={`${textClass} whitespace-normal leading-snug ${isActive ? "text-[var(--brand-navy)]" : ""}`}>
+                            {navItem.label}
+                          </span>
+                          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-slate-500">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              className={`h-3.5 w-3.5 transition ${isOpen ? "rotate-90" : ""}`}
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M7.21 5.23a.75.75 0 011.06-.02l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 11-1.04-1.08L11.19 10 7.23 6.33a.75.75 0 01-.02-1.06z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </span>
+                        </button>
+                      ) : (
+                        <Link
+                          href={navItem.href}
+                          className={`${textClass} whitespace-normal leading-snug ${isActive ? "text-[var(--brand-navy)]" : ""}`}
+                          style={{ paddingLeft }}
+                        >
+                          {navItem.label}
                         </Link>
-                              ))}
-                            </div>
-                          )}
+                      )}
+                      {hasChildren && (
+                        <div
+                          className={`grid gap-1 border-l border-slate-200 pl-3 ${isOpen ? "block" : "hidden"}`}
+                        >
+                          {navItem.children!.map((child) => renderMobileItem(child, level + 1))}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  )}
-                </div>
-              ))}
+                  );
+                };
+
+                return renderMobileItem(item, 0);
+              })}
               <div className="flex items-center gap-3 pt-2">
                 {isLoggedIn ? (
                   <div className="flex items-center gap-3">
