@@ -13,8 +13,8 @@ const frontendDevelopmentUrl =
 
 export const backendBaseUrl = normalizeBaseUrl(
   isProduction
-    ? backendProductionUrl || backendDevelopmentUrl || "http://localhost:5000"
-    : backendDevelopmentUrl || "http://localhost:5000"
+    ? backendProductionUrl || backendDevelopmentUrl || "https://api-airless-spray.rubyshop.co.th"
+    : backendDevelopmentUrl || "https://api-airless-spray.rubyshop.co.th"
 );
 
 export const frontendBaseUrl = normalizeBaseUrl(

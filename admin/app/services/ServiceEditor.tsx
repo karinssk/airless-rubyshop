@@ -106,7 +106,7 @@ export default function ServiceEditor({ slug }: { slug?: string }) {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ link: false }),
       Underline,
       TextStyle,
       Color,

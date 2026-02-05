@@ -61,7 +61,7 @@ export default function BlogManager() {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ link: false }),
       Underline,
       TextStyle,
       Color,

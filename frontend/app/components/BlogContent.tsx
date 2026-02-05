@@ -12,7 +12,7 @@ type BlogContentProps = {
 
 export default function BlogContent({ content }: BlogContentProps) {
   const html = generateHTML(content, [
-    StarterKit,
+    StarterKit.configure({ link: false }),
     Link.configure({ openOnClick: false }),
     Image,
     TextStyle,

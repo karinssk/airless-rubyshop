@@ -21,7 +21,7 @@ export const frontendBaseUrl = normalizeBaseUrl(
 export const backendBaseUrl = normalizeBaseUrl(
   isProduction
     ? backendProductionUrl || "https://api-airless-spray.rubyshop.co.th"
-    : backendDevelopmentUrl || "http://localhost:5000"
+    : backendDevelopmentUrl || "https://api-airless-spray.rubyshop.co.th"
 );
 
 
