@@ -23,6 +23,14 @@ function getLangDoc(value, locale) {
     return {};
 }
 
+function getLangCompareTable(value, locale) {
+    if (!value) return {};
+    if (value && typeof value === "object" && (value.th || value.en)) {
+        return value[locale] || value.th || value.en || {};
+    }
+    return value;
+}
+
 // Helper function to extract language-specific array items
 function getLangArray(arr, locale) {
     if (!Array.isArray(arr)) return [];
@@ -57,6 +65,7 @@ function localizeProduct(product, locale) {
             description: getLangString(product.seo?.description, locale),
             image: product.seo?.image || "",
         },
+        compareTable: getLangCompareTable(product.compareTable, locale),
     };
 }
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const compareCellSchema = new mongoose.Schema(
     {
-        value: { type: String, default: "" },
+        value: { type: mongoose.Schema.Types.Mixed, default: "" },
         href: { type: String, default: "" },
     },
     { _id: false }
@@ -10,9 +10,9 @@ const compareCellSchema = new mongoose.Schema(
 
 const compareTableSchema = new mongoose.Schema(
     {
-        heading: { type: String, default: "" },
-        subheading: { type: String, default: "" },
-        columns: { type: [String], default: [] },
+        heading: { type: mongoose.Schema.Types.Mixed, default: "" },
+        subheading: { type: mongoose.Schema.Types.Mixed, default: "" },
+        columns: { type: [mongoose.Schema.Types.Mixed], default: [] },
         rows: { type: [[compareCellSchema]], default: [] },
     },
     { _id: false }
@@ -56,7 +56,7 @@ const productSchema = new mongoose.Schema(
             description: { type: mongoose.Schema.Types.Mixed, default: "" },
             image: { type: String, default: "" },
         },
-        compareTable: { type: compareTableSchema, default: () => ({}) },
+        compareTable: { type: mongoose.Schema.Types.Mixed, default: () => ({}) },
     },
     { timestamps: true, versionKey: false }
 );

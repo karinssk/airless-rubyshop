@@ -28,7 +28,6 @@ import {
 import { backendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 import { LanguageTabs } from "../../pages/builder/LanguageTabs";
 import type { MultiLangString, Language } from "../types";
-import { getLangString } from "../types";
 
 const MySwal = withReactContent(Swal);
 
@@ -121,6 +120,11 @@ type MultiLangDoc = {
     en?: RichTextDoc;
 };
 
+type MultiLangCompareTable = {
+    th: CompareTable;
+    en: CompareTable;
+};
+
 type ProductForm = {
     id?: string;
     name: MultiLangString;
@@ -137,7 +141,7 @@ type ProductForm = {
     price: { device: number; installation: number; total: number };
     images: string[];
     seo: { title: MultiLangString; description: MultiLangString; image: string };
-    compareTable: CompareTable;
+    compareTable: MultiLangCompareTable | CompareTable;
 };
 
 const createEmptyDoc = (): RichTextDoc => ({
@@ -148,6 +152,18 @@ const createEmptyDoc = (): RichTextDoc => ({
 const createEmptyDescription = (): MultiLangDoc => ({
     th: createEmptyDoc(),
     en: createEmptyDoc(),
+});
+
+const createEmptyCompareTable = (): CompareTable => ({
+    heading: "",
+    subheading: "",
+    columns: [],
+    rows: [],
+});
+
+const createEmptyCompareTables = (): MultiLangCompareTable => ({
+    th: createEmptyCompareTable(),
+    en: createEmptyCompareTable(),
 });
 
 const emptyProduct = (): ProductForm => ({
@@ -165,12 +181,7 @@ const emptyProduct = (): ProductForm => ({
     price: { device: 0, installation: 0, total: 0 },
     images: [],
     seo: { title: { th: "", en: "" }, description: { th: "", en: "" }, image: "" },
-    compareTable: {
-        heading: "",
-        subheading: "",
-        columns: [],
-        rows: [],
-    },
+    compareTable: createEmptyCompareTables(),
 });
 
 export default function ProductDetailPage() {
@@ -197,9 +208,21 @@ export default function ProductDetailPage() {
         activeLanguageRef.current = activeLanguage;
     }, [activeLanguage]);
 
-    // Helper to extract language-specific string
+    // Helper to extract language-specific string (no fallback)
     const getLabel = (label: MultiLangString | undefined): string => {
-        return getLangString(label, activeLanguage);
+        if (!label) return "";
+        if (typeof label === "string") return label;
+        return label[activeLanguage] || "";
+    };
+
+    const normalizeMultiLangString = (
+        value: MultiLangString | undefined
+    ): { th: string; en: string } => {
+        if (!value) return { th: "", en: "" };
+        if (typeof value === "string") {
+            return { th: value, en: "" };
+        }
+        return { th: value.th || "", en: value.en || "" };
     };
 
     // Helper to update multi-language string
@@ -207,13 +230,8 @@ export default function ProductDetailPage() {
         current: MultiLangString | undefined,
         newValue: string
     ): MultiLangString => {
-        if (!current || typeof current === "string") {
-            return {
-                th: activeLanguage === "th" ? newValue : (current as string) || "",
-                en: activeLanguage === "en" ? newValue : "",
-            };
-        }
-        return { ...current, [activeLanguage]: newValue };
+        const normalized = normalizeMultiLangString(current);
+        return { ...normalized, [activeLanguage]: newValue };
     };
 
     // Helper for arrays
@@ -226,6 +244,82 @@ export default function ProductDetailPage() {
         updated[index] = updateMultiLangString(updated[index], newValue);
         return updated;
     };
+
+    const normalizeMultiLangArray = (
+        value: MultiLangString[] | undefined
+    ): MultiLangString[] => {
+        if (!Array.isArray(value)) return [];
+        return value.map((item) => normalizeMultiLangString(item));
+    };
+
+    const normalizeMultiLangFeatures = (
+        value: Record<string, MultiLangString> | undefined
+    ): Record<string, MultiLangString> => {
+        if (!value || typeof value !== "object") return {};
+        const next: Record<string, MultiLangString> = {};
+        for (const [key, item] of Object.entries(value)) {
+            next[key] = normalizeMultiLangString(item as MultiLangString);
+        }
+        return next;
+    };
+
+    const normalizeCompareTable = (
+        value: ProductForm["compareTable"] | undefined
+    ): MultiLangCompareTable => {
+        const normalizeSingle = (table?: Partial<CompareTable>): CompareTable => ({
+            ...createEmptyCompareTable(),
+            ...(table || {}),
+            columns: Array.isArray(table?.columns) ? table!.columns : [],
+            rows: Array.isArray(table?.rows) ? table!.rows : [],
+        });
+        if (value && typeof value === "object" && "th" in value && "en" in value) {
+            const cast = value as MultiLangCompareTable;
+            return {
+                th: normalizeSingle(cast.th),
+                en: normalizeSingle(cast.en),
+            };
+        }
+        if (value && typeof value === "object") {
+            return { th: normalizeSingle(value as CompareTable), en: createEmptyCompareTable() };
+        }
+        return createEmptyCompareTables();
+    };
+
+    const getCompareTableForLang = (
+        value: ProductForm["compareTable"] | undefined,
+        lang: Language
+    ): CompareTable => {
+        const normalized = normalizeCompareTable(value);
+        return normalized[lang] || createEmptyCompareTable();
+    };
+
+    const setCompareTableForLang = (
+        value: ProductForm["compareTable"] | undefined,
+        lang: Language,
+        table: CompareTable
+    ): MultiLangCompareTable => {
+        const normalized = normalizeCompareTable(value);
+        return { ...normalized, [lang]: table };
+    };
+
+    const updateCompareTableForLang = (
+        lang: Language,
+        patch: Partial<CompareTable>
+    ) => {
+        setProduct((prev) => {
+            if (!prev) return prev;
+            const current = getCompareTableForLang(prev.compareTable, lang);
+            const next = { ...current, ...patch };
+            return {
+                ...prev,
+                compareTable: setCompareTableForLang(prev.compareTable, lang, next),
+            };
+        });
+    };
+
+    const compareTable = product
+        ? getCompareTableForLang(product.compareTable, activeLanguage)
+        : createEmptyCompareTable();
 
     const isRichTextDoc = (value: any): value is RichTextDoc =>
         Boolean(value && typeof value === "object" && value.type === "doc");
@@ -251,7 +345,7 @@ export default function ProductDetailPage() {
             };
         }
         if (isRichTextDoc(description)) {
-            return { th: description, en: description };
+            return { th: description, en: createEmptyDoc() };
         }
         return createEmptyDescription();
     };
@@ -338,9 +432,22 @@ export default function ProductDetailPage() {
                     ...emptyProduct(),
                     ...loaded,
                     description: normalizeDescription(loaded.description),
+                    name: normalizeMultiLangString(loaded.name),
+                    features: normalizeMultiLangFeatures(loaded.features),
+                    highlights: normalizeMultiLangArray(loaded.highlights),
+                    inBox: normalizeMultiLangArray(loaded.inBox),
+                    warranty: {
+                        device: normalizeMultiLangString(loaded.warranty?.device),
+                        compressor: normalizeMultiLangString(loaded.warranty?.compressor),
+                    },
+                    seo: {
+                        ...emptyProduct().seo,
+                        ...loaded.seo,
+                        title: normalizeMultiLangString(loaded.seo?.title),
+                        description: normalizeMultiLangString(loaded.seo?.description),
+                    },
+                    compareTable: normalizeCompareTable(loaded.compareTable),
                     categoryId: loaded.category?.id || loaded.categoryId || null,
-                    compareTable:
-                        loaded.compareTable || emptyProduct().compareTable,
                 });
             }
         };
@@ -367,19 +474,17 @@ export default function ProductDetailPage() {
         });
 
     const updateCompareTable = (patch: Partial<CompareTable>) => {
-        if (!product) return;
-        const next = { ...product.compareTable, ...patch };
-        updateProduct({ compareTable: next });
+        updateCompareTableForLang(activeLanguage, patch);
     };
 
     const updateCompareColumns = (columns: string[]) => {
-        if (!product) return;
         const nextRows = normalizeCompareRows(
-            product.compareTable.rows || [],
+            compareTable.rows || [],
             columns.length
         );
-        updateProduct({
-            compareTable: { ...product.compareTable, columns, rows: nextRows },
+        updateCompareTableForLang(activeLanguage, {
+            columns,
+            rows: nextRows,
         });
     };
 
@@ -388,55 +493,47 @@ export default function ProductDetailPage() {
         colIndex: number,
         patch: Partial<CompareCell>
     ) => {
-        if (!product) return;
-        const rows = product.compareTable.rows.map((row, rIndex) =>
+        const rows = compareTable.rows.map((row, rIndex) =>
             rIndex === rowIndex
                 ? row.map((cell, cIndex) =>
                     cIndex === colIndex ? { ...cell, ...patch } : cell
                 )
                 : row
         );
-        updateCompareTable({ rows });
+        updateCompareTableForLang(activeLanguage, { rows });
     };
 
     const addCompareColumn = () => {
-        if (!product) return;
-        const nextColumns = [...product.compareTable.columns, "New Column"];
+        const nextColumns = [...compareTable.columns, "New Column"];
         updateCompareColumns(nextColumns);
     };
 
     const removeCompareColumn = (index: number) => {
-        if (!product) return;
-        const nextColumns = product.compareTable.columns.filter(
+        const nextColumns = compareTable.columns.filter(
             (_col, idx) => idx !== index
         );
-        const nextRows = (product.compareTable.rows || []).map((row) =>
+        const nextRows = (compareTable.rows || []).map((row) =>
             row.filter((_cell, idx) => idx !== index)
         );
-        updateProduct({
-            compareTable: {
-                ...product.compareTable,
-                columns: nextColumns,
-                rows: nextRows,
-            },
+        updateCompareTableForLang(activeLanguage, {
+            columns: nextColumns,
+            rows: nextRows,
         });
     };
 
     const addCompareRow = () => {
-        if (!product) return;
-        const row = product.compareTable.columns.map(() => ({
+        const row = compareTable.columns.map(() => ({
             value: "",
             href: "",
         }));
         updateCompareTable({
-            rows: [...product.compareTable.rows, row],
+            rows: [...compareTable.rows, row],
         });
     };
 
     const removeCompareRow = (index: number) => {
-        if (!product) return;
         updateCompareTable({
-            rows: product.compareTable.rows.filter((_row, idx) => idx !== index),
+            rows: compareTable.rows.filter((_row, idx) => idx !== index),
         });
     };
 
@@ -725,7 +822,7 @@ return (
                                 <div className="mb-4">
                                     <h3 className="text-lg font-semibold text-[var(--brand-navy)]">
                                         <InlineEditableText
-                                            value={product.compareTable.heading}
+                                            value={compareTable.heading}
                                             placeholder="Compare Table Heading"
                                             onCommit={(value) =>
                                                 updateCompareTable({ heading: value })
@@ -734,7 +831,7 @@ return (
                                     </h3>
                                     <p className="text-sm text-slate-500 mt-1">
                                         <InlineEditableText
-                                            value={product.compareTable.subheading || ""}
+                                            value={compareTable.subheading || ""}
                                             placeholder="Compare Table Subheading"
                                             onCommit={(value) =>
                                                 updateCompareTable({ subheading: value })
@@ -746,7 +843,7 @@ return (
                                     <table className="w-full text-sm border border-slate-200 border-collapse">
                                         <thead className="bg-[#0b66b2] text-white">
                                             <tr>
-                                                {product.compareTable.columns.map((column, colIndex) => (
+                                                {compareTable.columns.map((column, colIndex) => (
                                                     <th
                                                         key={`preview-col-${colIndex}`}
                                                         className="px-4 py-3 text-left font-semibold border border-[#0b66b2]"
@@ -755,7 +852,7 @@ return (
                                                             value={column}
                                                             placeholder={`Column ${colIndex + 1}`}
                                                             onCommit={(value) => {
-                                                                const next = [...product.compareTable.columns];
+                                                                const next = [...compareTable.columns];
                                                                 next[colIndex] = value;
                                                                 updateCompareColumns(next);
                                                             }}
@@ -767,12 +864,12 @@ return (
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-200">
-                                            {product.compareTable.rows.map((row, rowIndex) => (
+                                            {compareTable.rows.map((row, rowIndex) => (
                                                 <tr
                                                     key={`preview-row-${rowIndex}`}
                                                     className="odd:bg-white even:bg-slate-50/70"
                                                 >
-                                                    {product.compareTable.columns.map((_column, colIndex) => {
+                                                    {compareTable.columns.map((_column, colIndex) => {
                                                         const cell = row[colIndex] || { value: "", href: "" };
                                                         return (
                                                             <td
@@ -812,7 +909,7 @@ return (
                                     <span className="font-semibold">Heading</span>
                                     <input
                                         className="rounded-xl border border-slate-200 px-4 py-2.5"
-                                        value={product.compareTable.heading}
+                                        value={compareTable.heading}
                                         onChange={(event) =>
                                             updateCompareTable({ heading: event.target.value })
                                         }
@@ -822,7 +919,7 @@ return (
                                     <span className="font-semibold">Subheading</span>
                                     <input
                                         className="rounded-xl border border-slate-200 px-4 py-2.5"
-                                        value={product.compareTable.subheading || ""}
+                                        value={compareTable.subheading || ""}
                                         onChange={(event) =>
                                             updateCompareTable({ subheading: event.target.value })
                                         }
@@ -841,13 +938,13 @@ return (
                                     </button>
                                 </div>
                                 <div className="mt-3 grid gap-2 md:grid-cols-2">
-                                    {product.compareTable.columns.map((column, colIndex) => (
+                                    {compareTable.columns.map((column, colIndex) => (
                                         <div key={`column-${colIndex}`} className="flex items-center gap-2">
                                             <input
                                                 className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
                                                 value={column}
                                                 onChange={(event) => {
-                                                    const next = [...product.compareTable.columns];
+                                                    const next = [...compareTable.columns];
                                                     next[colIndex] = event.target.value;
                                                     updateCompareColumns(next);
                                                 }}
@@ -860,14 +957,14 @@ return (
                                             </button>
                                         </div>
                                     ))}
-                                    {product.compareTable.columns.length === 0 && (
+                                    {compareTable.columns.length === 0 && (
                                         <p className="text-xs text-slate-400">No columns yet.</p>
                                     )}
                                 </div>
                             </div>
 
                             <div className="grid gap-4">
-                                {product.compareTable.rows.map((row, rowIndex) => (
+                                {compareTable.rows.map((row, rowIndex) => (
                                     <div
                                         key={`row-${rowIndex}`}
                                         className="rounded-2xl border border-slate-200 bg-white p-4"
@@ -884,7 +981,7 @@ return (
                                             </button>
                                         </div>
                                         <div className="grid gap-3 md:grid-cols-2">
-                                            {product.compareTable.columns.map((column, colIndex) => {
+                                            {compareTable.columns.map((column, colIndex) => {
                                                 const cell = row[colIndex] || { value: "", href: "" };
                                                 return (
                                                     <div key={`${rowIndex}-${colIndex}`} className="grid gap-2">
@@ -917,7 +1014,7 @@ return (
                                         </div>
                                     </div>
                                 ))}
-                                {product.compareTable.rows.length === 0 && (
+                                {compareTable.rows.length === 0 && (
                                     <p className="text-sm text-slate-500">No rows yet.</p>
                                 )}
                             </div>
