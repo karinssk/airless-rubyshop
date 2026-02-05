@@ -175,12 +175,26 @@ router.get("/products", async (req, res) => {
             }
         }
     }
-    const products = await Product.find(filter)
-        .populate("categoryId")
-        .sort({ updatedAt: -1 })
-        .lean();
+    const products = await Product.find(filter).sort({ updatedAt: -1 }).lean();
+    const categoryIds = Array.from(
+        new Set(
+            products
+                .map((p) => p.categoryId)
+                .filter((id) => mongoose.isValidObjectId(id))
+                .map((id) => String(id))
+        )
+    );
+    const categories = categoryIds.length
+        ? await ProductCategory.find({ _id: { $in: categoryIds } }).lean()
+        : [];
+    const categoryMap = new Map(
+        categories.map((category) => [String(category._id), category])
+    );
 
     const mappedProducts = products.map((p) => {
+        const category = p.categoryId
+            ? categoryMap.get(String(p.categoryId))
+            : null;
         const baseProduct = {
             id: p._id,
             name: p.name,
@@ -188,8 +202,8 @@ router.get("/products", async (req, res) => {
             code: p.code,
             btu: p.btu,
             status: p.status,
-            category: p.categoryId
-                ? { id: p.categoryId._id, name: p.categoryId.name, slug: p.categoryId.slug }
+            category: category
+                ? { id: category._id, name: category.name, slug: category.slug }
                 : null,
             price: p.price,
             images: p.images,
@@ -213,16 +227,19 @@ router.get("/products/:slug", async (req, res) => {
     if (!preview) {
         query.status = "published";
     }
-    const p = await Product.findOne(query).populate("categoryId").lean();
+    const p = await Product.findOne(query).lean();
     if (!p) {
         return res.status(404).json({ error: "Product not found" });
     }
+    const category = mongoose.isValidObjectId(p.categoryId)
+        ? await ProductCategory.findById(p.categoryId).lean()
+        : null;
 
     let product = {
         ...p,
         id: p._id,
-        category: p.categoryId
-            ? { id: p.categoryId._id, name: p.categoryId.name, slug: p.categoryId.slug }
+        category: category
+            ? { id: category._id, name: category.name, slug: category.slug }
             : null,
     };
 
