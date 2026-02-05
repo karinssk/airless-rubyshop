@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { resolveUploadUrl } from "@/lib/urls";
 
 // Loading skeleton for blocks
@@ -1103,12 +1104,16 @@ function Hero(props: Record<string, any>) {
         </div>
         <div className="relative flex-1">
           <div className="absolute -right-8 -top-6 h-32 w-32 rounded-full bg-white/70 blur-xl" />
-          <div className="overflow-hidden rounded-3xl bg-white/90 shadow-2xl shadow-black/15 backdrop-blur">
+          <div className="relative h-80 overflow-hidden rounded-3xl bg-white/90 shadow-2xl shadow-black/15 backdrop-blur">
             {heroImage ? (
-              <img
+              <Image
                 src={heroImage}
                 alt={safeList(props.title) || "Hero image"}
-                className="h-80 w-full object-cover"
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                unoptimized={heroImage.includes("localhost")}
               />
             ) : slides.length > 0 ? (
               <div className="h-80">

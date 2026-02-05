@@ -32,6 +32,9 @@ export default function HeroSlider({
         src={current.image}
         alt={current.title || "Hero slide"}
         className={`h-full w-full object-${imageFit}`}
+        loading={index === 0 ? "eager" : "lazy"}
+        fetchpriority={index === 0 ? "high" : "auto"}
+        decoding="async"
       />
       <div className="absolute inset-0 bg-transparent" />
       <button
