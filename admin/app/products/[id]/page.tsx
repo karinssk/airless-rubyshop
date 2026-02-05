@@ -299,6 +299,10 @@ export default function ProductDetailPage() {
         const th: Record<string, string> = {};
         const en: Record<string, string> = {};
         for (const [key, item] of Object.entries(legacy)) {
+            if (typeof item === "string") {
+                th[key] = item;
+                continue;
+            }
             th[key] = item.th || "";
             if (item.en) en[key] = item.en;
         }
