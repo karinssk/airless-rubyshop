@@ -182,6 +182,8 @@ export default function PageRenderer({ page }: { page: Page }) {
             return <Gallery key={index} {...block.props} />;
           case "faq":
             return <Faq key={index} {...block.props} />;
+          case "frequently-asked-questions":
+            return <Faq key={index} {...block.props} />;
           case "contact":
             return <Contact key={index} {...block.props} />;
           case "top-products-sales":
