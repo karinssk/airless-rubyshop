@@ -50,6 +50,7 @@ const productSchema = new mongoose.Schema(
             total: { type: Number, default: 0 },
         },
         images: { type: [String], default: [] },
+        videoUrl: { type: String, default: "" },
         seo: {
             // SEO fields support multi-language
             title: { type: mongoose.Schema.Types.Mixed, default: "" },

@@ -299,6 +299,7 @@ router.post("/products", async (req, res) => {
             images: Array.isArray(req.body?.images)
                 ? req.body.images.map((item) => normalizeUploadPath(item))
                 : [],
+            videoUrl: req.body?.videoUrl || "",
             seo: req.body?.seo || { title: "", description: "", image: "" },
             compareTable: req.body?.compareTable || {
                 heading: "",

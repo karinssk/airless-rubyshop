@@ -150,6 +150,7 @@ type ProductForm = {
     warranty: { device: MultiLangString; compressor: MultiLangString };
     price: { device: number; installation: number; total: number };
     images: string[];
+    videoUrl: string;
     seo: { title: MultiLangString; description: MultiLangString; image: string };
     compareTable: MultiLangCompareTable | CompareTable;
 };
@@ -200,6 +201,7 @@ const emptyProduct = (): ProductForm => ({
     warranty: { device: { th: "", en: "" }, compressor: { th: "", en: "" } },
     price: { device: 0, installation: 0, total: 0 },
     images: [],
+    videoUrl: "",
     seo: { title: { th: "", en: "" }, description: { th: "", en: "" }, image: "" },
     compareTable: createEmptyCompareTables(),
 });
@@ -918,6 +920,18 @@ return (
                                     updateProduct({ images: [...product.images, ...urls.filter(Boolean) as string[]] });
                                 }} />
                             </label>
+                        </div>
+                        <div className="mt-4 grid gap-1.5 text-sm text-slate-700">
+                            <span className="font-semibold">YouTube Link</span>
+                            <input
+                                className="rounded-xl border border-slate-200 px-4 py-2.5"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                value={product.videoUrl || ""}
+                                onChange={(e) => updateProduct({ videoUrl: e.target.value })}
+                            />
+                            <p className="text-xs text-slate-500">
+                                Optional. Paste a full YouTube URL.
+                            </p>
                         </div>
                     </div>
 

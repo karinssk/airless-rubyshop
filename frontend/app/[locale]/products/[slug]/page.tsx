@@ -28,6 +28,7 @@ type ProductDetail = {
     inBox: string[];
     price: { device: number; installation: number; total: number };
     images: string[];
+    videoUrl?: string;
     compareTable?: {
         heading?: string;
         subheading?: string;
@@ -158,6 +159,11 @@ export default async function ProductDetail({
     const product = await fetchProduct(slug, locale);
     if (!product) return notFound();
 
+    const youtubeIdMatch =
+        product.videoUrl?.match(/(?:v=|youtu\.be\/|\/embed\/)([A-Za-z0-9_-]{6,})/) ||
+        product.videoUrl?.match(/^[A-Za-z0-9_-]{6,}$/);
+    const youtubeId = youtubeIdMatch ? youtubeIdMatch[1] || youtubeIdMatch[0] : "";
+
     const [menu, footer, products] = await Promise.all([
         fetchMenu(locale),
         fetchFooter(),
@@ -271,7 +277,7 @@ export default async function ProductDetail({
                         {/* Gallery */}
                         <div className="order-1 lg:order-none lg:col-start-1">
                             <div className="bg-white rounded-3xl p-6 shadow-sm">
-                                <ServiceGallery images={images} />
+                                <ServiceGallery images={images} youtubeId={youtubeId} />
                             </div>
                         </div>
 
