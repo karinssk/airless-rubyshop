@@ -1333,21 +1333,21 @@ function Faq(props: Record<string, any>) {
     ? { backgroundColor: safeList(props.backgroundColor) }
     : undefined;
   return (
-    <section className="mx-auto max-w-6xl px-0 pb-0" style={backgroundStyle}>
-      <div className="rounded-none bg-white/80 p-0 shadow-none">
+    <section className="mx-auto max-w-6xl px-6 py-12" style={backgroundStyle}>
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-2xl font-semibold text-[var(--brand-navy)]">
           {safeList(props.title)}
         </h2>
-        <div className="mt-0 grid gap-0 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {items.map((faq, index) => (
             <div
               key={`${faq.question}-${index}`}
-              className="rounded-none border border-slate-100 bg-white/90 p-0 text-sm"
+              className="rounded-2xl border border-slate-200 bg-white p-4 text-sm shadow-sm"
             >
               <p className="font-semibold text-[var(--brand-navy)]">
                 {safeList(faq.question)}
               </p>
-              <p className="mt-0 text-slate-600">{safeList(faq.answer)}</p>
+              <p className="mt-2 text-slate-600">{safeList(faq.answer)}</p>
             </div>
           ))}
         </div>
