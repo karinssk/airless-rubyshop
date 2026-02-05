@@ -33,13 +33,22 @@ function getLangCompareTable(value, locale) {
 
 // Helper function to extract language-specific array items
 function getLangArray(arr, locale) {
-    if (!Array.isArray(arr)) return [];
-    return arr.map(item => getLangString(item, locale));
+    if (!arr) return [];
+    if (Array.isArray(arr)) {
+        return arr.map(item => getLangString(item, locale));
+    }
+    if (typeof arr === "object") {
+        return arr[locale] || arr.th || arr.en || [];
+    }
+    return [];
 }
 
 // Helper function to extract language-specific features (Map)
 function getLangFeatures(features, locale) {
     if (!features) return {};
+    if (typeof features === "object" && (features.th || features.en)) {
+        return features[locale] || features.th || features.en || {};
+    }
     const result = {};
     for (const [key, value] of Object.entries(features)) {
         result[key] = getLangString(value, locale);

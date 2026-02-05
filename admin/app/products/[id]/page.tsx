@@ -120,6 +120,16 @@ type MultiLangDoc = {
     en?: RichTextDoc;
 };
 
+type MultiLangList = {
+    th: string[];
+    en: string[];
+};
+
+type MultiLangFeatures = {
+    th: Record<string, string>;
+    en: Record<string, string>;
+};
+
 type MultiLangCompareTable = {
     th: CompareTable;
     en: CompareTable;
@@ -134,9 +144,9 @@ type ProductForm = {
     status: string;
     categoryId?: string | null;
     description: RichTextDoc | MultiLangDoc;
-    features: Record<string, MultiLangString>;
-    highlights: MultiLangString[];
-    inBox: MultiLangString[];
+    features: MultiLangFeatures | Record<string, MultiLangString>;
+    highlights: MultiLangList | MultiLangString[];
+    inBox: MultiLangList | MultiLangString[];
     warranty: { device: MultiLangString; compressor: MultiLangString };
     price: { device: number; installation: number; total: number };
     images: string[];
@@ -166,6 +176,16 @@ const createEmptyCompareTables = (): MultiLangCompareTable => ({
     en: createEmptyCompareTable(),
 });
 
+const createEmptyMultiLangList = (): MultiLangList => ({
+    th: [],
+    en: [],
+});
+
+const createEmptyMultiLangFeatures = (): MultiLangFeatures => ({
+    th: {},
+    en: {},
+});
+
 const emptyProduct = (): ProductForm => ({
     name: { th: "", en: "" },
     slug: "",
@@ -174,9 +194,9 @@ const emptyProduct = (): ProductForm => ({
     status: "draft",
     categoryId: null,
     description: createEmptyDescription(),
-    features: {},
-    highlights: [],
-    inBox: [],
+    features: createEmptyMultiLangFeatures(),
+    highlights: createEmptyMultiLangList(),
+    inBox: createEmptyMultiLangList(),
     warranty: { device: { th: "", en: "" }, compressor: { th: "", en: "" } },
     price: { device: 0, installation: 0, total: 0 },
     images: [],
@@ -203,6 +223,8 @@ export default function ProductDetailPage() {
     const [uploading, setUploading] = useState(false);
     const [activeLanguage, setActiveLanguage] = useState<Language>("th");
     const activeLanguageRef = useRef<Language>(activeLanguage);
+    const [isDirty, setIsDirty] = useState(false);
+    const skipEditorUpdateRef = useRef(false);
 
     useEffect(() => {
         activeLanguageRef.current = activeLanguage;
@@ -263,6 +285,86 @@ export default function ProductDetailPage() {
         return next;
     };
 
+    const normalizeFeatures = (
+        value: ProductForm["features"] | undefined
+    ): MultiLangFeatures => {
+        if (value && typeof value === "object" && "th" in value && "en" in value) {
+            const cast = value as MultiLangFeatures;
+            return {
+                th: cast.th || {},
+                en: cast.en || {},
+            };
+        }
+        const legacy = normalizeMultiLangFeatures(value as Record<string, MultiLangString>);
+        const th: Record<string, string> = {};
+        const en: Record<string, string> = {};
+        for (const [key, item] of Object.entries(legacy)) {
+            th[key] = item.th || "";
+            if (item.en) en[key] = item.en;
+        }
+        return { th, en };
+    };
+
+    const normalizeList = (
+        value: ProductForm["highlights"] | ProductForm["inBox"] | undefined
+    ): MultiLangList => {
+        if (value && typeof value === "object" && "th" in value && "en" in value) {
+            const cast = value as MultiLangList;
+            return {
+                th: Array.isArray(cast.th) ? cast.th : [],
+                en: Array.isArray(cast.en) ? cast.en : [],
+            };
+        }
+        if (Array.isArray(value)) {
+            const th: string[] = [];
+            const en: string[] = [];
+            value.forEach((item) => {
+                if (typeof item === "string") {
+                    if (item) th.push(item);
+                    return;
+                }
+                if (item?.th) th.push(item.th);
+                if (item?.en) en.push(item.en);
+            });
+            return { th, en };
+        }
+        return createEmptyMultiLangList();
+    };
+
+    const getFeaturesForLang = (
+        value: ProductForm["features"] | undefined,
+        lang: Language
+    ): Record<string, string> => {
+        const normalized = normalizeFeatures(value);
+        return normalized[lang] || {};
+    };
+
+    const setFeaturesForLang = (
+        value: ProductForm["features"] | undefined,
+        lang: Language,
+        next: Record<string, string>
+    ): MultiLangFeatures => {
+        const normalized = normalizeFeatures(value);
+        return { ...normalized, [lang]: next };
+    };
+
+    const getListForLang = (
+        value: ProductForm["highlights"] | ProductForm["inBox"] | undefined,
+        lang: Language
+    ): string[] => {
+        const normalized = normalizeList(value);
+        return normalized[lang] || [];
+    };
+
+    const setListForLang = (
+        value: ProductForm["highlights"] | ProductForm["inBox"] | undefined,
+        lang: Language,
+        next: string[]
+    ): MultiLangList => {
+        const normalized = normalizeList(value);
+        return { ...normalized, [lang]: next };
+    };
+
     const normalizeCompareTable = (
         value: ProductForm["compareTable"] | undefined
     ): MultiLangCompareTable => {
@@ -315,6 +417,7 @@ export default function ProductDetailPage() {
                 compareTable: setCompareTableForLang(prev.compareTable, lang, next),
             };
         });
+        setIsDirty(true);
     };
 
     const compareTable = product
@@ -376,6 +479,7 @@ export default function ProductDetailPage() {
                 }
                 : prev
         );
+        setIsDirty(true);
     };
 
     const editor = useEditor({
@@ -392,6 +496,10 @@ export default function ProductDetailPage() {
         content: createEmptyDoc(),
         immediatelyRender: false,
         onUpdate: ({ editor }) => {
+            if (skipEditorUpdateRef.current) {
+                skipEditorUpdateRef.current = false;
+                return;
+            }
             updateDescriptionForLang(activeLanguageRef.current, editor.getJSON());
         },
         editorProps: {
@@ -405,6 +513,7 @@ export default function ProductDetailPage() {
     useEffect(() => {
         if (!editor || !product) return;
         const content = getDescriptionForLang(product.description, activeLanguage);
+        skipEditorUpdateRef.current = true;
         editor.commands.setContent(content);
     }, [editor, activeLanguage, product?.id]);
 
@@ -433,9 +542,9 @@ export default function ProductDetailPage() {
                     ...loaded,
                     description: normalizeDescription(loaded.description),
                     name: normalizeMultiLangString(loaded.name),
-                    features: normalizeMultiLangFeatures(loaded.features),
-                    highlights: normalizeMultiLangArray(loaded.highlights),
-                    inBox: normalizeMultiLangArray(loaded.inBox),
+                    features: normalizeFeatures(loaded.features),
+                    highlights: normalizeList(loaded.highlights),
+                    inBox: normalizeList(loaded.inBox),
                     warranty: {
                         device: normalizeMultiLangString(loaded.warranty?.device),
                         compressor: normalizeMultiLangString(loaded.warranty?.compressor),
@@ -449,6 +558,7 @@ export default function ProductDetailPage() {
                     compareTable: normalizeCompareTable(loaded.compareTable),
                     categoryId: loaded.category?.id || loaded.categoryId || null,
                 });
+                setIsDirty(false);
             }
         };
         load();
@@ -456,6 +566,7 @@ export default function ProductDetailPage() {
 
     const updateProduct = (patch: Partial<ProductForm>) => {
         setProduct((prev) => (prev ? { ...prev, ...patch } : prev));
+        setIsDirty(true);
     };
 
     const normalizeCompareRows = (
@@ -552,8 +663,8 @@ export default function ProductDetailPage() {
         return data.url as string;
     };
 
-    const saveProduct = async () => {
-        if (!product || !API_URL || !editor) return;
+    const saveProduct = async (): Promise<boolean> => {
+        if (!product || !API_URL || !editor) return false;
 
         // Validate
         if (!product.name) {
@@ -561,7 +672,7 @@ export default function ProductDetailPage() {
                 icon: "warning",
                 title: "Product name is required",
             });
-            return;
+            return false;
         }
 
         const nextDescription = setDescriptionForLang(
@@ -597,15 +708,18 @@ export default function ProductDetailPage() {
                     icon: "success",
                     title: "Saved successfully",
                 });
+                setIsDirty(false);
                 if (isNew) {
                     router.replace(`/products/${data.product.id}`);
                 }
             }
+            return true;
         } catch (e) {
             Toast.fire({
                 icon: "error",
                 title: "Error saving product",
             });
+            return false;
         }
     };
 
@@ -616,24 +730,50 @@ export default function ProductDetailPage() {
         router.push("/products");
     };
 
-const addFeature = () => {
-    if (!newFeatureKey || !newFeatureValue || !product) return;
-    updateProduct({
-        features: {
-            ...product.features,
-            [newFeatureKey]: updateMultiLangString(undefined, newFeatureValue)
+    const handleLanguageChange = async (nextLanguage: Language) => {
+        if (nextLanguage === activeLanguage) return;
+        if (!isDirty) {
+            setActiveLanguage(nextLanguage);
+            return;
         }
-    });
-    setNewFeatureKey("");
-    setNewFeatureValue("");
-};
 
-const removeFeature = (key: string) => {
-    if (!product) return;
-    const next = { ...product.features };
-    delete next[key];
-    updateProduct({ features: next });
-};
+        const result = await Swal.fire({
+            title: "Save changes before switching?",
+            text: "Unsaved changes will be kept if you stay on this language.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Save",
+            cancelButtonText: "Cancel",
+        });
+
+        if (result.isConfirmed) {
+            const saved = await saveProduct();
+            if (saved) {
+                setActiveLanguage(nextLanguage);
+            }
+        }
+    };
+
+    const addFeature = () => {
+        if (!newFeatureKey || !newFeatureValue || !product) return;
+        const current = getFeaturesForLang(product.features, activeLanguage);
+        const next = { ...current, [newFeatureKey]: newFeatureValue };
+        updateProduct({
+            features: setFeaturesForLang(product.features, activeLanguage, next),
+        });
+        setNewFeatureKey("");
+        setNewFeatureValue("");
+    };
+
+    const removeFeature = (key: string) => {
+        if (!product) return;
+        const current = getFeaturesForLang(product.features, activeLanguage);
+        const next = { ...current };
+        delete next[key];
+        updateProduct({
+            features: setFeaturesForLang(product.features, activeLanguage, next),
+        });
+    };
 
 const toolbarButtonClass = (active?: boolean) =>
     `inline-flex h-8 w-8 items-center justify-center rounded-md border text-xs font-semibold transition ${active
@@ -685,7 +825,7 @@ return (
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm mb-6">
                 <LanguageTabs
                     activeLanguage={activeLanguage}
-                    onLanguageChange={setActiveLanguage}
+                    onLanguageChange={handleLanguageChange}
                 />
             </div>
 
@@ -1062,11 +1202,11 @@ return (
                     <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                         <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">Specs</h2>
                         <div className="space-y-2 mb-4">
-                            {Object.entries(product.features).map(([k, v]) => (
+                            {Object.entries(getFeaturesForLang(product.features, activeLanguage)).map(([k, v]) => (
                                 <div key={k} className="flex justify-between text-sm p-2 bg-slate-50 rounded-lg group">
                                     <span className="font-medium text-slate-600">{k}</span>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-slate-800">{getLabel(v)}</span>
+                                        <span className="text-slate-800">{v}</span>
                                         <button onClick={() => removeFeature(k)} className="text-slate-400 hover:text-rose-500">×</button>
                                     </div>
                                 </div>
@@ -1098,28 +1238,57 @@ return (
                     <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                         <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">Highlights</h2>
                         <div className="space-y-2 mb-4">
-                            {product.highlights.map((highlight, idx) => (
+                            {getListForLang(product.highlights, activeLanguage).map((highlight, idx) => (
                                 <div key={idx} className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg group">
                                     <input
                                         className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                                        value={getLabel(highlight)}
-                                        onChange={e => updateProduct({
-                                            highlights: updateMultiLangArray(product.highlights, idx, e.target.value)
-                                        })}
+                                        value={highlight}
+                                        onChange={e => {
+                                            const current = getListForLang(product.highlights, activeLanguage);
+                                            const next = [...current];
+                                            next[idx] = e.target.value;
+                                            updateProduct({
+                                                highlights: setListForLang(product.highlights, activeLanguage, next),
+                                            });
+                                        }}
+                                        onBlur={() => {
+                                            const current = getListForLang(product.highlights, activeLanguage);
+                                            const raw = current[idx] || "";
+                                            const parts = raw
+                                                .split(/[\n,]+/g)
+                                                .map((value) => value.trim())
+                                                .filter(Boolean);
+                                            if (parts.length <= 1) return;
+                                            const next = [
+                                                ...current.slice(0, idx),
+                                                ...parts,
+                                                ...current.slice(idx + 1),
+                                            ];
+                                            updateProduct({
+                                                highlights: setListForLang(product.highlights, activeLanguage, next),
+                                            });
+                                        }}
                                     />
                                     <button
-                                        onClick={() => updateProduct({
-                                            highlights: product.highlights.filter((_, i) => i !== idx)
-                                        })}
+                                        onClick={() => {
+                                            const current = getListForLang(product.highlights, activeLanguage);
+                                            const next = current.filter((_, i) => i !== idx);
+                                            updateProduct({
+                                                highlights: setListForLang(product.highlights, activeLanguage, next),
+                                            });
+                                        }}
                                         className="text-slate-400 hover:text-rose-500"
                                     >×</button>
                                 </div>
                             ))}
                         </div>
                         <button
-                            onClick={() => updateProduct({
-                                highlights: [...product.highlights, { th: "", en: "" }]
-                            })}
+                            onClick={() => {
+                                const current = getListForLang(product.highlights, activeLanguage);
+                                updateProduct({
+                                    highlights: setListForLang(product.highlights, activeLanguage, [...current, ""]),
+                                });
+                            }}
                             className="w-full rounded-lg bg-slate-800 py-2 text-xs font-semibold text-white"
                         >
                             + Add Highlight
@@ -1130,28 +1299,57 @@ return (
                     <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                         <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">What's In the Box</h2>
                         <div className="space-y-2 mb-4">
-                            {product.inBox.map((item, idx) => (
+                            {getListForLang(product.inBox, activeLanguage).map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg group">
                                     <input
                                         className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                                        value={getLabel(item)}
-                                        onChange={e => updateProduct({
-                                            inBox: updateMultiLangArray(product.inBox, idx, e.target.value)
-                                        })}
+                                        value={item}
+                                        onChange={e => {
+                                            const current = getListForLang(product.inBox, activeLanguage);
+                                            const next = [...current];
+                                            next[idx] = e.target.value;
+                                            updateProduct({
+                                                inBox: setListForLang(product.inBox, activeLanguage, next),
+                                            });
+                                        }}
+                                        onBlur={() => {
+                                            const current = getListForLang(product.inBox, activeLanguage);
+                                            const raw = current[idx] || "";
+                                            const parts = raw
+                                                .split(/[\n,]+/g)
+                                                .map((value) => value.trim())
+                                                .filter(Boolean);
+                                            if (parts.length <= 1) return;
+                                            const next = [
+                                                ...current.slice(0, idx),
+                                                ...parts,
+                                                ...current.slice(idx + 1),
+                                            ];
+                                            updateProduct({
+                                                inBox: setListForLang(product.inBox, activeLanguage, next),
+                                            });
+                                        }}
                                     />
                                     <button
-                                        onClick={() => updateProduct({
-                                            inBox: product.inBox.filter((_, i) => i !== idx)
-                                        })}
+                                        onClick={() => {
+                                            const current = getListForLang(product.inBox, activeLanguage);
+                                            const next = current.filter((_, i) => i !== idx);
+                                            updateProduct({
+                                                inBox: setListForLang(product.inBox, activeLanguage, next),
+                                            });
+                                        }}
                                         className="text-slate-400 hover:text-rose-500"
                                     >×</button>
                                 </div>
                             ))}
                         </div>
                         <button
-                            onClick={() => updateProduct({
-                                inBox: [...product.inBox, { th: "", en: "" }]
-                            })}
+                            onClick={() => {
+                                const current = getListForLang(product.inBox, activeLanguage);
+                                updateProduct({
+                                    inBox: setListForLang(product.inBox, activeLanguage, [...current, ""]),
+                                });
+                            }}
                             className="w-full rounded-lg bg-slate-800 py-2 text-xs font-semibold text-white"
                         >
                             + Add Item

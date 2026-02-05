@@ -33,17 +33,17 @@ const productSchema = new mongoose.Schema(
         },
         // Description supports multi-language (stored as object for legacy compatibility)
         description: { type: Object, default: {} },
-        // Features: Map where each key's value can be string or {th, en}
-        features: { type: Map, of: mongoose.Schema.Types.Mixed, default: {} },
-        // Highlights: Array where each item can be string or {th, en}
-        highlights: { type: [mongoose.Schema.Types.Mixed], default: [] },
+        // Features: Multi-language object or map (legacy)
+        features: { type: mongoose.Schema.Types.Mixed, default: {} },
+        // Highlights: Multi-language list or legacy array
+        highlights: { type: mongoose.Schema.Types.Mixed, default: [] },
         warranty: {
             // Warranty texts support multi-language
             device: { type: mongoose.Schema.Types.Mixed, default: "" },
             compressor: { type: mongoose.Schema.Types.Mixed, default: "" },
         },
-        // InBox: Array where each item can be string or {th, en}
-        inBox: { type: [mongoose.Schema.Types.Mixed], default: [] },
+        // InBox: Multi-language list or legacy array
+        inBox: { type: mongoose.Schema.Types.Mixed, default: [] },
         price: {
             device: { type: Number, default: 0 },
             installation: { type: Number, default: 0 },

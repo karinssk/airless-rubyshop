@@ -268,15 +268,15 @@ export default async function ProductDetail({
 
                     <div className="grid gap-8 items-start lg:grid-cols-[1fr_400px]">
 
-                        {/* Left Column: Gallery */}
-                        <div className="space-y-8 lg:col-start-1">
+                        {/* Gallery */}
+                        <div className="order-1 lg:order-none lg:col-start-1">
                             <div className="bg-white rounded-3xl p-6 shadow-sm">
                                 <ServiceGallery images={images} />
                             </div>
                         </div>
 
                         {/* Right Column: Key Info & CTA (Sticky) */}
-                        <div className="space-y-6 lg:col-start-2 lg:row-start-1 lg:sticky lg:top-24">
+                        <div className="order-2 space-y-6 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-24">
                             <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
                                 {product.category && (
                                     <div className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -362,7 +362,7 @@ export default async function ProductDetail({
                         </div>
 
                         {/* Left Column: Details */}
-                        <div className="space-y-8 lg:col-start-1">
+                        <div className="order-3 space-y-8 lg:order-none lg:col-start-1">
                             {/* Compare Table */}
                             {product.compareTable?.columns?.length ? (
                                 <div className="bg-white rounded-3xl p-6 shadow-sm overflow-hidden">
@@ -455,6 +455,7 @@ export default async function ProductDetail({
                                 </div>
                             )}
                         </div>
+
                     </div>
 
                     {otherProducts.length > 0 && (
