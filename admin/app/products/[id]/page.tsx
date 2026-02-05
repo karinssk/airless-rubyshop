@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -114,6 +114,13 @@ type CompareTable = {
     rows: CompareCell[][];
 };
 
+type RichTextDoc = Record<string, any>;
+
+type MultiLangDoc = {
+    th?: RichTextDoc;
+    en?: RichTextDoc;
+};
+
 type ProductForm = {
     id?: string;
     name: MultiLangString;
@@ -122,7 +129,7 @@ type ProductForm = {
     btu: string;
     status: string;
     categoryId?: string | null;
-    description: Record<string, any>;
+    description: RichTextDoc | MultiLangDoc;
     features: Record<string, MultiLangString>;
     highlights: MultiLangString[];
     inBox: MultiLangString[];
@@ -133,6 +140,16 @@ type ProductForm = {
     compareTable: CompareTable;
 };
 
+const createEmptyDoc = (): RichTextDoc => ({
+    type: "doc",
+    content: [{ type: "paragraph" }],
+});
+
+const createEmptyDescription = (): MultiLangDoc => ({
+    th: createEmptyDoc(),
+    en: createEmptyDoc(),
+});
+
 const emptyProduct = (): ProductForm => ({
     name: { th: "", en: "" },
     slug: "",
@@ -140,7 +157,7 @@ const emptyProduct = (): ProductForm => ({
     btu: "",
     status: "draft",
     categoryId: null,
-    description: { type: "doc", content: [{ type: "paragraph" }] },
+    description: createEmptyDescription(),
     features: {},
     highlights: [],
     inBox: [],
@@ -174,6 +191,11 @@ export default function ProductDetailPage() {
     const [newFeatureValue, setNewFeatureValue] = useState("");
     const [uploading, setUploading] = useState(false);
     const [activeLanguage, setActiveLanguage] = useState<Language>("th");
+    const activeLanguageRef = useRef<Language>(activeLanguage);
+
+    useEffect(() => {
+        activeLanguageRef.current = activeLanguage;
+    }, [activeLanguage]);
 
     // Helper to extract language-specific string
     const getLabel = (label: MultiLangString | undefined): string => {
@@ -205,6 +227,63 @@ export default function ProductDetailPage() {
         return updated;
     };
 
+    const isRichTextDoc = (value: any): value is RichTextDoc =>
+        Boolean(value && typeof value === "object" && value.type === "doc");
+
+    const isMultiLangDoc = (value: any): value is MultiLangDoc =>
+        Boolean(
+            value &&
+            typeof value === "object" &&
+            ("th" in value || "en" in value)
+        );
+
+    const normalizeDescription = (
+        description: ProductForm["description"] | undefined
+    ): MultiLangDoc => {
+        if (isMultiLangDoc(description)) {
+            return {
+                th: isRichTextDoc(description.th)
+                    ? description.th
+                    : createEmptyDoc(),
+                en: isRichTextDoc(description.en)
+                    ? description.en
+                    : createEmptyDoc(),
+            };
+        }
+        if (isRichTextDoc(description)) {
+            return { th: description, en: description };
+        }
+        return createEmptyDescription();
+    };
+
+    const getDescriptionForLang = (
+        description: ProductForm["description"] | undefined,
+        lang: Language
+    ): RichTextDoc => {
+        const normalized = normalizeDescription(description);
+        return normalized[lang] || createEmptyDoc();
+    };
+
+    const setDescriptionForLang = (
+        description: ProductForm["description"] | undefined,
+        lang: Language,
+        doc: RichTextDoc
+    ): MultiLangDoc => {
+        const normalized = normalizeDescription(description);
+        return { ...normalized, [lang]: doc };
+    };
+
+    const updateDescriptionForLang = (lang: Language, doc: RichTextDoc) => {
+        setProduct((prev) =>
+            prev
+                ? {
+                    ...prev,
+                    description: setDescriptionForLang(prev.description, lang, doc),
+                }
+                : prev
+        );
+    };
+
     const editor = useEditor({
         extensions: [
             StarterKit.configure({ link: false }),
@@ -216,8 +295,11 @@ export default function ProductDetailPage() {
             Placeholder.configure({ placeholder: "Type product description..." }),
             TextAlign.configure({ types: ["heading", "paragraph"] }),
         ],
-        content: product?.description || emptyProduct().description,
+        content: createEmptyDoc(),
         immediatelyRender: false,
+        onUpdate: ({ editor }) => {
+            updateDescriptionForLang(activeLanguageRef.current, editor.getJSON());
+        },
         editorProps: {
             attributes: {
                 class:
@@ -227,9 +309,10 @@ export default function ProductDetailPage() {
     });
 
     useEffect(() => {
-        if (!editor || !product?.description) return;
-        editor.commands.setContent(product.description);
-    }, [product?.description, editor]);
+        if (!editor || !product) return;
+        const content = getDescriptionForLang(product.description, activeLanguage);
+        editor.commands.setContent(content);
+    }, [editor, activeLanguage, product?.id]);
 
     useEffect(() => {
         if (!API_URL) return;
@@ -254,6 +337,7 @@ export default function ProductDetailPage() {
                 setProduct({
                     ...emptyProduct(),
                     ...loaded,
+                    description: normalizeDescription(loaded.description),
                     categoryId: loaded.category?.id || loaded.categoryId || null,
                     compareTable:
                         loaded.compareTable || emptyProduct().compareTable,
@@ -371,63 +455,69 @@ export default function ProductDetailPage() {
         return data.url as string;
     };
 
-const saveProduct = async () => {
-    if (!product || !API_URL || !editor) return;
+    const saveProduct = async () => {
+        if (!product || !API_URL || !editor) return;
 
-    // Validate
-    if (!product.name) {
-        Toast.fire({
-            icon: "warning",
-            title: "Product name is required",
-        });
-        return;
-    }
-
-    const payload = {
-        ...product,
-        description: editor.getJSON(),
-    };
-    payload.price.total = Number(payload.price.device || 0) + Number(payload.price.installation || 0);
-    console.log("[Product Save] Payload", payload);
-
-    try {
-        const method = isNew ? "POST" : "PUT";
-        const url = isNew ? `${API_URL}/products` : `${API_URL}/products/${product.id}`;
-
-        const response = await fetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) throw new Error("Failed to save");
-
-        const data = await response.json();
-        console.log("[Product Save] Response", data);
-
-        if (data.product?.id) {
+        // Validate
+        if (!product.name) {
             Toast.fire({
-                icon: "success",
-                title: "Saved successfully",
+                icon: "warning",
+                title: "Product name is required",
             });
-            if (isNew) {
-                router.replace(`/products/${data.product.id}`);
-            }
+            return;
         }
-    } catch (e) {
-        Toast.fire({
-            icon: "error",
-            title: "Error saving product",
-        });
-    }
-};
 
-const deleteProduct = async () => {
-    if (!product?.id || !API_URL) return;
-    if (!confirm("Delete this product?")) return;
-    await fetch(`${API_URL}/products/${product.id}`, { method: "DELETE" });
-    router.push("/products");
-};
+        const nextDescription = setDescriptionForLang(
+            product.description,
+            activeLanguage,
+            editor.getJSON()
+        );
+
+        const payload = {
+            ...product,
+            description: nextDescription,
+        };
+        payload.price.total = Number(payload.price.device || 0) + Number(payload.price.installation || 0);
+        console.log("[Product Save] Payload", payload);
+
+        try {
+            const method = isNew ? "POST" : "PUT";
+            const url = isNew ? `${API_URL}/products` : `${API_URL}/products/${product.id}`;
+
+            const response = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) throw new Error("Failed to save");
+
+            const data = await response.json();
+            console.log("[Product Save] Response", data);
+
+            if (data.product?.id) {
+                Toast.fire({
+                    icon: "success",
+                    title: "Saved successfully",
+                });
+                if (isNew) {
+                    router.replace(`/products/${data.product.id}`);
+                }
+            }
+        } catch (e) {
+            Toast.fire({
+                icon: "error",
+                title: "Error saving product",
+            });
+        }
+    };
+
+    const deleteProduct = async () => {
+        if (!product?.id || !API_URL) return;
+        if (!confirm("Delete this product?")) return;
+        await fetch(`${API_URL}/products/${product.id}`, { method: "DELETE" });
+        router.push("/products");
+    };
 
 const addFeature = () => {
     if (!newFeatureKey || !newFeatureValue || !product) return;

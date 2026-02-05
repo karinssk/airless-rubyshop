@@ -12,6 +12,17 @@ function getLangString(value, locale) {
     return value[locale] || value.th || value.en || "";
 }
 
+// Helper function to extract language-specific rich text (TipTap JSON)
+function getLangDoc(value, locale) {
+    if (!value) return {};
+    if (typeof value === "string") return value;
+    if (value && typeof value === "object" && value.type === "doc") return value;
+    if (value && typeof value === "object") {
+        return value[locale] || value.th || value.en || {};
+    }
+    return {};
+}
+
 // Helper function to extract language-specific array items
 function getLangArray(arr, locale) {
     if (!Array.isArray(arr)) return [];
@@ -33,7 +44,7 @@ function localizeProduct(product, locale) {
     return {
         ...product,
         name: getLangString(product.name, locale),
-        description: product.description, // Keep as-is, frontend handles this
+        description: getLangDoc(product.description, locale),
         features: getLangFeatures(product.features, locale),
         highlights: getLangArray(product.highlights, locale),
         warranty: {
