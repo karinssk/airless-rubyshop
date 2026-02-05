@@ -1,7 +1,7 @@
 import Script from "next/script";
 import type { Metadata } from "next";
-import ChatWidget from "../components/ChatWidget";
-import PopupImage from "../components/PopupImage";
+import DeferredChatWidget from "../components/DeferredChatWidget";
+import DeferredPopupImage from "../components/DeferredPopupImage";
 import Footer from "../components/Footer";
 import Navbar, { type NavItem } from "../components/Navbar";
 import ContactBar from "../components/ContactBar";
@@ -290,8 +290,8 @@ export default async function Home({
       />
       <PageRenderer page={page} />
       {footer && <Footer footer={footer} />}
-      <ChatWidget />
-      <PopupImage />
+      <DeferredChatWidget />
+      <DeferredPopupImage />
     </div>
   );
 }

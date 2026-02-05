@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
-import ChatWidget from "../../../components/ChatWidget";
+import DeferredChatWidget from "../../../components/DeferredChatWidget";
 import BlogContent from "../../../components/BlogContent";
 import ServiceGallery from "../../../components/ServiceGallery";
 import ExpandableContent from "../../../components/ExpandableContent";
@@ -529,7 +529,7 @@ export default async function ProductDetail({
                 </div>
             </article>
             {footer && <Footer footer={footer} />}
-            <ChatWidget />
+            <DeferredChatWidget />
         </div>
     );
 }

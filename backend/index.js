@@ -73,9 +73,17 @@ const adminPresence = new Map();
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Static Uploads
+// Static Uploads (cache for faster repeat visits)
 const uploadsDir = path.join(__dirname, "uploads");
-app.use("/uploads", express.static(uploadsDir));
+app.use(
+  "/uploads",
+  express.static(uploadsDir, {
+    maxAge: "7d",
+    setHeaders: (res) => {
+      res.setHeader("Cache-Control", "public, max-age=604800");
+    },
+  })
+);
 
 // Routes
 app.use("/", require("./routes/auth"));

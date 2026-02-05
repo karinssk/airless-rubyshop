@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "../../../../components/Navbar";
 import Footer from "../../../../components/Footer";
-import ChatWidget from "../../../../components/ChatWidget";
+import DeferredChatWidget from "../../../../components/DeferredChatWidget";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 import { Link } from "@/lib/navigation";
 
@@ -393,7 +393,7 @@ export default async function ProductCategoryPage({
                 </button>
             </div>
             {footer && <Footer footer={footer} />}
-            <ChatWidget />
+            <DeferredChatWidget />
         </div>
     );
 }

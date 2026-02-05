@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
-import ChatWidget from "@/app/components/ChatWidget";
+import DeferredChatWidget from "@/app/components/DeferredChatWidget";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 
 // Cache revalidation time in seconds (60 = 1 minute)
@@ -162,7 +162,7 @@ export default async function BlogIndex({
         </div>
       </section>
       {footer && <Footer footer={footer} />}
-      <ChatWidget />
+      <DeferredChatWidget />
     </div>
   );
 }

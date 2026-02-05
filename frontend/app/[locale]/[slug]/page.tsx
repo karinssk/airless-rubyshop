@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { notFound } from "next/navigation";
 import PageRenderer from "../../components/PageRenderer";
-import ChatWidget from "../../components/ChatWidget";
+import DeferredChatWidget from "../../components/DeferredChatWidget";
 import Navbar, { type NavItem } from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { backendBaseUrl, frontendBaseUrl } from "@/lib/urls";
@@ -154,7 +154,7 @@ export default async function Page({
       />
       <PageRenderer page={page} />
       {footer && <Footer footer={footer} />}
-      <ChatWidget />
+      <DeferredChatWidget />
     </div>
   );
 }

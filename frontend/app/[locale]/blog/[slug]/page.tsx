@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
-import ChatWidget from "@/app/components/ChatWidget";
+import DeferredChatWidget from "@/app/components/DeferredChatWidget";
 import BlogContent from "@/app/components/BlogContent";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 
@@ -288,7 +288,7 @@ export default async function BlogDetail({
         </div>
       </article>
       {footer && <Footer footer={footer} />}
-      <ChatWidget />
+      <DeferredChatWidget />
     </div>
   );
 }

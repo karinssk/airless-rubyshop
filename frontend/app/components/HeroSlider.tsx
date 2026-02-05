@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export type HeroSlide = {
   image: string;
@@ -19,6 +20,8 @@ export default function HeroSlider({
   const [index, setIndex] = useState(0);
   const total = slides.length;
   const current = slides[index] || slides[0];
+  const imageFitClass =
+    imageFit === "cover" ? "object-cover" : imageFit === "fill" ? "object-fill" : "object-contain";
 
   if (!current) return null;
 
@@ -28,13 +31,14 @@ export default function HeroSlider({
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-none bg-white">
-      <img
+      <Image
         src={current.image}
         alt={current.title || "Hero slide"}
-        className={`h-full w-full object-${imageFit}`}
-        loading={index === 0 ? "eager" : "lazy"}
-        fetchPriority={index === 0 ? "high" : "auto"}
-        decoding="async"
+        fill
+        priority={index === 0}
+        sizes="100vw"
+        className={imageFitClass}
+        unoptimized={current.image.includes("localhost")}
       />
       <div className="absolute inset-0 bg-transparent" />
       <button
