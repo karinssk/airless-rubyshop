@@ -251,7 +251,6 @@ export default async function Home({
       "query-input": "required name=search_term_string",
     },
   };
- const backendBaseUrl = process.env.BACKEND_URL;
   return (
 
     <div>
@@ -264,7 +263,7 @@ export default async function Home({
       <Navbar
         items={menu?.items || []}
         cta={menu?.cta}
-        logoUrl={`${backendBaseUrl}/uploads/logo/rubyshop-no-bg-250pxx100px.jpg`}
+        logoUrl="/uploads/logo/rubyshop-no-bg-250pxx100px.jpg"
       />
       {faqItems.length > 0 && (
         <Script
