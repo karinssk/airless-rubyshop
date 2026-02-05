@@ -280,16 +280,15 @@ export default function Navbar({
               ☰
             </button>
             <Link href="/" className="flex items-center gap-3 text-lg font-semibold">
-              <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-white">
+              <span className="flex h-10 w-[140px] items-center justify-center rounded-md bg-white px-1">
                 {logoUrl || fallbackLogo ? (
                   <img
                     src={resolveUploadUrl(logoUrl || fallbackLogo)}
                     alt="Logo"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain"
                   />
                 ) : null}
               </span>
-              <span className="hidden sm:inline">RUBYSHOP</span>
             </Link>
           </div>
 
