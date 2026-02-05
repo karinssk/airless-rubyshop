@@ -38,7 +38,7 @@ type FooterData = {
 };
 
 const safeText = (value?: string) => (value ? String(value) : "");
-const fallbackLogo = "/uploads/logo/rubyshop-no-bg-250pxx100px.jpg";
+const fallbackLogo = "/uploads/logo/rubyshop-nobg.ico";
 const fallbackBrand = "RUBYSHOP เทคโนโลยีเครื่องมือช่าง";
 
 export default function Footer({ footer }: { footer: FooterData }) {
@@ -55,10 +55,10 @@ export default function Footer({ footer }: { footer: FooterData }) {
               <img
                 src={resolveUploadUrl(safeText(footer.brand?.logoUrl) || fallbackLogo)}
                 alt={safeText(footer.brand?.name) || fallbackBrand}
-                className="h-10 w-10 rounded-full bg-white p-1"
+                className="h-10 w-auto max-w-[160px] object-contain"
               />
             ) : (
-              <div className="h-10 w-10 rounded-full bg-white/10" />
+              <div className="h-10 w-24 rounded bg-white/10" />
             )}
             <p className="text-lg font-semibold">
               {safeText(footer.brand?.name) || fallbackBrand}

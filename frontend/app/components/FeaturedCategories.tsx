@@ -149,7 +149,7 @@ export default function FeaturedCategories(props: FeaturedCategoriesProps) {
             {categories.map((category) => (
               <Link
                 key={category.id}
-                href={`/${locale}/products?category=${category.slug}`}
+                href={`/${locale}/products/category/${category.slug}`}
                 className="group flex-shrink-0 rounded-xl p-3 transition-all hover:bg-slate-50 hover:shadow-lg"
                 style={{ width: "220px" }}
               >

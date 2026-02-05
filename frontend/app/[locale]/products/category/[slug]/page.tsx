@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-import ChatWidget from "../../components/ChatWidget";
+import Navbar from "../../../../components/Navbar";
+import Footer from "../../../../components/Footer";
+import ChatWidget from "../../../../components/ChatWidget";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 import { Link } from "@/lib/navigation";
 
@@ -85,33 +84,30 @@ async function fetchFooter() {
 export async function generateMetadata({
     params,
 }: {
-    params: Promise<{ locale: string }>;
+    params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-    const { locale } = await params;
+    const { locale, slug } = await params;
+    const categories = await fetchCategories();
+    const activeCategory = categories.find((category) => category.slug === slug);
+    const categoryName = activeCategory?.name || "สินค้า";
     const canonical = frontendBaseUrl
-        ? `${frontendBaseUrl}/${locale}/products`
-        : `/${locale}/products`;
+        ? `${frontendBaseUrl}/${locale}/products/category/${slug}`
+        : `/${locale}/products/category/${slug}`;
     return {
-        title: "เครื่องพ่นสีแรงดันสูง | RUBYSHOP",
-        description: "จำหน่ายเครื่องพ่นสีแรงดันสูง คุณภาพดี ราคาประหยัด พร้อมบริการหลังการขาย",
+        title: `${categoryName} | RUBYSHOP`,
+        description: `เลือกดูสินค้า ${categoryName} จาก RUBYSHOP`,
         alternates: { canonical },
     };
 }
 
-export default async function ProductsPage({
+export default async function ProductCategoryPage({
     params,
-    searchParams,
 }: {
-    params: Promise<{ locale: string }>;
-    searchParams: Promise<{ category?: string }>;
+    params: Promise<{ locale: string; slug: string }>;
 }) {
-    const { locale } = await params;
-    const searchParamsData = await searchParams;
-    const requestedCategory = searchParamsData?.category;
-    if (requestedCategory && requestedCategory !== "all") {
-        redirect(`/${locale}/products/category/${requestedCategory}`);
-    }
-    const activeCategory = "all";
+    const { locale, slug } = await params;
+    const activeCategory = slug;
+
     const [categories, products, menu, footer] = await Promise.all([
         fetchCategories(),
         fetchProducts(locale),
@@ -119,10 +115,9 @@ export default async function ProductsPage({
         fetchFooter(),
     ]);
 
-    const filteredProducts =
-        activeCategory === "all"
-            ? products
-            : products.filter((p) => p.category?.slug === activeCategory);
+    const filteredProducts = products.filter(
+        (product) => product.category?.slug === activeCategory
+    );
 
     const categoryById = new Map(categories.map((category) => [category.id, category]));
     const categoryBySlug = new Map(categories.map((category) => [category.slug, category]));
@@ -144,9 +139,9 @@ export default async function ProductsPage({
 
     const categoryTree = categories.filter((category) => !getParentId(category));
 
-    const getCategoryPath = (slug: string) => {
+    const getCategoryPath = (categorySlug: string) => {
         const path: ProductCategory[] = [];
-        let current = categoryBySlug.get(slug);
+        let current = categoryBySlug.get(categorySlug);
         const visited = new Set<string>();
         while (current && !visited.has(current.id)) {
             visited.add(current.id);
@@ -157,8 +152,7 @@ export default async function ProductsPage({
         return path;
     };
 
-    const activeCategoryPath =
-        activeCategory !== "all" ? getCategoryPath(activeCategory) : [];
+    const activeCategoryPath = getCategoryPath(activeCategory);
     const pageTitle =
         activeCategoryPath.length > 0
             ? activeCategoryPath[activeCategoryPath.length - 1].name
@@ -167,7 +161,7 @@ export default async function ProductsPage({
     const categoryCounts = categories.reduce<Record<string, number>>(
         (acc, category) => {
             acc[category.slug] = products.filter(
-                (p) => p.category?.slug === category.slug
+                (product) => product.category?.slug === category.slug
             ).length;
             return acc;
         },
@@ -213,13 +207,10 @@ export default async function ProductsPage({
                     >
                         <Link
                             href="/products"
-                            className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition ${activeCategory === "all"
-                                    ? "border-[var(--brand-navy)] bg-[var(--brand-navy)] text-white shadow-md"
-                                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                                }`}
+                            className="flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
                         >
                             <span>ทั้งหมด</span>
-                            <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${activeCategory === "all" ? "bg-white/20" : "bg-slate-100 text-slate-500"}`}>
+                            <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-500">
                                 {products.length}
                             </span>
                         </Link>
@@ -262,15 +253,10 @@ export default async function ProductsPage({
                                 <div className="mt-3 space-y-1 text-sm">
                                     <Link
                                         href="/products"
-                                        className={`flex items-center justify-between rounded-lg px-3 py-2 transition ${activeCategory === "all"
-                                                ? "bg-[var(--brand-navy)] text-white"
-                                                : "text-slate-700 hover:bg-slate-50"
-                                            }`}
+                                        className="flex items-center justify-between rounded-lg px-3 py-2 text-slate-700 transition hover:bg-slate-50"
                                     >
                                         <span>สินค้าทั้งหมด</span>
-                                        <span className={`text-xs ${activeCategory === "all" ? "text-white/80" : "text-slate-400"}`}>
-                                            {products.length}
-                                        </span>
+                                        <span className="text-xs text-slate-400">{products.length}</span>
                                     </Link>
                                     {(categoryTree.length > 0 ? categoryTree : categories).map((category) => {
                                         const renderCategory = (item: ProductCategory, level: number) => (
@@ -388,7 +374,6 @@ export default async function ProductsPage({
                             )}
                         </div>
                     </div>
-
                 </div>
             </section>
             <div className="fixed bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur md:hidden">
