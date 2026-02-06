@@ -82,10 +82,10 @@ export async function generateMetadata({
     getLocaleValue(page.seo?.title, locale) ||
     getLocaleValue(page.title, locale);
   const description = getLocaleValue(page.seo?.description, locale) || "";
-  const fallbackImage = frontendBaseUrl
-    ? `${frontendBaseUrl}/og-aircon.jpg`
-    : "/og-aircon.jpg";
-  const image = page.seo?.image || fallbackImage;
+  const fallbackImage = resolveUploadUrl(
+    "/uploads/logo/airless-rubyshop-fallback.webp"
+  );
+  const image = resolveUploadUrl(page.seo?.image || fallbackImage);
   const canonical = frontendBaseUrl
     ? `${frontendBaseUrl}/${locale}/${page.slug}`
     : `/${locale}/${page.slug}`;

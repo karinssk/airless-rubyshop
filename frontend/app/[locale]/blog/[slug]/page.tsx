@@ -93,9 +93,9 @@ export async function generateMetadata({
   if (!post) return {};
   const title = post.seo?.title || post.title;
   const description = post.seo?.description || post.excerpt || "";
-  const fallbackImage = frontendBaseUrl
-    ? `${frontendBaseUrl}/og-aircon.jpg`
-    : "/og-aircon.jpg";
+  const fallbackImage = resolveUploadUrl(
+    "/uploads/logo/airless-rubyshop-fallback.webp"
+  );
   const image = resolveUploadUrl(
     post.seo?.image || post.coverImage || fallbackImage
   );

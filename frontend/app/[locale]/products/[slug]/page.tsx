@@ -113,9 +113,9 @@ export async function generateMetadata({
     const description =
         product.seo?.description ||
         `${product.name} | ${storeName} — ${storeDescription}`;
-    const fallbackImage = frontendBaseUrl
-        ? `${frontendBaseUrl}/uploads/logo/fallback-images.png`
-        : "/uploads/logo/fallback-images.png";
+    const fallbackImage = resolveUploadUrl(
+        "/uploads/logo/airless-rubyshop-fallback.webp"
+    );
     const image = resolveUploadUrl(
         product.seo?.image || product.images?.[0] || fallbackImage
     );
