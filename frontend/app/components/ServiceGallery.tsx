@@ -80,9 +80,10 @@ export default function ServiceGallery({ images, youtubeId }: ServiceGalleryProp
             src={activeImageSrc}
             alt="Service gallery"
             fill
-            sizes="(max-width: 640px) 100vw, 640px"
+            sizes="(max-width: 1024px) 100vw, 900px"
             className="object-contain"
             priority
+            quality={95}
             unoptimized={activeImageSrc ? isLocalUrl(activeImageSrc) : false}
           />
         )}
