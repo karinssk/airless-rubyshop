@@ -90,9 +90,9 @@ function NavDropdownItem({ item }: { item: NavItem }) {
     >
       <Link
         href={item.href}
-        className="flex items-center gap-2 rounded-full px-3 py-2 text-center whitespace-normal leading-tight transition hover:bg-slate-100 max-w-[160px]"
+        className="flex min-w-0 items-center gap-2 rounded-full px-3 py-2 text-center whitespace-nowrap transition hover:bg-slate-100 max-w-[160px]"
       >
-        {item.label}
+        <span className="block flex-1 truncate">{item.label}</span>
         {hasChildren && <span className="text-xs">▾</span>}
       </Link>
       {hasChildren && (
