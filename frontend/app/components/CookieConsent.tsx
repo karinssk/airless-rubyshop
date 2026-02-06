@@ -9,7 +9,10 @@ export default function CookieConsent() {
   useEffect(() => {
     // Check if user has already accepted cookies
     const cookieConsent = localStorage.getItem("cookieConsent");
-    if (!cookieConsent) {
+    const cookieAccepted = document.cookie
+      .split("; ")
+      .some((cookie) => cookie === "cookieConsent=accepted");
+    if (!cookieConsent && !cookieAccepted) {
       // Small delay to prevent flash on page load
       const timer = setTimeout(() => {
         setShowBanner(true);
@@ -20,6 +23,8 @@ export default function CookieConsent() {
 
   const handleAccept = () => {
     localStorage.setItem("cookieConsent", "accepted");
+    document.cookie = "cookieConsent=accepted; path=/; max-age=31536000; SameSite=Lax";
+    window.dispatchEvent(new Event("cookieConsentAccepted"));
     setShowBanner(false);
   };
 
