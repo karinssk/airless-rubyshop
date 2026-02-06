@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 import Navbar, { type NavItem } from "../components/Navbar";
 import ContactBar from "../components/ContactBar";
 import PageRenderer from "../components/PageRenderer";
-import { backendBaseUrl, frontendBaseUrl } from "@/lib/urls";
+import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 
 type Block = {
   type: string;

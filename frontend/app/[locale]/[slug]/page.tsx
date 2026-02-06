@@ -5,7 +5,7 @@ import PageRenderer from "../../components/PageRenderer";
 import DeferredChatWidget from "../../components/DeferredChatWidget";
 import Navbar, { type NavItem } from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import { backendBaseUrl, frontendBaseUrl } from "@/lib/urls";
+import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 
 // Cache revalidation time in seconds (60 = 1 minute)
 const REVALIDATE_TIME = 60;
