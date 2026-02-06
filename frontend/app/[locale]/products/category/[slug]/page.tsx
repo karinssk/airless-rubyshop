@@ -301,14 +301,14 @@ export default async function ProductCategoryPage({
 
                         {/* Products Grid */}
                         <div>
-                            <div id="products-grid" className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+                            <div id="products-grid" className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-2 xl:grid-cols-3">
                                 {filteredProducts.map((product) => (
                                     <Link
                                         key={product.id}
                                         href={`/products/${product.slug}`}
-                                        className="group relative flex flex-col rounded-3xl bg-white p-3 shadow-xl shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-black/10 sm:p-4"
+                                        className="group relative flex flex-col rounded-3xl bg-white p-4 shadow-xl shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-black/10 sm:p-5"
                                     >
-                                        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-50">
+                                        <div className="relative aspect-[5/4] overflow-hidden rounded-2xl bg-slate-50">
                                             {product.images && product.images.length > 0 ? (
                                                 <img
                                                     src={resolveUploadUrl(product.images[0])}
@@ -327,14 +327,14 @@ export default async function ProductCategoryPage({
                                             )}
                                         </div>
 
-                                        <div className="mt-4 flex flex-1 flex-col">
+                                        <div className="mt-5 flex flex-1 flex-col">
                                             <div className="flex-1">
                                                 <div className="flex items-start justify-between gap-2">
-                                                    <h2 className="text-sm font-semibold text-[var(--brand-navy)] line-clamp-2 leading-snug sm:text-base">
+                                                    <h2 className="text-base font-semibold text-[var(--brand-navy)] line-clamp-2 leading-snug sm:text-lg">
                                                         {product.name}
                                                     </h2>
                                                 </div>
-                                                <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px] font-medium text-slate-500 sm:text-xs">
+                                                <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px] font-medium text-slate-500 sm:text-sm">
                                                     <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">{product.code}</span>
                                                     {product.btu && (
                                                         <span className="rounded bg-red-50 px-1.5 py-0.5 text-red-600">
@@ -345,17 +345,17 @@ export default async function ProductCategoryPage({
                                                 </div>
                                             </div>
 
-                                            <div className="mt-3 flex items-end justify-between">
+                                            <div className="mt-4 flex items-end justify-between">
                                                 <div>
-                                                    <p className="text-[10px] text-slate-400">ราคาเริ่มต้น</p>
-                                                    <p className="text-base font-bold text-[#f25c2a] sm:text-lg">
+                                                    <p className="text-[11px] text-slate-400">ราคาเริ่มต้น</p>
+                                                    <p className="text-lg font-bold text-[#f25c2a] sm:text-xl">
                                                         {product.price?.total
                                                             ? `฿${product.price.total.toLocaleString()}`
                                                             : "สอบถามราคา"}
                                                     </p>
                                                 </div>
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--brand-yellow)] text-white transition group-hover:bg-[var(--brand-navy)]">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                                                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-yellow)] text-white transition group-hover:bg-[var(--brand-navy)]">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
                                                         <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
                                                     </svg>
                                                 </span>
