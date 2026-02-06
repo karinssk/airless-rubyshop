@@ -138,6 +138,17 @@ export default async function ProductCategoryPage({
     });
 
     const categoryTree = categories.filter((category) => !getParentId(category));
+    const mobileCategoryItems: Array<{ item: ProductCategory; level: number }> = [];
+    const buildMobileCategories = (items: ProductCategory[], level = 0) => {
+        items.forEach((item) => {
+            mobileCategoryItems.push({ item, level });
+            const children = categoryChildren.get(item.id) || [];
+            if (children.length > 0) {
+                buildMobileCategories(children, level + 1);
+            }
+        });
+    };
+    buildMobileCategories(categoryTree.length > 0 ? categoryTree : categories);
 
     const getCategoryPath = (categorySlug: string) => {
         const path: ProductCategory[] = [];
@@ -214,35 +225,30 @@ export default async function ProductCategoryPage({
                                 {products.length}
                             </span>
                         </Link>
-                        {(categoryTree.length > 0 ? categoryTree : categories).map((category) => {
-                            const renderCategory = (item: ProductCategory, level: number) => (
-                                <div key={item.id} className="flex flex-wrap gap-3">
-                                    <Link
-                                        href={`/products/category/${item.slug}`}
-                                        className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition ${activeCategory === item.slug
-                                                ? "border-[var(--brand-navy)] bg-[var(--brand-navy)] text-white shadow-md"
-                                                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                                            }`}
-                                        style={{ marginLeft: level * 12 }}
-                                    >
-                                        {item.logo && (
-                                            <img
-                                                src={resolveUploadUrl(item.logo)}
-                                                alt=""
-                                                className={`h-4 w-4 object-contain ${activeCategory === item.slug ? "brightness-0 invert" : ""}`}
-                                            />
-                                        )}
-                                        <span>{level > 0 ? `↳ ${item.name}` : item.name}</span>
-                                        <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${activeCategory === item.slug ? "bg-white/20" : "bg-slate-100 text-slate-500"}`}>
-                                            {categoryCounts[item.slug] || 0}
-                                        </span>
-                                    </Link>
-                                    {(categoryChildren.get(item.id) || []).map((child) => renderCategory(child, level + 1))}
-                                </div>
-                            );
-
-                            return renderCategory(category, 0);
-                        })}
+                        {mobileCategoryItems.map(({ item, level }) => (
+                            <Link
+                                key={item.id}
+                                href={`/products/category/${item.slug}`}
+                                className={`flex max-w-[220px] shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition ${activeCategory === item.slug
+                                        ? "border-[var(--brand-navy)] bg-[var(--brand-navy)] text-white shadow-md"
+                                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                                    }`}
+                            >
+                                {item.logo && (
+                                    <img
+                                        src={resolveUploadUrl(item.logo)}
+                                        alt=""
+                                        className={`h-4 w-4 object-contain ${activeCategory === item.slug ? "brightness-0 invert" : ""}`}
+                                    />
+                                )}
+                                <span className="min-w-0 flex-1 truncate">
+                                    {level > 0 ? `↳ ${item.name}` : item.name}
+                                </span>
+                                <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${activeCategory === item.slug ? "bg-white/20" : "bg-slate-100 text-slate-500"}`}>
+                                    {categoryCounts[item.slug] || 0}
+                                </span>
+                            </Link>
+                        ))}
                     </div>
 
                     <div className="mt-6 grid gap-6 lg:grid-cols-[260px_1fr]">
@@ -376,7 +382,7 @@ export default async function ProductCategoryPage({
                     </div>
                 </div>
             </section>
-            <div className="fixed bottom-4 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur md:hidden">
+            <div className="fixed bottom-4 left-1/2 z-30 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur">
                 <a
                     href="#category-filters"
                     className="px-3 py-1 text-xs font-semibold text-slate-600"
