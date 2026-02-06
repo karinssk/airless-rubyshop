@@ -22,8 +22,15 @@ export default function ServiceGallery({ images, youtubeId }: ServiceGalleryProp
     return next;
   }, [images, youtubeId]);
 
+  const isLocalUrl = (value: string) =>
+    value.includes("localhost") || value.includes("127.0.0.1");
+
   const [activeIndex, setActiveIndex] = useState(0);
   const activeItem = items[activeIndex];
+  const activeImageSrc =
+    activeItem?.type === "image"
+      ? resolveUploadUrl(activeItem?.src || images[0])
+      : "";
   const [videoLoaded, setVideoLoaded] = useState(false);
 
   const handleSelect = (index: number) => {
@@ -35,7 +42,7 @@ export default function ServiceGallery({ images, youtubeId }: ServiceGalleryProp
 
   return (
     <div className="grid gap-4">
-      <div className="relative mx-auto w-full max-w-[640px] aspect-[4/3] sm:aspect-square overflow-hidden rounded-2xl bg-white">
+      <div className="relative mx-auto w-full max-w-none aspect-[4/5] sm:aspect-[4/3] lg:aspect-square overflow-hidden rounded-2xl bg-white">
         {activeItem?.type === "video" ? (
           videoLoaded ? (
             <iframe
@@ -70,12 +77,13 @@ export default function ServiceGallery({ images, youtubeId }: ServiceGalleryProp
           )
         ) : (
           <Image
-            src={resolveUploadUrl(activeItem?.src || images[0])}
+            src={activeImageSrc}
             alt="Service gallery"
             fill
             sizes="(max-width: 640px) 100vw, 640px"
             className="object-contain"
             priority
+            unoptimized={activeImageSrc ? isLocalUrl(activeImageSrc) : false}
           />
         )}
         <button
@@ -105,7 +113,7 @@ export default function ServiceGallery({ images, youtubeId }: ServiceGalleryProp
           <button
             key={`${item.type}-${item.type === "image" ? item.src : item.id}-${index}`}
             onClick={() => handleSelect(index)}
-            className={`h-16 w-20 overflow-hidden rounded-lg border ${
+            className={`h-20 w-24 overflow-hidden rounded-lg border sm:h-16 sm:w-20 ${
               index === activeIndex
                 ? "border-red-400 ring-2 ring-red-200"
                 : "border-slate-200"
@@ -136,6 +144,7 @@ export default function ServiceGallery({ images, youtubeId }: ServiceGalleryProp
                 sizes="80px"
                 className="object-contain bg-white"
                 loading="lazy"
+                unoptimized={isLocalUrl(resolveUploadUrl(item.src))}
               />
             )}
           </button>

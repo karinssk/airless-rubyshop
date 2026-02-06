@@ -320,57 +320,54 @@ export default async function ProductsPage({
                                     <Link
                                         key={product.id}
                                         href={`/products/${product.slug}`}
-                                        className="group relative flex flex-col rounded-3xl bg-white p-4 shadow-xl shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-black/10 sm:p-5"
+                                        className="group relative flex flex-col rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md sm:p-4"
                                     >
-                                        <div className="relative aspect-[5/4] overflow-hidden rounded-2xl bg-slate-50">
+                                        <div className="relative aspect-square overflow-hidden rounded-xl bg-white p-3">
                                             {product.images && product.images.length > 0 ? (
                                                 <img
                                                     src={resolveUploadUrl(product.images[0])}
                                                     alt={product.name}
-                                                    className="h-full w-full object-contain mix-blend-multiply transition duration-500 group-hover:scale-105"
+                                                    className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
                                                 />
                                             ) : (
                                                 <div className="flex h-full items-center justify-center text-xs text-slate-400">
                                                     No image
                                                 </div>
                                             )}
-                                            {product.category && (
-                                                <span className="absolute top-2 left-2 rounded-lg bg-white/90 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 backdrop-blur-sm">
-                                                    {product.category.name}
-                                                </span>
-                                            )}
                                         </div>
 
-                                        <div className="mt-4 flex flex-1 flex-col">
-                                            <div className="flex-1">
-                                                <div className="flex items-start justify-between gap-2">
-                                                    <h2 className="text-base font-semibold text-[var(--brand-navy)] line-clamp-2 leading-snug sm:text-lg">
-                                                        {product.name}
-                                                    </h2>
-                                                </div>
-                                                <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-medium text-slate-500 sm:text-sm">
-                                                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">{product.code}</span>
-                                                    {product.btu && (
-                                                        <span className="rounded bg-red-50 px-1.5 py-0.5 text-red-600">
-                                                            {product.btu}
-                                                            <span className="hidden sm:inline"> BTU</span>
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
+                                        <div className="mt-3 flex flex-1 flex-col">
+                                            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                                {product.category?.name || "สินค้า"}
+                                            </p>
+                                            <h2 className="mt-1 text-sm font-semibold text-[var(--brand-navy)] line-clamp-2 leading-snug sm:text-base">
+                                                {product.name}
+                                            </h2>
 
-                                            <div className="mt-4 flex items-end justify-between">
+                                            <div className="mt-3 flex items-end justify-between">
                                                 <div>
-                                                    <p className="text-[11px] text-slate-400">ราคาเริ่มต้น</p>
-                                                    <p className="text-lg font-bold text-[#f25c2a] sm:text-xl">
+                                                    <p className="text-[10px] text-slate-400">ราคาเริ่มต้น</p>
+                                                    <p className="text-base font-bold text-[var(--brand-navy)] sm:text-lg">
                                                         {product.price?.total
                                                             ? `฿${product.price.total.toLocaleString()}`
                                                             : "สอบถามราคา"}
                                                     </p>
                                                 </div>
-                                                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-yellow)] text-white transition group-hover:bg-[var(--brand-navy)]">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
-                                                        <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
+                                                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-700 transition hover:bg-slate-50">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="2"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        className="h-4 w-4"
+                                                    >
+                                                        <path d="M6 6h15l-1.5 9h-12z" />
+                                                        <path d="M6 6l-2-2" />
+                                                        <circle cx="9" cy="20" r="1" />
+                                                        <circle cx="18" cy="20" r="1" />
                                                     </svg>
                                                 </span>
                                             </div>
