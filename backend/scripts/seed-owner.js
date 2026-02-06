@@ -8,7 +8,7 @@ const seedOwner = async () => {
     console.log("Connecting to MongoDB...");
     const mongoUri =
         process.env.MONGO_URI ||
-        "mongodb+srv://ssk2:258369@cluster0.stk3a.mongodb.net/airless-db?retryWrites=true&w=majority";
+        "mongodb://admin_ruby168:258369ss@127.0.0.1:27017/airless-db?authSource=admin";
     await mongoose.connect(mongoUri);
     console.log("Connected.");
 
