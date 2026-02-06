@@ -219,6 +219,45 @@ export default async function ProductDetail({
         })
         .slice(0, 4);
 
+    const resolveFeatures = () => {
+        const raw = product.features as unknown;
+        if (!raw || typeof raw !== "object") return {};
+        const record = raw as Record<string, any>;
+        if ("th" in record || "en" in record) {
+            const localized = record[locale] ?? record.th ?? record.en;
+            if (localized && typeof localized === "object" && !Array.isArray(localized)) {
+                return localized as Record<string, any>;
+            }
+            if (typeof localized === "string") {
+                const label = locale === "th" ? "รายละเอียด" : "Details";
+                return { [label]: localized };
+            }
+            return {};
+        }
+        if (Array.isArray(raw)) {
+            const label = locale === "th" ? "รายการ" : "Item";
+            return raw.reduce<Record<string, any>>((acc, value, index) => {
+                acc[`${label} ${index + 1}`] = value;
+                return acc;
+            }, {});
+        }
+        return record;
+    };
+
+    const featureEntries = Object.entries(resolveFeatures())
+        .map(([key, value]) => {
+            let displayValue = value;
+            if (value && typeof value === "object") {
+                if ("th" in value || "en" in value) {
+                    displayValue = value[locale] ?? value.th ?? value.en ?? "";
+                } else {
+                    displayValue = "";
+                }
+            }
+            return [key, displayValue];
+        })
+        .filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== "");
+
     // Product Schema for rich snippets
     const productSchema = {
         "@context": "https://schema.org",
@@ -304,9 +343,9 @@ export default async function ProductDetail({
                                     </div>
                                     <div className="flex justify-between items-end pt-3 border-t border-slate-100">
                                         <span className="text-sm font-medium text-slate-900">ราคาสุทธิ</span>
-                                        <span className="text-3xl font-bold text-[#f25c2a]">฿{product.price.total.toLocaleString()}</span>
+                                        <span className="text-3xl font-bold text-[var(--brand-navy)]">฿{product.price.total.toLocaleString()}</span>
                                     </div>
-                                    <p className="text-[10px] text-right text-slate-400 mt-1">* ราคารวมภาษีมูลค่าเพิ่มแล้ว</p>
+                                    <p className="text-[10px] text-right text-slate-400 mt-1">* ราคายังไม่รวมรวมภาษีมูลค่าเพิ่ม</p>
                                 </div>
 
                                 <div className="space-y-3">
@@ -433,16 +472,16 @@ export default async function ProductDetail({
                             ) : null}
 
                             {/* Features Table */}
-                            {Object.keys(product.features).length > 0 && (
+                            {featureEntries.length > 0 && (
                                 <div className="bg-white rounded-3xl p-6 shadow-sm overflow-hidden">
                                     <h3 className="text-lg font-bold text-black mb-4">ข้อมูลทางเทคนิค</h3>
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-sm">
                                             <tbody className="divide-y divide-slate-100">
-                                                {Object.entries(product.features).map(([key, value]) => (
+                                                {featureEntries.map(([key, value]) => (
                                                     <tr key={key} className="group hover:bg-slate-50">
                                                         <td className="py-3 px-4 font-medium text-slate-600 w-1/3 bg-slate-50/50 group-hover:bg-slate-50">{key}</td>
-                                                        <td className="py-3 px-4 text-slate-800">{value}</td>
+                                                        <td className="py-3 px-4 text-slate-800">{String(value)}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
