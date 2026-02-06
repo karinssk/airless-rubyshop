@@ -322,7 +322,7 @@ export default async function ProductsPage({
                                         href={`/products/${product.slug}`}
                                         className="group relative flex flex-col rounded-3xl bg-white p-4 shadow-xl shadow-black/5 transition duration-300 hover:-translate-y-1 hover:shadow-black/10 sm:p-5"
                                     >
-                                        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-50">
+                                        <div className="relative aspect-[5/4] overflow-hidden rounded-2xl bg-slate-50">
                                             {product.images && product.images.length > 0 ? (
                                                 <img
                                                     src={resolveUploadUrl(product.images[0])}
