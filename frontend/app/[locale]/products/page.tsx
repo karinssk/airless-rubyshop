@@ -103,11 +103,13 @@ export default async function ProductsPage({
     searchParams,
 }: {
     params: Promise<{ locale: string }>;
-    searchParams: Promise<{ category?: string }>;
+    searchParams: Promise<{ category?: string; sort?: string }>;
 }) {
     const { locale } = await params;
     const searchParamsData = await searchParams;
     const requestedCategory = searchParamsData?.category;
+    const sortParam = searchParamsData?.sort;
+    const sortOrder = sortParam === "price-desc" ? "price-desc" : "price-asc";
     if (requestedCategory && requestedCategory !== "all") {
         redirect(`/${locale}/products/category/${requestedCategory}`);
     }
@@ -123,6 +125,12 @@ export default async function ProductsPage({
         activeCategory === "all"
             ? products
             : products.filter((p) => p.category?.slug === activeCategory);
+    const sortedProducts = [...filteredProducts].sort((a, b) => {
+        const priceA = a.price?.total ?? Number.POSITIVE_INFINITY;
+        const priceB = b.price?.total ?? Number.POSITIVE_INFINITY;
+        if (priceA === priceB) return 0;
+        return sortOrder === "price-desc" ? priceB - priceA : priceA - priceB;
+    });
 
     const categoryById = new Map(categories.map((category) => [category.id, category]));
     const categoryBySlug = new Map(categories.map((category) => [category.slug, category]));
@@ -315,8 +323,32 @@ export default async function ProductsPage({
 
                         {/* Products Grid */}
                         <div>
+                            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                                <p className="text-sm font-semibold text-slate-700">
+                                    สินค้าทั้งหมด {filteredProducts.length} รายการ
+                                </p>
+                                <div className="flex items-center gap-2 text-xs font-semibold">
+                                    <span className="text-slate-500">เรียงตาม:</span>
+                                    {[
+                                        { value: "price-asc", label: "ราคาต่ำไปสูง" },
+                                        { value: "price-desc", label: "ราคาสูงไปต่ำ" },
+                                    ].map((option) => (
+                                        <Link
+                                            key={option.value}
+                                            href={`/products?sort=${option.value}`}
+                                            className={`rounded-full border px-3 py-1 transition ${
+                                                sortOrder === option.value
+                                                    ? "border-[var(--brand-navy)] bg-[var(--brand-navy)] text-white"
+                                                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                                            }`}
+                                        >
+                                            {option.label}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
                             <div id="products-grid" className="grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-2 xl:grid-cols-3">
-                                {filteredProducts.map((product) => (
+                                {sortedProducts.map((product) => (
                                     <Link
                                         key={product.id}
                                         href={`/products/${product.slug}`}
