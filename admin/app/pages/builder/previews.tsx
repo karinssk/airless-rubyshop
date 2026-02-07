@@ -65,6 +65,32 @@ const isEmbeddableMapUrl = (value: string) =>
 const isProbablyImage = (value: string) =>
   /^(https?:|\/|uploads\/)/i.test(value);
 
+const extractYouTubeId = (value?: string) => {
+  const raw = safeText(value).trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    if (url.hostname.includes("youtu.be")) {
+      return url.pathname.replace("/", "");
+    }
+    if (url.hostname.includes("youtube.com")) {
+      if (url.searchParams.get("v")) return url.searchParams.get("v") || "";
+      const paths = url.pathname.split("/").filter(Boolean);
+      const embedIndex = paths.indexOf("embed");
+      if (embedIndex !== -1 && paths[embedIndex + 1]) {
+        return paths[embedIndex + 1];
+      }
+      const shortsIndex = paths.indexOf("shorts");
+      if (shortsIndex !== -1 && paths[shortsIndex + 1]) {
+        return paths[shortsIndex + 1];
+      }
+    }
+  } catch {
+    return "";
+  }
+  return "";
+};
+
 function ImageSliderPreview({
   images,
   onCaptionChange,
@@ -242,7 +268,7 @@ export function LivePreview({
           className="relative overflow-hidden"
           style={backgroundColor ? { backgroundColor } : undefined}
         >
-          <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 pb-16 pt-10 lg:flex-row lg:items-center">
+          <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-10 pt-8 sm:px-6 sm:pb-12 sm:pt-10 lg:flex-row lg:items-center lg:gap-10 lg:pb-16">
             <div className="max-w-xl space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1 text-xs font-semibold text-[var(--brand-navy)]">
                 <span className="h-2 w-2 rounded-full bg-[var(--brand-orange)]" />
@@ -251,14 +277,14 @@ export function LivePreview({
                   onCommit={(value) => onUpdateBlock(index, { subtitle: value })}
                 />
               </div>
-              <h1 className="text-4xl font-semibold leading-tight text-[var(--brand-navy)] md:text-5xl">
+              <h1 className="text-3xl font-semibold leading-tight text-[var(--brand-navy)] sm:text-4xl lg:text-5xl">
                 <EditableText
                   value={safeText(props.title)}
                   onCommit={(value) => onUpdateBlock(index, { title: value })}
                   className="text-[var(--brand-navy)]"
                 />
               </h1>
-              <p className="text-lg text-slate-700">
+              <p className="text-sm text-slate-700 sm:text-base lg:text-lg">
                 <EditableText
                   value={safeText(props.description)}
                   onCommit={(value) =>
@@ -269,7 +295,7 @@ export function LivePreview({
                 />
               </p>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <span className="rounded-full bg-[var(--brand-blue)] px-6 py-3 text-center font-semibold text-white shadow-lg shadow-blue-900/20">
+                <span className="rounded-full bg-[var(--brand-blue)] px-5 py-2.5 text-center text-sm font-semibold text-white shadow-lg shadow-blue-900/20 sm:px-6 sm:py-3">
                   <EditableText
                     value={safeText(props.primaryCtaText) || "จองคิว"}
                     onCommit={(value) =>
@@ -278,7 +304,7 @@ export function LivePreview({
                     className="text-white"
                   />
                 </span>
-                <span className="rounded-full border border-[var(--brand-blue)] px-6 py-3 text-center font-semibold text-[var(--brand-blue)]">
+                <span className="rounded-full border border-[var(--brand-blue)] px-5 py-2.5 text-center text-sm font-semibold text-[var(--brand-blue)] sm:px-6 sm:py-3">
                   <EditableText
                     value={safeText(props.secondaryCtaText) || "ดูรายละเอียด"}
                     onCommit={(value) =>
@@ -296,10 +322,10 @@ export function LivePreview({
                   <img
                     src={heroImage}
                     alt={safeText(props.title) || "Hero image"}
-                    className="h-80 w-full object-cover"
+                    className="h-64 w-full object-cover sm:h-72 lg:h-80"
                   />
                 ) : (
-                  <div className="flex h-80 items-center justify-center text-sm text-slate-400">
+                  <div className="flex h-64 items-center justify-center text-sm text-slate-400 sm:h-72 lg:h-80">
                     No hero image
                   </div>
                 )}
@@ -382,6 +408,89 @@ export function LivePreview({
           style={backgroundColor ? { backgroundColor } : undefined}
         >
           <HeroImagesPreview images={images} />
+        </section>
+      );
+    }
+
+    if (block.type === "youtube-embed") {
+      const heading = safeText(props.heading);
+      const videoId = extractYouTubeId(props.videoUrl);
+      const embedUrl = videoId
+        ? `https://www.youtube.com/embed/${videoId}`
+        : "";
+      return wrap(
+        <section className="py-16">
+          <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6">
+            <h2 className="text-center text-2xl font-semibold text-[var(--brand-navy)]">
+              <EditableText
+                value={heading}
+                onCommit={(value) => onUpdateBlock(index, { heading: value })}
+                className="text-[var(--brand-navy)]"
+              />
+            </h2>
+            <div className="relative w-full overflow-hidden rounded-3xl bg-slate-100 shadow-xl shadow-slate-900/10">
+              {embedUrl ? (
+                <iframe
+                  title={heading || "YouTube Video"}
+                  src={embedUrl}
+                  className="aspect-video w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <div className="flex aspect-video items-center justify-center text-sm text-slate-400">
+                  Paste a valid YouTube URL to preview the video.
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    if (block.type === "customer-reviews-images") {
+      const heading = safeText(props.heading);
+      const imageLeft = resolvePreviewImage(props.imageLeft);
+      const imageRight = resolvePreviewImage(props.imageRight);
+      return wrap(
+        <section className="py-16">
+          <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6">
+            <h2 className="text-center text-2xl font-semibold text-[var(--brand-navy)]">
+              <EditableText
+                value={heading}
+                onCommit={(value) => onUpdateBlock(index, { heading: value })}
+                className="text-[var(--brand-navy)]"
+              />
+            </h2>
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="overflow-hidden rounded-3xl bg-slate-100 shadow-lg shadow-slate-900/10">
+                {imageLeft ? (
+                  <img
+                    src={imageLeft}
+                    alt="Customer review 1"
+                    className="aspect-[4/5] w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex aspect-[4/5] items-center justify-center text-sm text-slate-400">
+                    Upload left image
+                  </div>
+                )}
+              </div>
+              <div className="overflow-hidden rounded-3xl bg-slate-100 shadow-lg shadow-slate-900/10">
+                {imageRight ? (
+                  <img
+                    src={imageRight}
+                    alt="Customer review 2"
+                    className="aspect-[4/5] w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex aspect-[4/5] items-center justify-center text-sm text-slate-400">
+                    Upload right image
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </section>
       );
     }
@@ -3230,7 +3339,7 @@ export function LivePreview({
       const buttonTextColor = safeText(props.buttonTextColor) || "#000000";
 
       return wrap(
-        <section className="relative min-h-[500px] overflow-hidden">
+        <section className="relative min-h-[320px] overflow-hidden sm:min-h-[420px] md:min-h-[520px] lg:min-h-[600px]">
           {/* Background Image */}
           {backgroundImage ? (
             <img
@@ -3249,15 +3358,15 @@ export function LivePreview({
           />
 
           {/* Content */}
-          <div className="relative z-10 flex min-h-[500px] flex-col items-center justify-center px-6 py-20 text-center text-white">
-            <h1 className="max-w-4xl text-4xl font-bold uppercase tracking-wide md:text-5xl lg:text-6xl">
+          <div className="relative z-10 flex min-h-[320px] flex-col items-center justify-center px-4 py-12 text-center text-white sm:min-h-[420px] sm:px-6 sm:py-16 md:min-h-[520px] md:py-20 lg:min-h-[600px]">
+            <h1 className="max-w-[720px] text-2xl font-bold uppercase tracking-wide sm:text-3xl md:text-4xl lg:text-5xl">
               <EditableText
                 value={safeText(props.title) || "BUILT FOR THE UNBREAKABLE™"}
                 onCommit={(value) => onUpdateBlock(index, { title: value })}
                 className="text-white"
               />
             </h1>
-            <p className="mt-6 max-w-2xl text-base text-slate-200 md:text-lg">
+            <p className="mt-4 max-w-xl text-xs text-slate-200 sm:mt-6 sm:max-w-2xl sm:text-base md:text-lg">
               <EditableText
                 value={safeText(props.description)}
                 onCommit={(value) => onUpdateBlock(index, { description: value })}
@@ -3266,7 +3375,7 @@ export function LivePreview({
             </p>
             <a
               href={safeText(props.buttonHref) || "#"}
-              className="mt-8 inline-block px-8 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:opacity-90"
+              className="mt-6 inline-block px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:opacity-90 sm:mt-8 sm:px-8 sm:py-3 sm:text-sm"
               style={{ backgroundColor: buttonColor, color: buttonTextColor }}
             >
               <EditableText
@@ -3437,7 +3546,7 @@ function HeroImagesPreview({
 
   if (!current) {
     return (
-      <div className="flex h-[380px] items-center justify-center text-sm text-slate-400 sm:h-[480px] lg:h-[600px]">
+      <div className="flex h-[260px] items-center justify-center text-sm text-slate-400 sm:h-[360px] md:h-[480px] lg:h-[600px]">
         No hero images yet.
       </div>
     );
@@ -3447,7 +3556,7 @@ function HeroImagesPreview({
   const goNext = () => setIndex((prev) => (prev + 1) % total);
 
   return (
-    <div className="relative h-[380px] w-full overflow-hidden bg-white sm:h-[480px] lg:h-[600px]">
+    <div className="relative h-[260px] w-full overflow-hidden bg-white sm:h-[360px] md:h-[480px] lg:h-[600px]">
       <img
         src={resolvePreviewImage(current.image)}
         alt={safeText(current.title) || "Hero slide"}

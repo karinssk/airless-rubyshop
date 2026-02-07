@@ -31,7 +31,7 @@ export default function HeroImagesWithButton(props: HeroImagesWithButtonProps) {
   const isExternalLink = buttonHref.startsWith("http");
 
   return (
-    <section className="relative min-h-[500px] overflow-hidden md:min-h-[600px]">
+    <section className="relative min-h-[320px] overflow-hidden sm:min-h-[420px] md:min-h-[520px] lg:min-h-[600px]">
       {/* Background Image */}
       {resolvedImage ? (
         <Image
@@ -54,13 +54,13 @@ export default function HeroImagesWithButton(props: HeroImagesWithButtonProps) {
       />
 
       {/* Content */}
-      <div className="relative z-10 flex min-h-[500px] flex-col items-center justify-end px-6 pt-16 pb-14 text-center text-white md:min-h-[600px] md:pt-24 md:pb-20">
-        <h1 className="max-w-4xl text-3xl font-bold uppercase tracking-wide sm:text-4xl md:text-5xl lg:text-6xl">
+      <div className="relative z-10 flex min-h-[320px] flex-col items-center justify-end px-4 pt-10 pb-8 text-center text-white sm:min-h-[420px] sm:px-6 sm:pt-16 sm:pb-12 md:min-h-[520px] md:pt-20 md:pb-16 lg:min-h-[600px]">
+        <h1 className="max-w-[720px] text-2xl font-bold uppercase tracking-wide sm:text-3xl md:text-4xl lg:text-5xl">
           {title}
         </h1>
 
         {description && (
-          <p className="mt-6 max-w-2xl text-sm text-slate-200 sm:text-base md:text-lg">
+          <p className="mt-4 max-w-xl text-xs text-slate-200 sm:mt-6 sm:max-w-2xl sm:text-base md:text-lg">
             {description}
           </p>
         )}
@@ -72,7 +72,7 @@ export default function HeroImagesWithButton(props: HeroImagesWithButtonProps) {
                 href={buttonHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-8 inline-block rounded-full px-8 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:opacity-90 hover:scale-105"
+                className="mt-6 inline-block rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:opacity-90 hover:scale-105 sm:mt-8 sm:px-8 sm:py-3 sm:text-sm"
                 style={{ backgroundColor: buttonColor, color: buttonTextColor }}
               >
                 {buttonText}
@@ -80,7 +80,7 @@ export default function HeroImagesWithButton(props: HeroImagesWithButtonProps) {
             ) : (
               <Link
                 href={buttonHref}
-                className="mt-8 inline-block rounded-full px-8 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:opacity-90 hover:scale-105"
+                className="mt-6 inline-block rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-all hover:opacity-90 hover:scale-105 sm:mt-8 sm:px-8 sm:py-3 sm:text-sm"
                 style={{ backgroundColor: buttonColor, color: buttonTextColor }}
               >
                 {buttonText}

@@ -18,6 +18,18 @@ export const blockCatalog = [
     stripe: "bg-slate-400",
   },
   {
+    type: "youtube-embed",
+    label: "YouTube Video",
+    preview: "bg-black",
+    stripe: "bg-red-500",
+  },
+  {
+    type: "customer-reviews-images",
+    label: "Customer Reviews Images",
+    preview: "bg-white",
+    stripe: "bg-[var(--brand-navy)]",
+  },
+  {
     type: "hero-with-available-rooms-check",
     label: "Hero With Product Search",
     preview: "bg-[var(--brand-navy)]",
@@ -251,6 +263,8 @@ export const thumbnailMap: Record<string, string> = {
   hero: "/thumbnails/hero.svg",
   "landing-hero-01": "/thumbnails/hero.svg",
   "hero-images": "/thumbnails/hero-images.svg",
+  "youtube-embed": "/thumbnails/gallery.svg",
+  "customer-reviews-images": "/thumbnails/gallery.svg",
   "hero-with-available-rooms-check": "/thumbnails/hero.svg",
   "contact-and-services": "/thumbnails/contact-and-services.svg",
   "achievement-expreience": "/thumbnails/achievement-expreience.svg",
@@ -325,6 +339,17 @@ export const defaultProps: Record<string, Record<string, unknown>> = {
         subtitle: "พร้อมจัดส่งและบริการหลังการขาย",
       },
     ],
+  },
+  "youtube-embed": {
+    heading: "วิดีโอแนะนำ",
+    videoUrl: "https://www.youtube.com/watch?v=Lq8aMdPJStU",
+  },
+  "customer-reviews-images": {
+    heading: "รีวิวจากลูกค้า",
+    imageLeft:
+      "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1200&q=80",
+    imageRight:
+      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
   },
   "hero-with-available-rooms-check": {
     title: "RUBYSHOP เทคโนโลยีเครื่องมือช่าง",

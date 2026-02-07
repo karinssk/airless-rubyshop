@@ -2876,6 +2876,70 @@ export function BlockEditor({
     );
   }
 
+  if (block.type === "youtube-embed") {
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Heading
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.heading as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { heading: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          YouTube URL
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            placeholder="https://www.youtube.com/watch?v=..."
+            defaultValue={toLine(props.videoUrl as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { videoUrl: event.target.value })
+            }
+          />
+        </label>
+        <p className="text-[11px] text-slate-400">
+          Supports youtube.com/watch, youtu.be, embed, and shorts links.
+        </p>
+      </div>
+    );
+  }
+
+  if (block.type === "customer-reviews-images") {
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Heading
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.heading as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { heading: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Left Image
+          <ImageUploader
+            value={toLine(props.imageLeft as string)}
+            onChange={(url) => updateBlockProps(index, { imageLeft: url })}
+            onUpload={uploadImage}
+          />
+        </label>
+        <label className="grid gap-1">
+          Right Image
+          <ImageUploader
+            value={toLine(props.imageRight as string)}
+            onChange={(url) => updateBlockProps(index, { imageRight: url })}
+            onUpload={uploadImage}
+          />
+        </label>
+      </div>
+    );
+  }
+
   if (block.type === "hero-with-available-rooms-check") {
     return (
       <div className="mt-3 grid gap-3 text-xs text-slate-600">

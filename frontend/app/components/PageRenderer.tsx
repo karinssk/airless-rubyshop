@@ -116,6 +116,32 @@ const isProbablyImage = (value?: string) =>
 const isEmbeddableMapUrl = (value?: string) =>
   Boolean(value && /google\.com\/maps\/embed\?/i.test(value));
 
+const extractYouTubeId = (value?: string) => {
+  const raw = safeList(value).trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    if (url.hostname.includes("youtu.be")) {
+      return url.pathname.replace("/", "");
+    }
+    if (url.hostname.includes("youtube.com")) {
+      if (url.searchParams.get("v")) return url.searchParams.get("v") || "";
+      const paths = url.pathname.split("/").filter(Boolean);
+      const embedIndex = paths.indexOf("embed");
+      if (embedIndex !== -1 && paths[embedIndex + 1]) {
+        return paths[embedIndex + 1];
+      }
+      const shortsIndex = paths.indexOf("shorts");
+      if (shortsIndex !== -1 && paths[shortsIndex + 1]) {
+        return paths[shortsIndex + 1];
+      }
+    }
+  } catch {
+    return "";
+  }
+  return "";
+};
+
 export default function PageRenderer({ page }: { page: Page }) {
   const background = page.theme?.background;
   return (
@@ -131,6 +157,10 @@ export default function PageRenderer({ page }: { page: Page }) {
             return <LandingHero01 key={index} {...block.props} />;
           case "hero-images":
             return <HeroImages key={index} {...block.props} />;
+          case "youtube-embed":
+            return <YouTubeEmbed key={index} {...block.props} />;
+          case "customer-reviews-images":
+            return <CustomerReviewsImages key={index} {...block.props} />;
           case "hero-with-available-rooms-check":
             return <HeroWithAvailableRoomsCheck key={index} {...block.props} />;
           case "contact-and-services":
@@ -819,7 +849,7 @@ function JobVacancies(props: Record<string, any>) {
         <h2 className="text-center text-2xl font-semibold text-[var(--brand-navy)]">
           {safeList(props.heading)}
         </h2>
-        <div className="grid gap-6">
+        <div className="grid gap-6 md:grid-cols-2">
           {jobs.map((job, index) => (
             <div
               key={job.id || `${job.title}-${index}`}
@@ -1335,25 +1365,27 @@ function Hero(props: Record<string, any>) {
   return (
     <header className="relative overflow-hidden" style={backgroundStyle}>
       <div />
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 pb-16 pt-10 lg:flex-row lg:items-center">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-10 pt-8 sm:px-6 sm:pb-12 sm:pt-10 lg:flex-row lg:items-center lg:gap-10 lg:pb-16">
         <div className="max-w-xl space-y-6">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1 text-xs font-semibold text-[var(--brand-navy)]">
             <span className="h-2 w-2 rounded-full bg-[var(--brand-orange)]" />
             {safeList(props.subtitle) || safeList(slides[0]?.subtitle)}
           </div>
-          <h1 className="text-4xl font-semibold leading-tight text-[var(--brand-navy)] md:text-5xl">
+          <h1 className="text-3xl font-semibold leading-tight text-[var(--brand-navy)] sm:text-4xl lg:text-5xl">
             {safeList(props.title) || safeList(slides[0]?.title)}
           </h1>
-          <p className="text-lg text-slate-700">{safeList(props.description)}</p>
+          <p className="text-sm text-slate-700 sm:text-base lg:text-lg">
+            {safeList(props.description)}
+          </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <a
-              className="rounded-full bg-[var(--brand-blue)] px-6 py-3 text-center font-semibold text-white shadow-lg shadow-black/20"
+              className="rounded-full bg-[var(--brand-blue)] px-5 py-2.5 text-center text-sm font-semibold text-white shadow-lg shadow-black/20 sm:px-6 sm:py-3"
               href={safeList(props.primaryCtaHref) || "#"}
             >
               {safeList(props.primaryCtaText) || "จองคิว"}
             </a>
             <a
-              className="rounded-full border border-[var(--brand-blue)] px-6 py-3 text-center font-semibold text-[var(--brand-blue)]"
+              className="rounded-full border border-[var(--brand-blue)] px-5 py-2.5 text-center text-sm font-semibold text-[var(--brand-blue)] sm:px-6 sm:py-3"
               href={safeList(props.secondaryCtaHref) || "#"}
             >
               {safeList(props.secondaryCtaText) || "ดูรายละเอียด"}
@@ -1362,7 +1394,7 @@ function Hero(props: Record<string, any>) {
         </div>
         <div className="relative flex-1">
           <div className="absolute -right-8 -top-6 h-32 w-32 rounded-full bg-white/70 blur-xl" />
-          <div className="relative h-80 overflow-hidden rounded-3xl bg-white/90 shadow-2xl shadow-black/15 backdrop-blur">
+          <div className="relative h-64 overflow-hidden rounded-3xl bg-white/90 shadow-2xl shadow-black/15 backdrop-blur sm:h-72 lg:h-80">
             {heroImage ? (
               <Image
                 src={heroImage}
@@ -1374,7 +1406,7 @@ function Hero(props: Record<string, any>) {
                 unoptimized={heroImage.includes("localhost")}
               />
             ) : slides.length > 0 ? (
-              <div className="h-80">
+              <div className="h-64 sm:h-72 lg:h-80">
                 <HeroSlider
                   slides={slides.map((slide) => ({
                     image: resolveImage(slide.image || slide.url),
@@ -1384,7 +1416,7 @@ function Hero(props: Record<string, any>) {
                 />
               </div>
             ) : (
-              <div className="flex h-80 items-center justify-center text-sm text-slate-400">
+              <div className="flex h-64 items-center justify-center text-sm text-slate-400 sm:h-72 lg:h-80">
                 No hero image
               </div>
             )}
@@ -1403,7 +1435,7 @@ function HeroImages(props: Record<string, any>) {
   return (
     <section className="py-0" style={backgroundStyle}>
       {images.length > 0 ? (
-        <div className="h-[380px] w-full sm:h-[480px] lg:h-[600px]">
+        <div className="h-[260px] w-full sm:h-[360px] md:h-[480px] lg:h-[600px]">
           <HeroSlider
             slides={images.map((slide) => ({
               image: resolveImage(slide.image || slide.url),
@@ -1414,10 +1446,91 @@ function HeroImages(props: Record<string, any>) {
           />
         </div>
       ) : (
-        <div className="flex h-[300px] items-center justify-center text-sm text-slate-400 sm:h-[380px] lg:h-[480px]">
+        <div className="flex h-[220px] items-center justify-center text-sm text-slate-400 sm:h-[320px] md:h-[400px] lg:h-[480px]">
           No hero images yet.
         </div>
       )}
+    </section>
+  );
+}
+
+function YouTubeEmbed(props: Record<string, any>) {
+  const heading = safeList(props.heading);
+  const videoId = extractYouTubeId(props.videoUrl);
+  const embedUrl = videoId
+    ? `https://www.youtube.com/embed/${videoId}`
+    : "";
+
+  return (
+    <section className="py-16">
+      <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6">
+        {heading ? (
+          <h2 className="text-center text-2xl font-semibold text-[var(--brand-navy)]">
+            {heading}
+          </h2>
+        ) : null}
+        <div className="relative w-full overflow-hidden rounded-3xl bg-slate-100 shadow-xl shadow-slate-900/10">
+          {embedUrl ? (
+            <iframe
+              title={heading || "YouTube Video"}
+              src={embedUrl}
+              className="aspect-video w-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <div className="flex aspect-video items-center justify-center text-sm text-slate-400">
+              Invalid YouTube URL.
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CustomerReviewsImages(props: Record<string, any>) {
+  const heading = safeList(props.heading);
+  const imageLeft = resolveImage(props.imageLeft);
+  const imageRight = resolveImage(props.imageRight);
+
+  return (
+    <section className="py-16">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6">
+        {heading ? (
+          <h2 className="text-center text-2xl font-semibold text-[var(--brand-navy)]">
+            {heading}
+          </h2>
+        ) : null}
+        <div className="grid gap-6">
+          <div className="overflow-hidden rounded-3xl bg-slate-100 shadow-lg shadow-slate-900/10">
+            {imageLeft ? (
+              <img
+                src={imageLeft}
+                alt="Customer review 1"
+                className="aspect-[4/5] w-full object-cover"
+              />
+            ) : (
+              <div className="flex aspect-[4/5] items-center justify-center text-sm text-slate-400">
+                No image
+              </div>
+            )}
+          </div>
+          <div className="overflow-hidden rounded-3xl bg-slate-100 shadow-lg shadow-slate-900/10">
+            {imageRight ? (
+              <img
+                src={imageRight}
+                alt="Customer review 2"
+                className="aspect-[4/5] w-full object-cover"
+              />
+            ) : (
+              <div className="flex aspect-[4/5] items-center justify-center text-sm text-slate-400">
+                No image
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
