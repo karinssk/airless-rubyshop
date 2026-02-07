@@ -62,6 +62,9 @@ const extractMapEmbedSrc = (value?: string) => {
 const isEmbeddableMapUrl = (value: string) =>
   /google\.com\/maps\/embed\?/i.test(value);
 
+const isProbablyImage = (value: string) =>
+  /^(https?:|\/|uploads\/)/i.test(value);
+
 function ImageSliderPreview({
   images,
   onCaptionChange,
@@ -304,6 +307,69 @@ export function LivePreview({
             </div>
           </div>
         </header>
+      );
+    }
+
+    if (block.type === "landing-hero-01") {
+      const backgroundImage = resolvePreviewImage(props.backgroundImage);
+      const overlayOpacity = Math.min(
+        0.85,
+        Math.max(0.2, Number(props.overlayOpacity) || 0.55)
+      );
+      const logoUrl = resolvePreviewImage(props.logoUrl);
+      return wrap(
+        <section className="relative min-h-[300px] overflow-hidden sm:min-h-[380px] lg:min-h-[600px]">
+          {backgroundImage && (
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${backgroundImage})` }}
+            />
+          )}
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/70 to-transparent"
+            style={{ opacity: overlayOpacity }}
+          />
+          <div className="relative mx-auto flex min-h-[300px] max-w-6xl flex-col justify-end gap-4 px-4 pb-8 pt-6 text-white sm:min-h-[380px] sm:gap-6 sm:px-6 sm:pb-12 sm:pt-8 lg:min-h-[600px] lg:pb-16">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Logo"
+                className="h-10 w-auto object-contain"
+              />
+            ) : null}
+            <div className="max-w-[520px] space-y-3 sm:space-y-4">
+              <h1 className="text-2xl font-semibold leading-tight drop-shadow sm:text-4xl lg:text-5xl">
+                <EditableText
+                  value={safeText(props.title)}
+                  onCommit={(value) => onUpdateBlock(index, { title: value })}
+                  className="text-white whitespace-pre-line"
+                  multiline
+                />
+              </h1>
+              <p className="text-xs text-white/80 drop-shadow sm:text-base whitespace-pre-line">
+                <EditableText
+                  value={safeText(props.description)}
+                  onCommit={(value) =>
+                    onUpdateBlock(index, { description: value })
+                  }
+                  className="text-white/80 whitespace-pre-line"
+                  multiline
+                />
+              </p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <span className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold shadow-lg shadow-black/20 sm:px-5 sm:py-3 sm:text-sm">
+                  <EditableText
+                    value={safeText(props.buttonText)}
+                    onCommit={(value) =>
+                      onUpdateBlock(index, { buttonText: value })
+                    }
+                    className="text-white"
+                  />
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
       );
     }
 
@@ -1427,6 +1493,191 @@ export function LivePreview({
                     />
                   </button>
                 ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    if (block.type === "contact-info-card") {
+      const backgroundColor = safeText(props.backgroundColor) || "#ffffff";
+      const items = (props.items || []) as Array<Record<string, any>>;
+      const socials = (props.socials || []) as Array<Record<string, any>>;
+      const mapSrc = extractMapEmbedSrc(props.mapUrl);
+      const embedSrc = mapSrc && isEmbeddableMapUrl(mapSrc) ? mapSrc : "";
+      const mapHeight = Math.max(240, Number(props.mapHeight) || 420);
+      const updateInfo = (itemIndex: number, patch: Record<string, unknown>) =>
+        updateItem("items", itemIndex, patch);
+      const updateSocial = (itemIndex: number, patch: Record<string, unknown>) =>
+        updateItem("socials", itemIndex, patch);
+      return wrap(
+        <section className="py-16" style={{ backgroundColor }}>
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="grid gap-8 lg:grid-cols-[0.58fr_0.42fr]">
+              <div className="rounded-[32px] bg-white p-8 shadow-2xl shadow-slate-900/10">
+                <h2 className="text-2xl font-semibold text-slate-900">
+                  <EditableText
+                    value={safeText(props.heading)}
+                    onCommit={(value) =>
+                      onUpdateBlock(index, { heading: value })
+                    }
+                    className="text-slate-900"
+                  />
+                </h2>
+                <div className="mt-6 grid gap-4">
+                  {items.map((item, itemIndex) => {
+                    const icon = safeText(item.icon);
+                    const iconIsImage = icon && isProbablyImage(icon);
+                    const value = safeText(item.value);
+                    const href = safeText(item.href);
+                    return (
+                      <div
+                        key={item.id || `${item.title}-${itemIndex}`}
+                        className="flex gap-4"
+                      >
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+                          {icon ? (
+                            iconIsImage ? (
+                              <img
+                                src={resolvePreviewImage(icon)}
+                                alt=""
+                                className="h-5 w-5 object-contain"
+                              />
+                            ) : (
+                              <span className="text-lg">{icon}</span>
+                            )
+                          ) : (
+                            <span className="text-lg">•</span>
+                          )}
+                        </div>
+                        <div className="flex-1 text-sm text-slate-600">
+                          <p className="font-semibold text-slate-900">
+                            <EditableText
+                              value={safeText(item.title)}
+                              onCommit={(value) =>
+                                updateInfo(itemIndex, { title: value })
+                              }
+                              className="text-slate-900"
+                            />
+                          </p>
+                          {href ? (
+                            <a
+                              href={href}
+                              className="text-slate-800 underline-offset-2 hover:underline whitespace-pre-line"
+                            >
+                              <EditableText
+                                value={value}
+                                onCommit={(next) =>
+                                  updateInfo(itemIndex, { value: next })
+                                }
+                                className="text-slate-800 whitespace-pre-line"
+                              />
+                            </a>
+                          ) : (
+                            <p className="text-slate-800 whitespace-pre-line">
+                              <EditableText
+                                value={value}
+                                onCommit={(next) =>
+                                  updateInfo(itemIndex, { value: next })
+                                }
+                                className="text-slate-800 whitespace-pre-line"
+                              />
+                            </p>
+                          )}
+                          {safeText(item.note) ? (
+                            <p className="mt-1 text-xs text-slate-500">
+                              <EditableText
+                                value={safeText(item.note)}
+                                onCommit={(next) =>
+                                  updateInfo(itemIndex, { note: next })
+                                }
+                                className="text-slate-500"
+                              />
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                  <span className="text-xs font-semibold text-slate-500">
+                    <EditableText
+                      value={safeText(props.socialLabel)}
+                      onCommit={(value) =>
+                        onUpdateBlock(index, { socialLabel: value })
+                      }
+                      className="text-slate-500"
+                    />
+                  </span>
+                  {socials.map((social, socialIndex) => {
+                    const icon = safeText(social.icon);
+                    const iconIsImage = icon && isProbablyImage(icon);
+                    const href = safeText(social.href) || "#";
+                    return (
+                      <a
+                        key={social.id || `${social.label}-${socialIndex}`}
+                        href={href}
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600"
+                      >
+                        {icon ? (
+                          iconIsImage ? (
+                            <img
+                              src={resolvePreviewImage(icon)}
+                              alt={safeText(social.label)}
+                              className="h-4 w-4 object-contain"
+                            />
+                          ) : (
+                            <span className="text-sm">{icon}</span>
+                          )
+                        ) : (
+                          <span className="text-sm">★</span>
+                        )}
+                        <span className="sr-only">
+                          <EditableText
+                            value={safeText(social.label)}
+                            onCommit={(value) =>
+                              updateSocial(socialIndex, { label: value })
+                            }
+                          />
+                        </span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-2xl shadow-slate-900/10">
+                {embedSrc ? (
+                  <iframe
+                    title="Contact map"
+                    src={embedSrc}
+                    className="w-full"
+                    style={{ height: mapHeight }}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    allowFullScreen
+                  />
+                ) : (
+                  <div
+                    className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-sm text-slate-400"
+                    style={{ height: mapHeight }}
+                  >
+                    <span>Map URL must be a Google Maps embed link.</span>
+                    {mapSrc ? (
+                      <a
+                        href={mapSrc}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700"
+                      >
+                        Open in maps
+                      </a>
+                    ) : (
+                      <span>Add mapUrl to show the map.</span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

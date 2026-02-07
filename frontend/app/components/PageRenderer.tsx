@@ -111,6 +111,8 @@ const extractMapEmbedSrc = (value?: string) => {
   const match = raw.match(/<iframe[^>]*src=["']([^"']+)["']/i);
   return match ? match[1] : raw;
 };
+const isProbablyImage = (value?: string) =>
+  Boolean(value && /^(https?:|\/|uploads\/)/i.test(value));
 const isEmbeddableMapUrl = (value?: string) =>
   Boolean(value && /google\.com\/maps\/embed\?/i.test(value));
 
@@ -125,6 +127,8 @@ export default function PageRenderer({ page }: { page: Page }) {
         switch (block.type) {
           case "hero":
             return <Hero key={index} {...block.props} />;
+          case "landing-hero-01":
+            return <LandingHero01 key={index} {...block.props} />;
           case "hero-images":
             return <HeroImages key={index} {...block.props} />;
           case "hero-with-available-rooms-check":
@@ -137,6 +141,8 @@ export default function PageRenderer({ page }: { page: Page }) {
             return <AboutUsImages key={index} {...block.props} />;
           case "branches-detail":
             return <BranchesDetail key={index} {...block.props} />;
+          case "contact-info-card":
+            return <ContactInfoCard key={index} {...block.props} />;
           case "google-map":
             return <GoogleMap key={index} {...block.props} />;
           case "our-vision":
@@ -204,6 +210,55 @@ export default function PageRenderer({ page }: { page: Page }) {
         }
       })}
     </div>
+  );
+}
+
+function LandingHero01(props: Record<string, any>) {
+  const backgroundImage = resolveImage(props.backgroundImage);
+  const overlayOpacity = Math.min(
+    0.85,
+    Math.max(0.2, Number(props.overlayOpacity) || 0.55)
+  );
+  const logoUrl = resolveImage(props.logoUrl);
+
+  return (
+    <section className="relative min-h-[300px] overflow-hidden sm:min-h-[380px] lg:min-h-[600px]">
+      {backgroundImage ? (
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${backgroundImage})` }}
+        />
+      ) : null}
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/70 to-transparent"
+        style={{ opacity: overlayOpacity }}
+      />
+      <div className="relative mx-auto flex min-h-[300px] max-w-6xl flex-col justify-end gap-4 px-4 pb-8 pt-6 text-white sm:min-h-[380px] sm:gap-6 sm:px-6 sm:pb-12 sm:pt-8 lg:min-h-[600px] lg:pb-16">
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt="Logo"
+            className="h-10 w-auto object-contain"
+          />
+        ) : null}
+        <div className="max-w-[520px] space-y-3 sm:space-y-4">
+          <h1 className="text-2xl font-semibold leading-tight drop-shadow sm:text-4xl lg:text-5xl whitespace-pre-line">
+            {safeList(props.title)}
+          </h1>
+          <p className="text-xs text-white/80 drop-shadow sm:text-base whitespace-pre-line">
+            {safeList(props.description)}
+          </p>
+          {props.buttonText ? (
+            <a
+              href={safeList(props.buttonHref) || "#"}
+              className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-black/20 sm:px-5 sm:py-3 sm:text-sm"
+            >
+              {safeList(props.buttonText)}
+            </a>
+          ) : null}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -412,6 +467,146 @@ function GoogleMap(props: Record<string, any>) {
               )}
             </div>
           )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContactInfoCard(props: Record<string, any>) {
+  const backgroundStyle = safeList(props.backgroundColor)
+    ? { backgroundColor: safeList(props.backgroundColor) }
+    : undefined;
+  const items = (props.items || []) as Array<Record<string, any>>;
+  const socials = (props.socials || []) as Array<Record<string, any>>;
+  const mapSrc = extractMapEmbedSrc(props.mapUrl);
+  const embedSrc = mapSrc && isEmbeddableMapUrl(mapSrc) ? mapSrc : "";
+  const mapHeight = Math.max(240, Number(props.mapHeight) || 420);
+
+  return (
+    <section className="py-16" style={backgroundStyle}>
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid gap-8 lg:grid-cols-[0.58fr_0.42fr]">
+          <div className="rounded-[32px] bg-white p-8 shadow-2xl shadow-black/10">
+            <h2 className="text-2xl font-semibold text-slate-900">
+              {safeList(props.heading)}
+            </h2>
+            <div className="mt-6 grid gap-4">
+              {items.map((item, itemIndex) => {
+                const icon = safeList(item.icon);
+                const iconIsImage = icon && isProbablyImage(icon);
+                const value = safeList(item.value);
+                const href = safeList(item.href);
+                return (
+                  <div
+                    key={item.id || `${item.title}-${itemIndex}`}
+                    className="flex gap-4"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-600">
+                      {icon ? (
+                        iconIsImage ? (
+                          <img
+                            src={resolveImage(icon)}
+                            alt=""
+                            className="h-5 w-5 object-contain"
+                          />
+                        ) : (
+                          <span className="text-lg">{icon}</span>
+                        )
+                      ) : (
+                        <span className="text-lg">•</span>
+                      )}
+                    </div>
+                    <div className="flex-1 text-sm text-slate-600">
+                      <p className="font-semibold text-slate-900">
+                        {safeList(item.title)}
+                      </p>
+                      {href ? (
+                        <a
+                          href={href}
+                          className="text-slate-800 underline-offset-2 hover:underline whitespace-pre-line"
+                        >
+                          {value}
+                        </a>
+                      ) : (
+                        <p className="text-slate-800 whitespace-pre-line">
+                          {value}
+                        </p>
+                      )}
+                      {safeList(item.note) ? (
+                        <p className="mt-1 text-xs text-slate-500">
+                          {safeList(item.note)}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+              <span className="text-xs font-semibold text-slate-500">
+                {safeList(props.socialLabel)}
+              </span>
+              {socials.map((social, socialIndex) => {
+                const icon = safeList(social.icon);
+                const iconIsImage = icon && isProbablyImage(icon);
+                const href = safeList(social.href) || "#";
+                return (
+                  <a
+                    key={social.id || `${social.label}-${socialIndex}`}
+                    href={href}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600"
+                  >
+                    {icon ? (
+                      iconIsImage ? (
+                        <img
+                          src={resolveImage(icon)}
+                          alt={safeList(social.label)}
+                          className="h-4 w-4 object-contain"
+                        />
+                      ) : (
+                        <span className="text-sm">{icon}</span>
+                      )
+                    ) : (
+                      <span className="text-sm">★</span>
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+          <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-2xl shadow-black/10">
+            {embedSrc ? (
+              <iframe
+                title="Contact map"
+                src={embedSrc}
+                className="w-full"
+                style={{ height: mapHeight }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            ) : (
+              <div
+                className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-sm text-slate-400"
+                style={{ height: mapHeight }}
+              >
+                <span>Map URL must be a Google Maps embed link.</span>
+                {mapSrc ? (
+                  <a
+                    href={mapSrc}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700"
+                  >
+                    Open in maps
+                  </a>
+                ) : (
+                  <span>Add mapUrl to show the map.</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>

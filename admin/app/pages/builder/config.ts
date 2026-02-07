@@ -6,6 +6,12 @@ export const blockCatalog = [
     stripe: "bg-[var(--brand-navy)]",
   },
   {
+    type: "landing-hero-01",
+    label: "Landing Hero 01",
+    preview: "bg-slate-800",
+    stripe: "bg-red-500",
+  },
+  {
     type: "hero-images",
     label: "Hero Images",
     preview: "bg-slate-200",
@@ -156,6 +162,12 @@ export const blockCatalog = [
     stripe: "bg-[var(--brand-navy)]",
   },
   {
+    type: "contact-info-card",
+    label: "Contact Info Card",
+    preview: "bg-white",
+    stripe: "bg-[var(--brand-navy)]",
+  },
+  {
     type: "contact-us-text",
     label: "Contact Us Text",
     preview: "bg-[var(--brand-navy)]",
@@ -237,6 +249,7 @@ export const blockCatalog = [
 
 export const thumbnailMap: Record<string, string> = {
   hero: "/thumbnails/hero.svg",
+  "landing-hero-01": "/thumbnails/hero.svg",
   "hero-images": "/thumbnails/hero-images.svg",
   "hero-with-available-rooms-check": "/thumbnails/hero.svg",
   "contact-and-services": "/thumbnails/contact-and-services.svg",
@@ -262,6 +275,7 @@ export const thumbnailMap: Record<string, string> = {
   "job-vacancies": "/thumbnails/job-vacancies.svg",
   "request-quotation-forms": "/thumbnails/request-quotation-forms.svg",
   "contact-channels": "/thumbnails/contact-channels.svg",
+  "contact-info-card": "/thumbnails/contact.svg",
   "contact-us-text": "/thumbnails/contact-us-text.svg",
   services: "/thumbnails/services.svg",
   "our-services-v2": "/thumbnails/services.svg",
@@ -290,6 +304,16 @@ export const defaultProps: Record<string, Record<string, unknown>> = {
     backgroundImage: "",
     backgroundColor: "",
     slides: [],
+  },
+  "landing-hero-01": {
+    title: "พ่นเร็ว งานจบไว\nประหยัดแรงช่าง",
+    description: "เครื่องพ่นสีคมชัด สำหรับงานจริง",
+    buttonText: "เช็คราคา / ทัก LINE",
+    buttonHref: "https://line.me/R/ti/p/~rubyshop168",
+    backgroundImage:
+      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=80",
+    overlayOpacity: 0.55,
+    logoUrl: "",
   },
   "hero-images": {
     backgroundColor: "",
@@ -986,6 +1010,68 @@ export const defaultProps: Record<string, Record<string, unknown>> = {
         label: "Call EN: 02-000-0001",
         href: "tel:020000001",
         icon: "https://cdn.jsdelivr.net/npm/heroicons@2.1.5/24/outline/phone.svg",
+      },
+    ],
+  },
+  "contact-info-card": {
+    backgroundColor: "#ffffff",
+    heading: "ข้อมูลการติดต่อ",
+    mapUrl:
+      "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7745.624928821442!2d100.57566!3d13.910155000000001!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e2838a1d8ed6f5%3A0x71b9b36c507a601e!2zUlVCWVNIT1AgV0FSRUhPVVNFICjguKvguIjguIEu4Lij4Li54Lia4Li14LmJ4LiK4LmK4Lit4LibKQ!5e0!3m2!1sen!2sth!4v1770452222479!5m2!1sen!2sth",
+    mapHeight: 420,
+    items: [
+      {
+        id: "contact-address",
+        title: "สำนักงานใหญ่",
+        value:
+          "97/60 โกสุมรวมใจ ซ. 39 แขวงดอนเมือง ดอนเมือง กรุงเทพฯ 10210",
+        note: "",
+        icon: "📍",
+      },
+      {
+        id: "contact-phone",
+        title: "สายด่วนบริการลูกค้า",
+        value: "089-666-7802",
+        note: "เปิดทำการ จันทร์-เสาร์ 08:30-17:30 น.",
+        icon: "☎️",
+        href: "tel:0896667802",
+      },
+      {
+        id: "contact-line",
+        title: "LINE Official",
+        value: "@rubyshop168",
+        note: "",
+        icon: "💬",
+        href: "https://line.me/R/ti/p/~rubyshop168",
+      },
+      {
+        id: "contact-email",
+        title: "อีเมลฝ่ายบริการลูกค้า",
+        value: "saleruby.benjavan@gmail.com",
+        note: "",
+        icon: "✉️",
+        href: "mailto:saleruby.benjavan@gmail.com",
+      },
+    ],
+    socialLabel: "ติดตามเรา",
+    socials: [
+      {
+        id: "social-facebook",
+        label: "Facebook",
+        href: "https://facebook.com",
+        icon: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/facebook.svg",
+      },
+      {
+        id: "social-youtube",
+        label: "YouTube",
+        href: "https://youtube.com",
+        icon: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/youtube.svg",
+      },
+      {
+        id: "social-instagram",
+        label: "Instagram",
+        href: "https://instagram.com",
+        icon: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/instagram.svg",
       },
     ],
   },

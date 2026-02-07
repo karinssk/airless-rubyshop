@@ -199,6 +199,22 @@ type ContactChannelCta = {
   icon?: string;
 };
 
+type ContactInfoItem = {
+  id: string;
+  title: string;
+  value: string;
+  note?: string;
+  icon?: string;
+  href?: string;
+};
+
+type ContactInfoSocial = {
+  id: string;
+  label: string;
+  href: string;
+  icon?: string;
+};
+
 const extractMapEmbedSrc = (value: string) => {
   const trimmed = value.trim();
   const match = trimmed.match(/<iframe[^>]*src=["']([^"']+)["']/i);
@@ -2761,6 +2777,82 @@ export function BlockEditor({
     );
   }
 
+  if (block.type === "landing-hero-01") {
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Title
+          <textarea
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            rows={3}
+            defaultValue={toLine(props.title as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { title: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Description
+          <textarea
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            rows={3}
+            defaultValue={toLine(props.description as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { description: event.target.value })
+            }
+          />
+        </label>
+        {[
+          ["buttonText", "Button Text"],
+          ["buttonHref", "Button Link"],
+        ].map(([key, label]) => (
+          <label key={key} className="grid gap-1">
+            {label}
+            <input
+              className="rounded-xl border border-slate-200 px-3 py-2"
+              defaultValue={toLine(props[key as string] as string)}
+              onBlur={(event) =>
+                updateBlockProps(index, { [key]: event.target.value })
+              }
+            />
+          </label>
+        ))}
+        <label className="grid gap-1">
+          Overlay Opacity (0.2 - 0.85)
+          <input
+            type="number"
+            step="0.05"
+            min="0.2"
+            max="0.85"
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={props.overlayOpacity as number || 0.55}
+            onBlur={(event) =>
+              updateBlockProps(index, {
+                overlayOpacity: parseFloat(event.target.value) || 0.55,
+              })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Background Image
+          <ImageUploader
+            value={toLine(props.backgroundImage as string)}
+            onChange={(url) => updateBlockProps(index, { backgroundImage: url })}
+            onUpload={uploadImage}
+          />
+        </label>
+        <label className="grid gap-1">
+          Logo (optional)
+          <ImageUploader
+            value={toLine(props.logoUrl as string)}
+            onChange={(url) => updateBlockProps(index, { logoUrl: url })}
+            onUpload={uploadImage}
+          />
+        </label>
+      </div>
+    );
+  }
+
   if (block.type === "hero-images") {
     return (
       <div className="mt-3 grid gap-3 text-xs text-slate-600">
@@ -4770,6 +4862,280 @@ export function BlockEditor({
                   value={cta.icon || ""}
                   onChange={(event) =>
                     updateCta(ctaIndex, { icon: event.target.value })
+                  }
+                />
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (block.type === "contact-info-card") {
+    const items = (props.items as ContactInfoItem[]) || [];
+    const socials = (props.socials as ContactInfoSocial[]) || [];
+    const updateItem = (itemIndex: number, patch: Partial<ContactInfoItem>) => {
+      const next = items.map((item, idx) =>
+        idx === itemIndex ? { ...item, ...patch } : item
+      );
+      updateBlockProps(index, { items: next });
+    };
+    const removeItem = (itemIndex: number) => {
+      const next = items.filter((_, idx) => idx !== itemIndex);
+      updateBlockProps(index, { items: next });
+    };
+    const addItem = () => {
+      updateBlockProps(index, {
+        items: [
+          ...items,
+          {
+            id: crypto.randomUUID(),
+            title: "หัวข้อใหม่",
+            value: "",
+            note: "",
+            icon: "📍",
+            href: "",
+          },
+        ],
+      });
+    };
+    const updateSocial = (
+      socialIndex: number,
+      patch: Partial<ContactInfoSocial>
+    ) => {
+      const next = socials.map((item, idx) =>
+        idx === socialIndex ? { ...item, ...patch } : item
+      );
+      updateBlockProps(index, { socials: next });
+    };
+    const removeSocial = (socialIndex: number) => {
+      const next = socials.filter((_, idx) => idx !== socialIndex);
+      updateBlockProps(index, { socials: next });
+    };
+    const addSocial = () => {
+      updateBlockProps(index, {
+        socials: [
+          ...socials,
+          {
+            id: crypto.randomUUID(),
+            label: "Social",
+            href: "",
+            icon: "",
+          },
+        ],
+      });
+    };
+
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Background Color
+          <input
+            type="color"
+            className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+            defaultValue={toLine(props.backgroundColor as string) || "#ffffff"}
+            onChange={(event) =>
+              updateBlockProps(index, { backgroundColor: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Heading
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.heading as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { heading: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Map URL or Embed iframe
+          <textarea
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            rows={4}
+            defaultValue={toLine(props.mapUrl as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, {
+                mapUrl: extractMapEmbedSrc(event.target.value),
+              })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Map Height (px)
+          <input
+            type="number"
+            min="200"
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={props.mapHeight as number || 420}
+            onBlur={(event) =>
+              updateBlockProps(index, {
+                mapHeight: Number(event.target.value) || 420,
+              })
+            }
+          />
+        </label>
+        <p className="text-[11px] text-slate-400">
+          Tip: Google Maps → Share → Embed a map → copy the iframe or embed URL.
+        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-slate-600">Items</p>
+          <button
+            onClick={addItem}
+            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs"
+          >
+            + Add Item
+          </button>
+        </div>
+        <div className="grid gap-3">
+          {items.map((item, itemIndex) => (
+            <div
+              key={item.id}
+              className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-3"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-slate-600">
+                  Item #{itemIndex + 1}
+                </p>
+                <button
+                  onClick={() => removeItem(itemIndex)}
+                  className="rounded-full bg-rose-50 px-3 py-1 text-xs text-rose-600"
+                >
+                  Delete
+                </button>
+              </div>
+              <label className="grid gap-1">
+                Title
+                <input
+                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  value={item.title}
+                  onChange={(event) =>
+                    updateItem(itemIndex, { title: event.target.value })
+                  }
+                />
+              </label>
+              <label className="grid gap-1">
+                Value
+                <input
+                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  value={item.value}
+                  onChange={(event) =>
+                    updateItem(itemIndex, { value: event.target.value })
+                  }
+                />
+              </label>
+              <label className="grid gap-1">
+                Note
+                <input
+                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  value={item.note || ""}
+                  onChange={(event) =>
+                    updateItem(itemIndex, { note: event.target.value })
+                  }
+                />
+              </label>
+              <label className="grid gap-1">
+                Icon (emoji or URL)
+                <input
+                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  value={item.icon || ""}
+                  onChange={(event) =>
+                    updateItem(itemIndex, { icon: event.target.value })
+                  }
+                />
+              </label>
+              <label className="grid gap-1">
+                📤 Upload New Icon
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
+                  onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+                    const url = await uploadImage(file);
+                    updateItem(itemIndex, { icon: url });
+                  }}
+                />
+              </label>
+              <label className="grid gap-1">
+                Link (optional)
+                <input
+                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  value={item.href || ""}
+                  onChange={(event) =>
+                    updateItem(itemIndex, { href: event.target.value })
+                  }
+                />
+              </label>
+            </div>
+          ))}
+        </div>
+        <label className="grid gap-1">
+          Social Label
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.socialLabel as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { socialLabel: event.target.value })
+            }
+          />
+        </label>
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-slate-600">Socials</p>
+          <button
+            onClick={addSocial}
+            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs"
+          >
+            + Add Social
+          </button>
+        </div>
+        <div className="grid gap-3">
+          {socials.map((social, socialIndex) => (
+            <div
+              key={social.id}
+              className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-3"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-slate-600">
+                  Social #{socialIndex + 1}
+                </p>
+                <button
+                  onClick={() => removeSocial(socialIndex)}
+                  className="rounded-full bg-rose-50 px-3 py-1 text-xs text-rose-600"
+                >
+                  Delete
+                </button>
+              </div>
+              <label className="grid gap-1">
+                Label
+                <input
+                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  value={social.label}
+                  onChange={(event) =>
+                    updateSocial(socialIndex, { label: event.target.value })
+                  }
+                />
+              </label>
+              <label className="grid gap-1">
+                Link
+                <input
+                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  value={social.href}
+                  onChange={(event) =>
+                    updateSocial(socialIndex, { href: event.target.value })
+                  }
+                />
+              </label>
+              <label className="grid gap-1">
+                Icon (emoji or URL)
+                <input
+                  className="rounded-xl border border-slate-200 px-3 py-2"
+                  value={social.icon || ""}
+                  onChange={(event) =>
+                    updateSocial(socialIndex, { icon: event.target.value })
                   }
                 />
               </label>
