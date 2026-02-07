@@ -3,6 +3,11 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./i18n.ts');
 
+const backendUrl =
+  process.env.NEXT_PUBLIC_BACKEND_PRODUCTION_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_DEVELOPMENT_URL ||
+  "http://localhost:5000";
+
 const nextConfig: NextConfig = {
   images: {
     // Enable modern image formats for better compression
@@ -45,6 +50,14 @@ const nextConfig: NextConfig = {
         hostname: "**.cloudinary.com",
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/uploads/:path*",
+        destination: `${backendUrl.replace(/\/+$/, "")}/uploads/:path*`,
+      },
+    ];
   },
 };
 

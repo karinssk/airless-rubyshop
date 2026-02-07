@@ -21,8 +21,6 @@ export function usePages({ createBlock }: UsePagesOptions) {
     setStatusMessage(
       "Backend URL ไม่พร้อมใช้งาน: ตั้งค่า NEXT_PUBLIC_BACKEND_DEVELOPMENT_URL ใน admin/.env แล้ว restart"
     );
-    console.log(API_URL);
-    console.log('process.env.NEXT_PUBLIC_BACKEND_DEVELOPMENT_URL:', process.env.NEXT_PUBLIC_BACKEND_DEVELOPMENT_URL);
     return false;
   };
 

@@ -199,6 +199,12 @@ type ContactChannelCta = {
   icon?: string;
 };
 
+const extractMapEmbedSrc = (value: string) => {
+  const trimmed = value.trim();
+  const match = trimmed.match(/<iframe[^>]*src=["']([^"']+)["']/i);
+  return match ? match[1] : trimmed;
+};
+
 function SortableAchievementItem({
   item,
   onChange,
@@ -5284,6 +5290,64 @@ export function BlockEditor({
             />
           </label>
         ))}
+      </div>
+    );
+  }
+
+  if (block.type === "google-map") {
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Background Color
+          <input
+            type="color"
+            className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+            defaultValue={toLine(props.backgroundColor as string) || "#ffffff"}
+            onChange={(event) =>
+              updateBlockProps(index, { backgroundColor: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Heading
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.heading as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { heading: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Map URL or Embed iframe
+          <textarea
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            rows={4}
+            defaultValue={toLine(props.mapUrl as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, {
+                mapUrl: extractMapEmbedSrc(event.target.value),
+              })
+            }
+          />
+        </label>
+        <p className="text-[11px] text-slate-400">
+          Tip: Google Maps → Share → Embed a map → copy the iframe or embed URL.
+        </p>
+        <label className="grid gap-1">
+          Map Height (px)
+          <input
+            type="number"
+            min="200"
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={props.height as number || 420}
+            onBlur={(event) =>
+              updateBlockProps(index, {
+                height: Number(event.target.value) || 420,
+              })
+            }
+          />
+        </label>
       </div>
     );
   }

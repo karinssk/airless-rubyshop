@@ -106,6 +106,11 @@ type Page = {
 
 const safeList = (value?: string) => (value ? String(value) : "");
 const resolveImage = (value?: string) => resolveUploadUrl(safeList(value));
+const extractMapEmbedSrc = (value?: string) => {
+  const raw = safeList(value).trim();
+  const match = raw.match(/<iframe[^>]*src=["']([^"']+)["']/i);
+  return match ? match[1] : raw;
+};
 const isEmbeddableMapUrl = (value?: string) =>
   Boolean(value && /google\.com\/maps\/embed\?/i.test(value));
 
@@ -132,6 +137,8 @@ export default function PageRenderer({ page }: { page: Page }) {
             return <AboutUsImages key={index} {...block.props} />;
           case "branches-detail":
             return <BranchesDetail key={index} {...block.props} />;
+          case "google-map":
+            return <GoogleMap key={index} {...block.props} />;
           case "our-vision":
             return <OurVision key={index} {...block.props} />;
           case "our-core-values":
@@ -351,6 +358,60 @@ function BranchesDetail(props: Record<string, any>) {
               </div>
             )}
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function GoogleMap(props: Record<string, any>) {
+  const backgroundStyle = safeList(props.backgroundColor)
+    ? { backgroundColor: safeList(props.backgroundColor) }
+    : undefined;
+  const heading = safeList(props.heading);
+  const mapSrc = extractMapEmbedSrc(props.mapUrl);
+  const embedSrc = mapSrc && isEmbeddableMapUrl(mapSrc) ? mapSrc : "";
+  const height = Math.max(240, Number(props.height) || 420);
+
+  return (
+    <section className="py-16" style={backgroundStyle}>
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6">
+        {heading ? (
+          <h2 className="text-center text-3xl font-semibold text-[var(--brand-navy)]">
+            {heading}
+          </h2>
+        ) : null}
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-black/10">
+          {embedSrc ? (
+            <iframe
+              title="Google Map"
+              src={embedSrc}
+              className="w-full"
+              style={{ height }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          ) : (
+            <div
+              className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-sm text-slate-400"
+              style={{ height }}
+            >
+              <span>Map URL must be a Google Maps embed link.</span>
+              {mapSrc ? (
+                <a
+                  href={mapSrc}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700"
+                >
+                  Open in maps
+                </a>
+              ) : (
+                <span>Add mapUrl to show the map.</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>

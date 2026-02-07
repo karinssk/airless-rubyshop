@@ -50,6 +50,15 @@ const pickReadableTextColor = (value: string, fallback: string) => {
   return luminance >= 0.6 ? trimmed : fallback;
 };
 
+const resolvePreviewImage = (value?: string) =>
+  resolveUploadUrl(safeText(value));
+
+const extractMapEmbedSrc = (value?: string) => {
+  const raw = safeText(value).trim();
+  const match = raw.match(/<iframe[^>]*src=["']([^"']+)["']/i);
+  return match ? match[1] : raw;
+};
+
 const isEmbeddableMapUrl = (value: string) =>
   /google\.com\/maps\/embed\?/i.test(value);
 
@@ -90,7 +99,7 @@ function ImageSliderPreview({
     <div className="relative overflow-hidden rounded-3xl bg-white shadow-xl shadow-blue-900/10">
       <div className="h-96 w-full">
         <img
-          src={safeText(current.url)}
+          src={resolvePreviewImage(current.url)}
           alt={safeText(current.caption)}
           className="h-full w-full object-cover"
         />
@@ -312,7 +321,7 @@ export function LivePreview({
     }
 
     if (block.type === "hero-with-available-rooms-check") {
-      const backgroundImage = safeText(props.backgroundImage);
+      const backgroundImage = resolvePreviewImage(props.backgroundImage);
       return wrap(
         <section className="relative overflow-hidden bg-slate-900 text-slate-50">
           {backgroundImage && (
@@ -511,7 +520,7 @@ export function LivePreview({
 
     if (block.type === "about-us-images") {
       const backgroundColor = safeText(props.backgroundColor) || "#ffe800";
-      const image = safeText(props.image);
+      const image = resolvePreviewImage(props.image);
       return wrap(
         <section className="py-16" style={{ backgroundColor }}>
           <div className="mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
@@ -726,6 +735,58 @@ export function LivePreview({
       );
     }
 
+    if (block.type === "google-map") {
+      const backgroundColor = safeText(props.backgroundColor) || "#ffffff";
+      const mapSrc = extractMapEmbedSrc(props.mapUrl);
+      const embedSrc = mapSrc && isEmbeddableMapUrl(mapSrc) ? mapSrc : "";
+      const height = Math.max(240, Number(props.height) || 420);
+      return wrap(
+        <section className="py-16" style={{ backgroundColor }}>
+          <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6">
+            <h2 className="text-center text-3xl font-semibold text-[var(--brand-navy)]">
+              <EditableText
+                value={safeText(props.heading)}
+                onCommit={(value) => onUpdateBlock(index, { heading: value })}
+                className="text-[var(--brand-navy)]"
+              />
+            </h2>
+            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg shadow-blue-900/10">
+              {embedSrc ? (
+                <iframe
+                  title="Google Map"
+                  src={embedSrc}
+                  className="w-full"
+                  style={{ height }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              ) : (
+                <div
+                  className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-sm text-slate-400"
+                  style={{ height }}
+                >
+                  <span>Paste a Google Maps embed URL or iframe.</span>
+                  {mapSrc ? (
+                    <a
+                      href={mapSrc}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700"
+                    >
+                      Open map link
+                    </a>
+                  ) : (
+                    <span>No map URL yet.</span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
     if (block.type === "our-vision") {
       const backgroundColor = safeText(props.backgroundColor) || "#fff78a";
       const cards = (props.cards || []) as Array<Record<string, any>>;
@@ -742,7 +803,7 @@ export function LivePreview({
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--brand-blue)] text-white">
                   {card.icon ? (
                     <img
-                      src={safeText(card.icon)}
+                      src={resolvePreviewImage(card.icon)}
                       alt=""
                       className="h-6 w-6 object-contain brightness-0 invert"
                     />
@@ -817,7 +878,7 @@ export function LivePreview({
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--brand-blue)] text-white">
                     {item.icon ? (
                       <img
-                        src={safeText(item.icon)}
+                        src={resolvePreviewImage(item.icon)}
                         alt=""
                         className="h-6 w-6 object-contain brightness-0 invert"
                       />
@@ -915,7 +976,7 @@ export function LivePreview({
 
     if (block.type === "work-with-us") {
       const backgroundColor = safeText(props.backgroundColor) || "#0b3c86";
-      const icon = safeText(props.icon);
+      const icon = resolvePreviewImage(props.icon);
       return wrap(
         <section className="py-14 text-white" style={{ backgroundColor }}>
           <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 px-6 text-center">
@@ -978,7 +1039,7 @@ export function LivePreview({
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--brand-blue)] text-white">
                     {item.icon ? (
                       <img
-                        src={safeText(item.icon)}
+                        src={resolvePreviewImage(item.icon)}
                         alt=""
                         className="h-6 w-6 object-contain brightness-0 invert"
                       />
@@ -1261,7 +1322,7 @@ export function LivePreview({
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--brand-blue)] text-white">
                     {channel.icon ? (
                       <img
-                        src={safeText(channel.icon)}
+                        src={resolvePreviewImage(channel.icon)}
                         alt=""
                         className="h-6 w-6 object-contain brightness-0 invert"
                       />
@@ -1350,7 +1411,7 @@ export function LivePreview({
                   >
                     {cta.icon ? (
                       <img
-                        src={safeText(cta.icon)}
+                        src={resolvePreviewImage(cta.icon)}
                         alt=""
                         className="h-4 w-4 object-contain"
                       />
@@ -1476,7 +1537,7 @@ export function LivePreview({
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--brand-blue)] text-white">
                     {item.icon ? (
                       <img
-                        src={safeText(item.icon)}
+                        src={resolvePreviewImage(item.icon)}
                         alt=""
                         className="h-6 w-6 object-contain brightness-0 invert"
                       />
@@ -1572,7 +1633,7 @@ export function LivePreview({
                   >
                     {item.image && (
                       <img
-                        src={safeText(item.image)}
+                        src={resolvePreviewImage(item.image)}
                         alt={safeText(item.title)}
                         className="h-full w-full object-cover"
                       />
@@ -1582,7 +1643,7 @@ export function LivePreview({
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--brand-blue)] text-white">
                       {item.icon ? (
                         <img
-                          src={safeText(item.icon)}
+                          src={resolvePreviewImage(item.icon)}
                           alt=""
                           className="h-5 w-5 object-contain brightness-0 invert"
                         />
@@ -1782,8 +1843,8 @@ export function LivePreview({
       const descriptionClass = isLight ? "text-slate-600" : "text-white/80";
       const secondaryBorderClass = isLight ? "border-slate-300" : "border-white/30";
       const iconBgClass = isLight ? "bg-slate-100" : "bg-white/20";
-      const primaryIcon = safeText(props.primaryIcon);
-      const secondaryIcon = safeText(props.secondaryIcon);
+      const primaryIcon = resolvePreviewImage(props.primaryIcon);
+      const secondaryIcon = resolvePreviewImage(props.secondaryIcon);
 
       return wrap(
         <section
@@ -1918,7 +1979,7 @@ export function LivePreview({
                 >
                   {item.image && (
                     <img
-                      src={safeText(item.image)}
+                      src={resolvePreviewImage(item.image)}
                       alt={safeText(item.title)}
                       className="w-full object-cover"
                       style={{ height: tileHeight }}
@@ -2011,7 +2072,7 @@ export function LivePreview({
                   <div className="h-48 w-full overflow-hidden">
                     {item.image ? (
                       <img
-                        src={safeText(item.image)}
+                        src={resolvePreviewImage(item.image)}
                         alt={safeText(item.title)}
                         className="h-full w-full object-cover"
                       />
@@ -2085,7 +2146,7 @@ export function LivePreview({
                   <div className="h-48 w-full overflow-hidden">
                     {image.url ? (
                       <img
-                        src={safeText(image.url)}
+                        src={resolvePreviewImage(image.url)}
                         alt={safeText(image.caption)}
                         className="h-full w-full object-cover"
                       />
@@ -2156,7 +2217,7 @@ export function LivePreview({
                 <div className="h-48 w-full overflow-hidden">
                   {props.imageTop ? (
                     <img
-                      src={safeText(props.imageTop)}
+                      src={resolvePreviewImage(props.imageTop)}
                       alt={safeText(props.heading)}
                       className="h-full w-full object-cover"
                     />
@@ -2171,7 +2232,7 @@ export function LivePreview({
                 <div className="h-full min-h-[240px] w-full overflow-hidden">
                   {props.imageSide ? (
                     <img
-                      src={safeText(props.imageSide)}
+                      src={resolvePreviewImage(props.imageSide)}
                       alt={safeText(props.heading)}
                       className="h-full w-full object-cover"
                     />
@@ -2186,7 +2247,7 @@ export function LivePreview({
                 <div className="h-48 w-full overflow-hidden">
                   {props.imageBottom ? (
                     <img
-                      src={safeText(props.imageBottom)}
+                      src={resolvePreviewImage(props.imageBottom)}
                       alt={safeText(props.heading)}
                       className="h-full w-full object-cover"
                     />
@@ -2258,7 +2319,7 @@ export function LivePreview({
                     <div className="overflow-hidden rounded-3xl bg-slate-100 shadow-xl shadow-slate-900/10">
                       {item.image ? (
                         <img
-                          src={safeText(item.image)}
+                          src={resolvePreviewImage(item.image)}
                           alt={safeText(item.title)}
                           className="h-64 w-full object-cover md:h-72"
                         />
@@ -2429,7 +2490,7 @@ export function LivePreview({
                   <div className="overflow-hidden rounded-[32px] bg-slate-100">
                     {service.image && (
                       <img
-                        src={safeText(service.image)}
+                        src={resolvePreviewImage(service.image)}
                         alt={safeText(service.title)}
                         className="h-52 w-full object-cover"
                       />
@@ -2542,7 +2603,7 @@ export function LivePreview({
                 className="overflow-hidden rounded-2xl bg-white shadow"
               >
                 <img
-                  src={safeText(image.url)}
+                  src={resolvePreviewImage(image.url)}
                   alt={safeText(image.caption)}
                   className="h-48 w-full object-cover"
                 />
@@ -2912,7 +2973,7 @@ export function LivePreview({
     }
 
     if (block.type === "hero-images-with-button") {
-      const backgroundImage = safeText(props.backgroundImage);
+      const backgroundImage = resolvePreviewImage(props.backgroundImage);
       const overlayOpacity = (props.overlayOpacity as number) || 0.5;
       const buttonColor = safeText(props.buttonColor) || "#f59e0b";
       const buttonTextColor = safeText(props.buttonTextColor) || "#000000";
@@ -3137,7 +3198,7 @@ function HeroImagesPreview({
   return (
     <div className="relative h-[380px] w-full overflow-hidden bg-white sm:h-[480px] lg:h-[600px]">
       <img
-        src={safeText(current.image)}
+        src={resolvePreviewImage(current.image)}
         alt={safeText(current.title) || "Hero slide"}
         className="h-full w-full object-contain"
       />
@@ -3209,7 +3270,7 @@ function AchievementMetric({
     <div className="flex flex-col items-center gap-2 text-center">
       {item.icon && (
         <img
-          src={safeText(item.icon)}
+          src={resolvePreviewImage(item.icon)}
           alt=""
           className="h-8 w-8 object-contain"
         />

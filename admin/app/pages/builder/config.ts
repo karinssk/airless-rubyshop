@@ -102,6 +102,12 @@ export const blockCatalog = [
     stripe: "bg-white/70",
   },
   {
+    type: "google-map",
+    label: "Google Map",
+    preview: "bg-white",
+    stripe: "bg-[var(--brand-navy)]",
+  },
+  {
     type: "our-vision",
     label: "Our Vision",
     preview: "bg-[var(--brand-yellow)]",
@@ -247,6 +253,7 @@ export const thumbnailMap: Record<string, string> = {
   "about-us-text": "/thumbnails/about-us-text.svg",
   "about-us-images": "/thumbnails/about-us-images.svg",
   "branches-detail": "/thumbnails/branches-detail.svg",
+  "google-map": "/thumbnails/contact.svg",
   "our-vision": "/thumbnails/our-vision.svg",
   "our-core-values": "/thumbnails/our-core-values.svg",
   "why-choose-us-v2": "/thumbnails/why-choose-us-v2.svg",
@@ -725,6 +732,13 @@ export const defaultProps: Record<string, Record<string, unknown>> = {
         mapHref: "https://maps.google.com",
       },
     ],
+  },
+  "google-map": {
+    backgroundColor: "#ffffff",
+    heading: "แผนที่ร้านของเรา",
+    mapUrl:
+      "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7745.624928821442!2d100.57566!3d13.910155000000001!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e2838a1d8ed6f5%3A0x71b9b36c507a601e!2zUlVCWVNIT1AgV0FSRUhPVVNFICjguKvguIjguIEu4Lij4Li54Lia4Li14LmJ4LiK4LmK4Lit4LibKQ!5e0!3m2!1sen!2sth!4v1770452222479!5m2!1sen!2sth",
+    height: 420,
   },
   "our-vision": {
     backgroundColor: "#ffffff",
