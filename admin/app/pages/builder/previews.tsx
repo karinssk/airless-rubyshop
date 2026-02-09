@@ -346,7 +346,7 @@ export function LivePreview({
       );
       const logoUrl = resolvePreviewImage(props.logoUrl);
       return wrap(
-        <section className="relative min-h-[300px] overflow-hidden sm:min-h-[380px] lg:min-h-[600px]">
+        <section className="relative min-h-[300px] overflow-hidden aspect-[4/5] sm:aspect-[4/5] md:aspect-auto sm:min-h-[380px] lg:min-h-[600px]">
           {backgroundImageMobile ? (
             <>
               <div
@@ -368,43 +368,45 @@ export function LivePreview({
             className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/70 to-transparent"
             style={{ opacity: overlayOpacity }}
           />
-          <div className="relative mx-auto flex min-h-[300px] max-w-6xl flex-col justify-end gap-4 px-4 pb-8 pt-6 text-white sm:min-h-[380px] sm:gap-6 sm:px-6 sm:pb-12 sm:pt-8 lg:min-h-[600px] lg:pb-16">
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt="Logo"
-                className="h-10 w-auto object-contain"
-              />
-            ) : null}
-            <div className="max-w-[520px] space-y-3 sm:space-y-4">
-              <h1 className="text-2xl font-semibold leading-tight drop-shadow sm:text-4xl lg:text-5xl">
-                <EditableText
-                  value={safeText(props.title)}
-                  onCommit={(value) => onUpdateBlock(index, { title: value })}
-                  className="text-white whitespace-pre-line"
-                  multiline
+          <div className="absolute inset-0">
+            <div className="mx-auto flex h-full max-w-6xl flex-col items-start justify-end gap-4 px-4 pb-8 pt-6 text-left text-white sm:gap-6 sm:px-6 sm:pb-12 sm:pt-8 lg:pb-16">
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt="Logo"
+                  className="h-10 w-auto object-contain"
                 />
-              </h1>
-              <p className="text-xs text-white/80 drop-shadow sm:text-base whitespace-pre-line">
-                <EditableText
-                  value={safeText(props.description)}
-                  onCommit={(value) =>
-                    onUpdateBlock(index, { description: value })
-                  }
-                  className="text-white/80 whitespace-pre-line"
-                  multiline
-                />
-              </p>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <span className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold shadow-lg shadow-black/20 sm:px-5 sm:py-3 sm:text-sm">
+              ) : null}
+              <div className="max-w-[520px] space-y-3 sm:space-y-4">
+                <h1 className="text-2xl font-semibold leading-tight drop-shadow sm:text-4xl lg:text-5xl">
                   <EditableText
-                    value={safeText(props.buttonText)}
-                    onCommit={(value) =>
-                      onUpdateBlock(index, { buttonText: value })
-                    }
-                    className="text-white"
+                    value={safeText(props.title)}
+                    onCommit={(value) => onUpdateBlock(index, { title: value })}
+                    className="text-white whitespace-pre-line"
+                    multiline
                   />
-                </span>
+                </h1>
+                <p className="text-xs text-white/80 drop-shadow sm:text-base whitespace-pre-line">
+                  <EditableText
+                    value={safeText(props.description)}
+                    onCommit={(value) =>
+                      onUpdateBlock(index, { description: value })
+                    }
+                    className="text-white/80 whitespace-pre-line"
+                    multiline
+                  />
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <span className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold shadow-lg shadow-black/20 sm:px-5 sm:py-3 sm:text-sm">
+                    <EditableText
+                      value={safeText(props.buttonText)}
+                      onCommit={(value) =>
+                        onUpdateBlock(index, { buttonText: value })
+                      }
+                      className="text-white"
+                    />
+                  </span>
+                </div>
               </div>
             </div>
           </div>
