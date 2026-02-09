@@ -314,7 +314,7 @@ function AboutUsImages(props: Record<string, any>) {
     ? { backgroundColor: safeList(props.backgroundColor) }
     : undefined;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
         <div className="space-y-4">
           <h2 className="text-3xl font-semibold text-[var(--brand-navy)] whitespace-pre-line">
@@ -349,7 +349,7 @@ function BranchesDetail(props: Record<string, any>) {
   const branches = (props.branches || []) as Array<Record<string, any>>;
   const branch = branches[0];
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6">
         <h2 className="text-center text-3xl font-semibold text-[var(--brand-navy)]">
           {safeList(props.heading)}
@@ -476,7 +476,7 @@ function GoogleMap(props: Record<string, any>) {
   const height = Math.max(240, Number(props.height) || 420);
 
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6">
         {heading ? (
           <h2 className="text-center text-3xl font-semibold text-[var(--brand-navy)]">
@@ -531,7 +531,7 @@ function ContactInfoCard(props: Record<string, any>) {
   const mapHeight = Math.max(240, Number(props.mapHeight) || 420);
 
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid gap-8 lg:grid-cols-[0.58fr_0.42fr]">
           <div className="rounded-[32px] bg-white p-8 shadow-2xl shadow-black/10">
@@ -666,7 +666,7 @@ function OurVision(props: Record<string, any>) {
     : undefined;
   const cards = (props.cards || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto grid max-w-5xl gap-6 px-6 md:grid-cols-2">
         {cards.map((card, index) => (
           <div
@@ -706,7 +706,7 @@ function OurCoreValues(props: Record<string, any>) {
     : undefined;
   const items = (props.items || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-5xl flex-col gap-8 px-6 text-center">
         <div>
           <h2 className="text-3xl font-semibold text-[var(--brand-navy)]">
@@ -753,7 +753,7 @@ function WhyChooseUsV2(props: Record<string, any>) {
     : undefined;
   const items = (props.items || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-5xl flex-col gap-8 px-6 text-center">
         <div>
           <h2 className="text-3xl font-semibold text-[var(--brand-navy)]">
@@ -819,7 +819,7 @@ function WelfareAndBenefits(props: Record<string, any>) {
     : undefined;
   const items = (props.items || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-5xl flex-col gap-8 px-6 text-center">
         <h2 className="text-3xl font-semibold text-[var(--brand-navy)]">
           {safeList(props.heading)}
@@ -861,7 +861,7 @@ function JobVacancies(props: Record<string, any>) {
     : undefined;
   const jobs = (props.jobs || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-4xl flex-col gap-6 px-6">
         <h2 className="text-center text-2xl font-semibold text-[var(--brand-navy)]">
           {safeList(props.heading)}
@@ -920,7 +920,7 @@ function ContactUsText(props: Record<string, any>) {
     background: `linear-gradient(90deg, ${baseColor} 0%, ${gradientColor} 100%)`,
   };
   return (
-    <section className="py-16 text-white" style={backgroundStyle}>
+    <section className="py-10 md:py-16 text-white" style={backgroundStyle}>
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 px-6 text-center">
         <h2 className="text-4xl font-semibold text-white">
           {safeList(props.heading)}
@@ -941,7 +941,7 @@ function ContactChannels(props: Record<string, any>) {
   const channels = (props.channels || []) as Array<Record<string, any>>;
   const ctaButtons = (props.ctaButtons || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-3xl flex-col gap-6 px-6">
         <div className="text-left">
           <h2 className="text-2xl font-semibold text-[var(--brand-navy)]">
@@ -1037,7 +1037,7 @@ function AboutUsText(props: Record<string, any>) {
   const taglineClass = isLight ? "text-slate-500" : "text-slate-200";
   return (
     <section
-      className={`py-16 ${isLight ? "text-slate-900" : "text-white"}`}
+      className={`py-10 md:py-16 ${isLight ? "text-slate-900" : "text-white"}`}
       style={backgroundStyle}
     >
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-6 text-center">
@@ -1073,7 +1073,7 @@ function ContactAndServices(props: Record<string, any>) {
     : "border-white/40 text-white";
   return (
     <section
-      className={`py-10 ${isLight ? "text-slate-900" : "text-white"}`}
+      className={`py-6 md:py-16 ${isLight ? "text-slate-900" : "text-white"}`}
       style={backgroundStyle}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6">
@@ -1118,7 +1118,7 @@ function OurWork(props: Record<string, any>) {
   const descriptionClass = isLight ? "text-slate-600" : "text-white/80";
   const items = (props.items || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6">
         <div className="text-center">
           <p className={`text-xs font-semibold uppercase tracking-[0.3em] ${subheadingClass}`}>
@@ -1172,7 +1172,7 @@ function OurWorkGallery(props: Record<string, any>) {
     : undefined;
   const images = (props.images || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-orange)]">
@@ -1219,7 +1219,7 @@ function GrandEvents(props: Record<string, any>) {
   const ctaBackground = safeList(props.ctaBackground) || "#6b6f2d";
   const ctaTextColor = safeList(props.ctaTextColor) || "#ffffff";
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div className="space-y-4">
           <h2 className="text-3xl font-semibold text-[var(--brand-navy)] whitespace-pre-line">
@@ -1296,7 +1296,7 @@ function WellnessFacilities(props: Record<string, any>) {
     : undefined;
   const items = (props.items || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-6xl flex-col gap-12 px-6">
         {items.map((item, index) => {
           const imageFirst = index % 2 === 1;
@@ -1351,7 +1351,7 @@ function ImagesSlider(props: Record<string, any>) {
     : undefined;
   const images = (props.images || []) as Array<Record<string, any>>;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--brand-orange)]">
@@ -1479,7 +1479,7 @@ function YouTubeEmbed(props: Record<string, any>) {
     : "";
 
   return (
-    <section className="py-16">
+    <section className="py-10 md:py-16">
       <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6">
         {heading ? (
           <h2 className="text-center text-2xl font-semibold text-[var(--brand-navy)]">
@@ -1521,7 +1521,7 @@ function VideoHls01(props: Record<string, any>) {
   const resolvedPoster = posterImage ? resolveUploadUrl(posterImage) : "";
 
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6">
         {heading ? (
           <div className="text-center">
@@ -1576,7 +1576,7 @@ function CustomerReviewsImages(props: Record<string, any>) {
   const imageRight = resolveImage(props.imageRight);
 
   return (
-    <section className="py-16">
+    <section className="py-10 md:py-16">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6">
         {heading ? (
           <h2 className="text-center text-2xl font-semibold text-[var(--brand-navy)]">
@@ -1677,7 +1677,7 @@ function ProductsSectionImages(props: Record<string, any>) {
     ? { backgroundColor: safeList(props.backgroundColor) }
     : undefined;
   return (
-    <section className="py-16" style={backgroundStyle}>
+    <section className="py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto max-w-6xl px-6">
         <p className="text-xs font-semibold uppercase tracking-[0.4em] text-[var(--brand-orange)]">
           {safeList(props.eyebrow)}
@@ -1783,7 +1783,7 @@ function Faq(props: Record<string, any>) {
     ? { backgroundColor: safeList(props.backgroundColor) }
     : undefined;
   return (
-    <section className="mx-auto max-w-6xl px-6 py-12" style={backgroundStyle}>
+    <section className="mx-auto max-w-6xl px-6 py-8 md:py-12" style={backgroundStyle}>
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-2xl font-semibold text-[var(--brand-navy)]">
           {safeList(props.title)}
@@ -1815,7 +1815,7 @@ function FrequentlyAskedQuestions(props: Record<string, any>) {
   const subtitle = safeList(props.subtitle);
 
   return (
-    <section className="px-6 py-16" style={backgroundStyle}>
+    <section className="px-6 py-10 md:py-16" style={backgroundStyle}>
       <div className="mx-auto max-w-4xl text-center">
         {title ? (
           <h2 className="text-3xl font-semibold text-[var(--brand-navy)] whitespace-pre-line">
@@ -1871,7 +1871,7 @@ function Contact(props: Record<string, any>) {
   return (
     <section
       id="booking"
-      className="mx-auto max-w-6xl px-6 py-16"
+      className="mx-auto max-w-6xl px-6 py-10 md:py-16"
       style={backgroundStyle}
     >
       <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">

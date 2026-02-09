@@ -111,10 +111,7 @@ function ImageSliderPreview({
 
   useEffect(() => {
     if (total <= 1) return;
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % total);
-    }, 4000);
-    return () => clearInterval(timer);
+    return undefined;
   }, [total]);
 
   if (!current) {
@@ -126,12 +123,12 @@ function ImageSliderPreview({
   }
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-white shadow-xl shadow-blue-900/10">
-      <div className="h-96 w-full">
+    <div className="relative mx-auto w-full max-w-[800px] overflow-hidden rounded-3xl bg-white shadow-xl shadow-blue-900/10">
+      <div className="aspect-square w-full">
         <img
           src={resolvePreviewImage(current.url)}
           alt={safeText(current.caption)}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain"
         />
       </div>
       <button
