@@ -1583,7 +1583,7 @@ function CustomerReviewsImages(props: Record<string, any>) {
             {heading}
           </h2>
         ) : null}
-        <div className="grid gap-6">
+        <div className="grid gap-6 md:grid-cols-2">
           <div className="overflow-hidden rounded-3xl bg-slate-100 shadow-lg shadow-slate-900/10">
             {imageLeft ? (
               <img
