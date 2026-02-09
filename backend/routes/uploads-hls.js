@@ -100,6 +100,10 @@ const runFfmpeg = (args, onProgress) =>
     });
 
 router.post("/", uploadVideo.single("file"), async (req, res) => {
+    console.log("[hls] Upload request received", {
+        contentLength: req.headers["content-length"],
+        contentType: req.headers["content-type"],
+    });
     if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
     }
@@ -118,6 +122,13 @@ router.post("/", uploadVideo.single("file"), async (req, res) => {
         `${req.protocol}://${req.get("host")}`;
 
     try {
+        console.log("[hls] Upload stored", {
+            jobId,
+            originalName: req.file.originalname,
+            filename: req.file.filename,
+            size: req.file.size,
+            mime: req.file.mimetype,
+        });
         await fs.promises.mkdir(outputDir, { recursive: true });
         jobs.set(jobId, {
             status: "processing",
