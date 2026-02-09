@@ -2494,7 +2494,10 @@ type BlockEditorProps = {
   index: number;
   updateBlockProps: (index: number, patch: Record<string, unknown>) => void;
   uploadImage: (file: File) => Promise<string>;
-  uploadVideo?: (file: File) => Promise<string>;
+  uploadVideo?: (
+    file: File,
+    onProgress?: (stage: "upload" | "convert", percent: number) => void
+  ) => Promise<string>;
 };
 
 type ImageUploaderProps = {
@@ -2583,6 +2586,14 @@ export function BlockEditor({
 }: BlockEditorProps) {
   const [desktopUploading, setDesktopUploading] = useState(false);
   const [mobileUploading, setMobileUploading] = useState(false);
+  const [desktopStage, setDesktopStage] = useState<"upload" | "convert" | null>(
+    null
+  );
+  const [desktopProgress, setDesktopProgress] = useState(0);
+  const [mobileStage, setMobileStage] = useState<"upload" | "convert" | null>(
+    null
+  );
+  const [mobileProgress, setMobileProgress] = useState(0);
   if (!block) return null;
   const props = block.props as Record<string, unknown>;
 
@@ -2842,8 +2853,13 @@ export function BlockEditor({
               const file = event.target.files?.[0];
               if (!file || !uploadVideo) return;
               setDesktopUploading(true);
+              setDesktopStage("upload");
+              setDesktopProgress(0);
               try {
-                const url = await uploadVideo(file);
+                const url = await uploadVideo(file, (stage, percent) => {
+                  setDesktopStage(stage);
+                  setDesktopProgress(percent);
+                });
                 updateBlockProps(index, { hlsUrlDesktop: url });
               } finally {
                 setDesktopUploading(false);
@@ -2856,7 +2872,10 @@ export function BlockEditor({
             </span>
           )}
           {desktopUploading && (
-            <span className="text-[11px] text-slate-500">Uploading...</span>
+            <span className="text-[11px] text-slate-500">
+              {desktopStage === "convert" ? "Processing" : "Uploading"}{" "}
+              {Math.round(desktopProgress)}%
+            </span>
           )}
         </label>
         <label className="grid gap-1">
@@ -2881,8 +2900,13 @@ export function BlockEditor({
               const file = event.target.files?.[0];
               if (!file || !uploadVideo) return;
               setMobileUploading(true);
+              setMobileStage("upload");
+              setMobileProgress(0);
               try {
-                const url = await uploadVideo(file);
+                const url = await uploadVideo(file, (stage, percent) => {
+                  setMobileStage(stage);
+                  setMobileProgress(percent);
+                });
                 updateBlockProps(index, { hlsUrlMobile: url });
               } finally {
                 setMobileUploading(false);
@@ -2890,7 +2914,10 @@ export function BlockEditor({
             }}
           />
           {mobileUploading && (
-            <span className="text-[11px] text-slate-500">Uploading...</span>
+            <span className="text-[11px] text-slate-500">
+              {mobileStage === "convert" ? "Processing" : "Uploading"}{" "}
+              {Math.round(mobileProgress)}%
+            </span>
           )}
         </label>
         <label className="grid gap-1">

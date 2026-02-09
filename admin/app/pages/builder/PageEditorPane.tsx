@@ -31,7 +31,10 @@ type PageEditorPaneProps = {
   onReorder: (oldIndex: number, newIndex: number) => void;
   updateBlockProps: (index: number, patch: Record<string, unknown>) => void;
   uploadImage: (file: File) => Promise<string>;
-  uploadVideo?: (file: File) => Promise<string>;
+  uploadVideo?: (
+    file: File,
+    onProgress?: (stage: "upload" | "convert", percent: number) => void
+  ) => Promise<string>;
 };
 
 // Helper function to extract language-specific string

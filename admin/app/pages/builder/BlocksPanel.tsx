@@ -26,7 +26,10 @@ type BlocksPanelProps = {
   onDragEnd: (event: DragEndEvent) => void;
   updateBlockProps: (index: number, patch: Record<string, unknown>) => void;
   uploadImage: (file: File) => Promise<string>;
-  uploadVideo?: (file: File) => Promise<string>;
+  uploadVideo?: (
+    file: File,
+    onProgress?: (stage: "upload" | "convert", percent: number) => void
+  ) => Promise<string>;
 };
 
 export function BlocksPanel({

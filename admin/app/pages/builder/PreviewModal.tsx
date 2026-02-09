@@ -30,7 +30,10 @@ type PreviewModalProps = {
   onClearSelection: () => void;
   updateBlockProps: (index: number, patch: Record<string, unknown>) => void;
   uploadImage: (file: File) => Promise<string>;
-  uploadVideo?: (file: File) => Promise<string>;
+  uploadVideo?: (
+    file: File,
+    onProgress?: (stage: "upload" | "convert", percent: number) => void
+  ) => Promise<string>;
 };
 
 export function PreviewModal({
@@ -125,12 +128,15 @@ export function PreviewModal({
     }
   };
 
-  const handleUploadVideo = async (file: File): Promise<string> => {
+  const handleUploadVideo = async (
+    file: File,
+    onProgress?: (stage: "upload" | "convert", percent: number) => void
+  ): Promise<string> => {
     if (!uploadVideo) {
       throw new Error("Video upload is not configured");
     }
     try {
-      const url = await uploadVideo(file);
+      const url = await uploadVideo(file, onProgress);
 
       Swal.fire({
         icon: "success",

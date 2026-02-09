@@ -57,18 +57,62 @@ export default function PagesBuilder() {
     return data.path as string;
   };
 
-  const uploadVideoHls = async (file: File) => {
+  const uploadVideoHls = async (
+    file: File,
+    onProgress?: (stage: "upload" | "convert", percent: number) => void
+  ) => {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await fetch(`${API_URL}/uploads/hls`, {
-      method: "POST",
-      body: formData,
+
+    const responseData = await new Promise<any>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${API_URL}/uploads/hls`, true);
+      xhr.responseType = "json";
+
+      xhr.upload.onprogress = (event) => {
+        if (!event.lengthComputable) return;
+        const percent = Math.round((event.loaded / event.total) * 100);
+        onProgress?.("upload", percent);
+      };
+
+      xhr.onload = () => {
+        if (xhr.status < 200 || xhr.status >= 300) {
+          reject(new Error("Upload failed"));
+          return;
+        }
+        resolve(xhr.response || JSON.parse(xhr.responseText));
+      };
+
+      xhr.onerror = () => reject(new Error("Upload failed"));
+      xhr.send(formData);
     });
-    if (!response.ok) {
-      throw new Error("Upload failed");
+
+    if (!responseData?.jobId) {
+      return responseData?.path as string;
     }
-    const data = await response.json();
-    return data.path as string;
+
+    const jobId = String(responseData.jobId);
+    const pollProgress = async (): Promise<string> => {
+      const response = await fetch(`${API_URL}/uploads/hls/${jobId}`);
+      if (!response.ok) {
+        throw new Error("Failed to read conversion progress");
+      }
+      const data = await response.json();
+      const status = data.status as string;
+      const progress = Number(data.progress || 0);
+      onProgress?.("convert", progress);
+      if (status === "done") {
+        onProgress?.("convert", 100);
+        return data.path as string;
+      }
+      if (status === "error") {
+        throw new Error(data.error || "Video processing failed");
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return pollProgress();
+    };
+
+    return pollProgress();
   };
 
   // Handle save with SweetAlert notification
