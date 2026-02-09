@@ -227,9 +227,9 @@ export default function PageRenderer({ page }: { page: Page }) {
           case "gallery":
             return <Gallery key={index} {...block.props} />;
           case "faq":
-            return <Faq key={index} {...block.props} />;
+            return <FrequentlyAskedQuestions key={index} {...block.props} />;
           case "frequently-asked-questions":
-            return <Faq key={index} {...block.props} />;
+            return <FrequentlyAskedQuestions key={index} {...block.props} />;
           case "contact":
             return <Contact key={index} {...block.props} />;
           case "top-products-sales":
@@ -1801,6 +1801,64 @@ function Faq(props: Record<string, any>) {
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function FrequentlyAskedQuestions(props: Record<string, any>) {
+  const items = (props.items || []) as Array<Record<string, string>>;
+  const backgroundStyle = safeList(props.backgroundColor)
+    ? { backgroundColor: safeList(props.backgroundColor) }
+    : undefined;
+  const title = safeList(props.title);
+  const subtitle = safeList(props.subtitle);
+
+  return (
+    <section className="px-6 py-16" style={backgroundStyle}>
+      <div className="mx-auto max-w-4xl text-center">
+        {title ? (
+          <h2 className="text-3xl font-semibold text-[var(--brand-navy)] whitespace-pre-line">
+            {title}
+          </h2>
+        ) : null}
+        {subtitle ? (
+          <p className="mt-2 text-sm font-semibold uppercase tracking-[0.2em] text-[var(--brand-navy)]/70 whitespace-pre-line">
+            {subtitle}
+          </p>
+        ) : null}
+      </div>
+      <div className="mx-auto mt-10 grid max-w-4xl gap-4">
+        {items.map((faq, index) => (
+          <details
+            key={`${faq.question}-${index}`}
+            className="group rounded-2xl border border-slate-200 bg-white shadow-sm"
+          >
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-4 text-left [&::-webkit-details-marker]:hidden">
+              <span className="text-base font-semibold text-[var(--brand-navy)]">
+                {safeList(faq.question)}
+              </span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-[var(--brand-navy)] transition-transform duration-200 group-open:rotate-180">
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  className="h-4 w-4"
+                >
+                  <path
+                    d="M5.5 7.5l4.5 4.5 4.5-4.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </summary>
+            <div className="px-6 pb-5 text-sm text-slate-600 whitespace-pre-line">
+              {safeList(faq.answer)}
+            </div>
+          </details>
+        ))}
       </div>
     </section>
   );
