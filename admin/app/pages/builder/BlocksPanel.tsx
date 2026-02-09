@@ -26,6 +26,7 @@ type BlocksPanelProps = {
   onDragEnd: (event: DragEndEvent) => void;
   updateBlockProps: (index: number, patch: Record<string, unknown>) => void;
   uploadImage: (file: File) => Promise<string>;
+  uploadVideo?: (file: File) => Promise<string>;
 };
 
 export function BlocksPanel({
@@ -36,6 +37,7 @@ export function BlocksPanel({
   onDragEnd,
   updateBlockProps,
   uploadImage,
+  uploadVideo,
 }: BlocksPanelProps) {
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -79,6 +81,7 @@ export function BlocksPanel({
                   index={index}
                   updateBlockProps={updateBlockProps}
                   uploadImage={uploadImage}
+                  uploadVideo={uploadVideo}
                 />
               </div>
             ))}

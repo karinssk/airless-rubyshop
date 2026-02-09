@@ -30,6 +30,7 @@ type PreviewModalProps = {
   onClearSelection: () => void;
   updateBlockProps: (index: number, patch: Record<string, unknown>) => void;
   uploadImage: (file: File) => Promise<string>;
+  uploadVideo?: (file: File) => Promise<string>;
 };
 
 export function PreviewModal({
@@ -51,6 +52,7 @@ export function PreviewModal({
   onClearSelection,
   updateBlockProps,
   uploadImage,
+  uploadVideo,
 }: PreviewModalProps) {
   const [dropTarget, setDropTarget] = useState<{
     index: number;
@@ -113,6 +115,40 @@ export function PreviewModal({
         icon: "error",
         title: "Upload Failed",
         text: "Failed to upload image. Please try again.",
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+      throw error;
+    }
+  };
+
+  const handleUploadVideo = async (file: File): Promise<string> => {
+    if (!uploadVideo) {
+      throw new Error("Video upload is not configured");
+    }
+    try {
+      const url = await uploadVideo(file);
+
+      Swal.fire({
+        icon: "success",
+        title: "Upload Successful!",
+        text: `${file.name} has been uploaded`,
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+
+      return url;
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Upload Failed",
+        text: "Failed to upload video. Please try again.",
         toast: true,
         position: "bottom-end",
         showConfirmButton: false,
@@ -551,6 +587,7 @@ export function PreviewModal({
                     index={activeIndex}
                     updateBlockProps={updateBlockProps}
                     uploadImage={handleUploadImage}
+                    uploadVideo={uploadVideo ? handleUploadVideo : undefined}
                   />
                 </div>
               )}

@@ -31,6 +31,7 @@ type PageEditorPaneProps = {
   onReorder: (oldIndex: number, newIndex: number) => void;
   updateBlockProps: (index: number, patch: Record<string, unknown>) => void;
   uploadImage: (file: File) => Promise<string>;
+  uploadVideo?: (file: File) => Promise<string>;
 };
 
 // Helper function to extract language-specific string
@@ -65,6 +66,7 @@ export function PageEditorPane({
   onReorder,
   updateBlockProps,
   uploadImage,
+  uploadVideo,
 }: PageEditorPaneProps) {
   // Extract language-specific values
   const currentTitle = getLangString(page.title, activeLanguage);
@@ -160,6 +162,7 @@ export function PageEditorPane({
         onClearSelection={onClearSelection}
         updateBlockProps={updateBlockProps}
         uploadImage={uploadImage}
+        uploadVideo={uploadVideo}
       />
     </div>
   );

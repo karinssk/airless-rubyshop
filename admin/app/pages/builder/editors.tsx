@@ -19,6 +19,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Block } from "./types";
 import { formatItems, parseItems, toLine } from "./utils";
 import { resolveUploadUrl, backendBaseUrl } from "@/lib/urls";
+import { HlsVideoPlayer } from "./HlsVideoPlayer";
 
 type GalleryItem = {
   id: string;
@@ -305,30 +306,14 @@ function SortableAchievementItem({
           onChange={(event) => onChange({ sublabel: event.target.value })}
         />
       </label>
-      <div className="grid gap-2 md:grid-cols-[1fr_auto]">
-        <label className="grid gap-1">
-          Icon URL
-          <input
-            className="rounded-xl border border-slate-200 px-3 py-2"
-            value={item.icon || ""}
-            onChange={(event) => onChange({ icon: event.target.value })}
-          />
-        </label>
-        <label className="grid gap-1">
-          🎨 Upload New Icon
-          <input
-            type="file"
-            accept="image/*"
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              const url = await onUpload(file);
-              onChange({ icon: url });
-            }}
-          />
-        </label>
-      </div>
+      <label className="grid gap-1">
+        Icon
+        <ImageUploader
+          value={item.icon || ""}
+          onChange={(url) => onChange({ icon: url })}
+          onUpload={onUpload}
+        />
+      </label>
     </div>
   );
 }
@@ -415,30 +400,14 @@ function SortableWhyChooseItem({
           onChange={(event) => onChange({ description: event.target.value })}
         />
       </label>
-      <div className="grid gap-2 md:grid-cols-[1fr_auto]">
-        <label className="grid gap-1">
-          Icon URL
-          <input
-            className="rounded-xl border border-slate-200 px-3 py-2"
-            value={item.icon || ""}
-            onChange={(event) => onChange({ icon: event.target.value })}
-          />
-        </label>
-        <label className="grid gap-1">
-          🎨 Upload New Icon
-          <input
-            type="file"
-            accept="image/*"
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              const url = await onUpload(file);
-              onChange({ icon: url });
-            }}
-          />
-        </label>
-      </div>
+      <label className="grid gap-1">
+        Icon
+        <ImageUploader
+          value={item.icon || ""}
+          onChange={(url) => onChange({ icon: url })}
+          onUpload={onUpload}
+        />
+      </label>
     </div>
   );
 }
@@ -699,43 +668,14 @@ function SortableCoreServiceItem({
           Delete
         </button>
       </div>
-      <div className="grid gap-3 md:grid-cols-[96px_1fr]">
-        <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-          {item.image ? (
-            <img
-              src={item.image}
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="text-[10px] text-slate-400">Image</span>
-          )}
-        </div>
-        <div className="grid gap-2">
-          <label className="grid gap-1">
-            Image URL
-            <input
-              className="rounded-xl border border-slate-200 px-3 py-2"
-              value={item.image || ""}
-              onChange={(event) => onChange({ image: event.target.value })}
-            />
-          </label>
-          <label className="grid gap-1">
-            Upload New Image
-            <input
-              type="file"
-              accept="image/*"
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-              onChange={async (event) => {
-                const file = event.target.files?.[0];
-                if (!file) return;
-                const url = await onUpload(file);
-                onChange({ image: url });
-              }}
-            />
-          </label>
-        </div>
-      </div>
+      <label className="grid gap-1">
+        Image
+        <ImageUploader
+          value={item.image || ""}
+          onChange={(url) => onChange({ image: url })}
+          onUpload={onUpload}
+        />
+      </label>
       <div className="grid gap-2 md:grid-cols-2">
         <label className="grid gap-1">
           Title
@@ -762,30 +702,14 @@ function SortableCoreServiceItem({
           onChange={(event) => onChange({ description: event.target.value })}
         />
       </label>
-      <div className="grid gap-2 md:grid-cols-[1fr_auto]">
-        <label className="grid gap-1">
-          Icon URL
-          <input
-            className="rounded-xl border border-slate-200 px-3 py-2"
-            value={item.icon || ""}
-            onChange={(event) => onChange({ icon: event.target.value })}
-          />
-        </label>
-        <label className="grid gap-1">
-          🎨 Upload New Icon
-          <input
-            type="file"
-            accept="image/*"
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              const url = await onUpload(file);
-              onChange({ icon: url });
-            }}
-          />
-        </label>
-      </div>
+      <label className="grid gap-1">
+        Icon
+        <ImageUploader
+          value={item.icon || ""}
+          onChange={(url) => onChange({ icon: url })}
+          onUpload={onUpload}
+        />
+      </label>
       <div className="grid gap-2 md:grid-cols-2">
         <label className="grid gap-1">
           CTA Text
@@ -966,25 +890,11 @@ function SortableOurServicesV2Item({
       </div>
       <div className="grid gap-2 text-xs text-slate-600">
         <label className="grid gap-1">
-          Image URL
-          <input
-            className="rounded-xl border border-slate-200 px-3 py-2"
-            value={item.image}
-            onChange={(event) => onChange({ image: event.target.value })}
-          />
-        </label>
-        <label className="grid gap-1">
-          Upload Image
-          <input
-            type="file"
-            accept="image/*"
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              const url = await onUpload(file);
-              onChange({ image: url });
-            }}
+          Image
+          <ImageUploader
+            value={item.image || ""}
+            onChange={(url) => onChange({ image: url })}
+            onUpload={onUpload}
           />
         </label>
         <label className="grid gap-1">
@@ -1176,25 +1086,11 @@ function SortableOurWorkItem({
       </div>
       <div className="grid gap-2 text-xs text-slate-600">
         <label className="grid gap-1">
-          Image URL
-          <input
-            className="rounded-xl border border-slate-200 px-3 py-2"
-            value={item.image}
-            onChange={(event) => onChange({ image: event.target.value })}
-          />
-        </label>
-        <label className="grid gap-1">
-          Upload Image
-          <input
-            type="file"
-            accept="image/*"
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              const url = await onUpload(file);
-              onChange({ image: url });
-            }}
+          Image
+          <ImageUploader
+            value={item.image || ""}
+            onChange={(url) => onChange({ image: url })}
+            onUpload={onUpload}
           />
         </label>
         <label className="grid gap-1">
@@ -1689,43 +1585,14 @@ function SortablePortfolioItem({
           Delete
         </button>
       </div>
-      <div className="grid gap-3 md:grid-cols-[120px_1fr]">
-        <div className="flex h-24 w-28 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-          {item.image ? (
-            <img
-              src={item.image}
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="text-[10px] text-slate-400">Image</span>
-          )}
-        </div>
-        <div className="grid gap-2">
-          <label className="grid gap-1">
-            Image URL
-            <input
-              className="rounded-xl border border-slate-200 px-3 py-2"
-              value={item.image || ""}
-              onChange={(event) => onChange({ image: event.target.value })}
-            />
-          </label>
-          <label className="grid gap-1">
-            📤 Upload New Image
-            <input
-              type="file"
-              accept="image/*"
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-              onChange={async (event) => {
-                const file = event.target.files?.[0];
-                if (!file) return;
-                const url = await onUpload(file);
-                onChange({ image: url });
-              }}
-            />
-          </label>
-        </div>
-      </div>
+      <label className="grid gap-1">
+        Image
+        <ImageUploader
+          value={item.image || ""}
+          onChange={(url) => onChange({ image: url })}
+          onUpload={onUpload}
+        />
+      </label>
       <label className="grid gap-1">
         Title
         <input
@@ -1982,19 +1849,24 @@ function GalleryEditor({
 
   return (
     <div className="mt-3 grid gap-3 text-xs text-slate-600">
-      <label className="grid gap-1">
-        📤 Upload New Image
+      <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-slate-400">
+          <svg className="h-8 w-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span className="text-xs">Upload new image to gallery</span>
+        </div>
         <input
           type="file"
           accept="image/*"
-          className="rounded-xl border border-slate-200 px-3 py-2"
+          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
           onChange={(event) => {
             const file = event.target.files?.[0];
             if (!file) return;
             handleUpload(file);
           }}
         />
-      </label>
+      </div>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -2151,8 +2023,13 @@ function HeroImagesEditor({
 
   return (
     <div className="mt-3 grid gap-3 text-xs text-slate-600">
-      <label className="grid gap-1">
-        📤 Upload New Image
+      <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-slate-400">
+          <svg className="h-8 w-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span className="text-xs">Upload new hero image</span>
+        </div>
         <input
           type="file"
           accept="image/*"
@@ -2163,7 +2040,7 @@ function HeroImagesEditor({
             handleUpload(file);
           }}
         />
-      </label>
+      </div>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -2617,6 +2494,7 @@ type BlockEditorProps = {
   index: number;
   updateBlockProps: (index: number, patch: Record<string, unknown>) => void;
   uploadImage: (file: File) => Promise<string>;
+  uploadVideo?: (file: File) => Promise<string>;
 };
 
 type ImageUploaderProps = {
@@ -2701,7 +2579,10 @@ export function BlockEditor({
   index,
   updateBlockProps,
   uploadImage,
+  uploadVideo,
 }: BlockEditorProps) {
+  const [desktopUploading, setDesktopUploading] = useState(false);
+  const [mobileUploading, setMobileUploading] = useState(false);
   if (!block) return null;
   const props = block.props as Record<string, unknown>;
 
@@ -2741,38 +2622,12 @@ export function BlockEditor({
         </label>
         <label className="grid gap-1">
           Hero Image
-          <input
-            type="file"
-            accept="image/*"
-            className="rounded-xl border border-slate-200 px-3 py-2"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              const url = await uploadImage(file);
-              updateBlockProps(index, { backgroundImage: url });
-            }}
+          <ImageUploader
+            value={toLine(props.backgroundImage as string)}
+            onChange={(url) => updateBlockProps(index, { backgroundImage: url })}
+            onUpload={uploadImage}
           />
         </label>
-        {props.backgroundImage ? (
-          <div className="grid gap-2">
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <img
-                src={resolveUploadUrl(String(props.backgroundImage))}
-                alt="Hero preview"
-                className="h-36 w-full object-cover"
-              />
-            </div>
-            <button
-              type="button"
-              className="w-fit rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[11px] font-semibold text-rose-600"
-              onClick={() => updateBlockProps(index, { backgroundImage: "" })}
-            >
-              Remove hero image
-            </button>
-          </div>
-        ) : (
-          <p className="text-[11px] text-slate-400">No hero image yet.</p>
-        )}
       </div>
     );
   }
@@ -2834,12 +2689,21 @@ export function BlockEditor({
           />
         </label>
         <label className="grid gap-1">
-          Background Image
+          Background Image (PC)
           <ImageUploader
             value={toLine(props.backgroundImage as string)}
             onChange={(url) => updateBlockProps(index, { backgroundImage: url })}
             onUpload={uploadImage}
           />
+        </label>
+        <label className="grid gap-1">
+          Background Image (Mobile)
+          <ImageUploader
+            value={toLine(props.backgroundImageMobile as string)}
+            onChange={(url) => updateBlockProps(index, { backgroundImageMobile: url })}
+            onUpload={uploadImage}
+          />
+          <span className="text-[10px] text-slate-400">If empty, PC image will be used on mobile</span>
         </label>
         <label className="grid gap-1">
           Logo (optional)
@@ -2907,6 +2771,176 @@ export function BlockEditor({
     );
   }
 
+  if (block.type === "video-hls-01") {
+    const hlsUrlDesktop = toLine(
+      (props.hlsUrlDesktop || props.hlsUrl) as string
+    );
+    const hlsUrlMobile = toLine(
+      (props.hlsUrlMobile || props.hlsUrl) as string
+    );
+    const resolvedHlsDesktop = hlsUrlDesktop
+      ? resolveUploadUrl(hlsUrlDesktop)
+      : "";
+    const resolvedHlsMobile = hlsUrlMobile
+      ? resolveUploadUrl(hlsUrlMobile)
+      : "";
+    const posterUrl = toLine(props.posterImage as string);
+    const resolvedPosterUrl = posterUrl ? resolveUploadUrl(posterUrl) : "";
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Heading
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.heading as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { heading: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Description
+          <textarea
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            rows={3}
+            defaultValue={toLine(props.description as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { description: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Background Color
+          <input
+            type="color"
+            className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+            defaultValue={toLine(props.backgroundColor as string) || "#ffffff"}
+            onChange={(event) =>
+              updateBlockProps(index, { backgroundColor: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          HLS Playlist URL (Desktop)
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            placeholder="/uploads/hls/.../index.m3u8"
+            defaultValue={hlsUrlDesktop}
+            onBlur={(event) =>
+              updateBlockProps(index, { hlsUrlDesktop: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Upload Video (Desktop)
+          <input
+            type="file"
+            accept="video/*"
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
+            disabled={!uploadVideo || desktopUploading}
+            onChange={async (event) => {
+              const file = event.target.files?.[0];
+              if (!file || !uploadVideo) return;
+              setDesktopUploading(true);
+              try {
+                const url = await uploadVideo(file);
+                updateBlockProps(index, { hlsUrlDesktop: url });
+              } finally {
+                setDesktopUploading(false);
+              }
+            }}
+          />
+          {!uploadVideo && (
+            <span className="text-[11px] text-rose-500">
+              Video upload is not configured.
+            </span>
+          )}
+          {desktopUploading && (
+            <span className="text-[11px] text-slate-500">Uploading...</span>
+          )}
+        </label>
+        <label className="grid gap-1">
+          HLS Playlist URL (Mobile)
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            placeholder="/uploads/hls/.../index.m3u8"
+            defaultValue={hlsUrlMobile}
+            onBlur={(event) =>
+              updateBlockProps(index, { hlsUrlMobile: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Upload Video (Mobile)
+          <input
+            type="file"
+            accept="video/*"
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
+            disabled={!uploadVideo || mobileUploading}
+            onChange={async (event) => {
+              const file = event.target.files?.[0];
+              if (!file || !uploadVideo) return;
+              setMobileUploading(true);
+              try {
+                const url = await uploadVideo(file);
+                updateBlockProps(index, { hlsUrlMobile: url });
+              } finally {
+                setMobileUploading(false);
+              }
+            }}
+          />
+          {mobileUploading && (
+            <span className="text-[11px] text-slate-500">Uploading...</span>
+          )}
+        </label>
+        <label className="grid gap-1">
+          Poster Image (optional)
+          <ImageUploader
+            value={toLine(props.posterImage as string)}
+            onChange={(url) => updateBlockProps(index, { posterImage: url })}
+            onUpload={uploadImage}
+          />
+        </label>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <div className="mb-2 text-[11px] font-semibold text-slate-500">
+              Desktop Preview
+            </div>
+            {resolvedHlsDesktop ? (
+              <HlsVideoPlayer
+                src={resolvedHlsDesktop}
+                poster={resolvedPosterUrl}
+                className="aspect-video w-full rounded-xl bg-black"
+              />
+            ) : (
+              <div className="flex aspect-video w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-slate-400">
+                No desktop video
+              </div>
+            )}
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <div className="mb-2 text-[11px] font-semibold text-slate-500">
+              Mobile Preview
+            </div>
+            {resolvedHlsMobile ? (
+              <div className="mx-auto w-full max-w-[320px]">
+                <HlsVideoPlayer
+                  src={resolvedHlsMobile}
+                  poster={resolvedPosterUrl}
+                  className="aspect-[9/16] w-full rounded-xl bg-black"
+                />
+              </div>
+            ) : (
+              <div className="flex aspect-video w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white text-slate-400">
+                No mobile video
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (block.type === "customer-reviews-images") {
     return (
       <div className="mt-3 grid gap-3 text-xs text-slate-600">
@@ -2963,63 +2997,11 @@ export function BlockEditor({
         ))}
         <label className="grid gap-1">
           Background Image
-          <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
-            {props.backgroundImage ? (
-              <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <img
-                  src={resolveUploadUrl(props.backgroundImage as string)}
-                  alt="Background"
-                  className="h-full w-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    updateBlockProps(index, { backgroundImage: "" })
-                  }
-                  className="absolute right-2 top-2 rounded-full bg-rose-600 p-1.5 text-white shadow hover:bg-rose-700 transition"
-                  title="Remove image"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-            ) : (
-              <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white text-slate-400">
-                <svg className="h-8 w-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className="text-xs">No image selected</span>
-              </div>
-            )}
-
-            <div className="grid gap-2">
-              <input
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs"
-                placeholder="Image URL..."
-                value={props.backgroundImage as string || ""}
-                onChange={(event) =>
-                  updateBlockProps(index, { backgroundImage: event.target.value })
-                }
-              />
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  onChange={async (event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
-                    const url = await uploadImage(file);
-                    updateBlockProps(index, { backgroundImage: url });
-                  }}
-                />
-                <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-white border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 button">
-                  <span>📂 Classification/Click to upload</span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <ImageUploader
+            value={toLine(props.backgroundImage as string)}
+            onChange={(url) => updateBlockProps(index, { backgroundImage: url })}
+            onUpload={uploadImage}
+          />
         </label>
         <label className="grid gap-1">
           Title Color
@@ -3414,10 +3396,8 @@ export function BlockEditor({
           ["description", "Description"],
           ["primaryCtaText", "Primary CTA Text"],
           ["primaryCtaHref", "Primary CTA Link"],
-          ["primaryIcon", "Primary Icon URL"],
           ["secondaryCtaText", "Secondary CTA Text"],
           ["secondaryCtaHref", "Secondary CTA Link"],
-          ["secondaryIcon", "Secondary Icon URL"],
         ].map(([key, label]) => (
           <label key={key} className="grid gap-1">
             {label}
@@ -3430,36 +3410,22 @@ export function BlockEditor({
             />
           </label>
         ))}
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="grid gap-1">
-            Upload Primary Icon
-            <input
-              type="file"
-              accept="image/*"
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-              onChange={async (event) => {
-                const file = event.target.files?.[0];
-                if (!file) return;
-                const url = await uploadImage(file);
-                updateBlockProps(index, { primaryIcon: url });
-              }}
-            />
-          </label>
-          <label className="grid gap-1">
-            Upload Secondary Icon
-            <input
-              type="file"
-              accept="image/*"
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-              onChange={async (event) => {
-                const file = event.target.files?.[0];
-                if (!file) return;
-                const url = await uploadImage(file);
-                updateBlockProps(index, { secondaryIcon: url });
-              }}
-            />
-          </label>
-        </div>
+        <label className="grid gap-1">
+          Primary Icon
+          <ImageUploader
+            value={toLine(props.primaryIcon as string)}
+            onChange={(url) => updateBlockProps(index, { primaryIcon: url })}
+            onUpload={uploadImage}
+          />
+        </label>
+        <label className="grid gap-1">
+          Secondary Icon
+          <ImageUploader
+            value={toLine(props.secondaryIcon as string)}
+            onChange={(url) => updateBlockProps(index, { secondaryIcon: url })}
+            onUpload={uploadImage}
+          />
+        </label>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="grid gap-1">
             Primary Button Background
@@ -3590,27 +3556,11 @@ export function BlockEditor({
           />
         </label>
         <label className="grid gap-1">
-          Image URL
-          <input
-            className="rounded-xl border border-slate-200 px-3 py-2"
-            defaultValue={toLine(props.image as string)}
-            onBlur={(event) =>
-              updateBlockProps(index, { image: event.target.value })
-            }
-          />
-        </label>
-        <label className="grid gap-1">
-          📤 Upload New Image
-          <input
-            type="file"
-            accept="image/*"
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              const url = await uploadImage(file);
-              updateBlockProps(index, { image: url });
-            }}
+          Image
+          <ImageUploader
+            value={toLine(props.image as string)}
+            onChange={(url) => updateBlockProps(index, { image: url })}
+            onUpload={uploadImage}
           />
         </label>
         <label className="grid gap-1">
@@ -3708,36 +3658,18 @@ export function BlockEditor({
           </label>
         </div>
         {[
-          ["imageTop", "Top Image URL"],
-          ["imageBottom", "Bottom Image URL"],
-          ["imageSide", "Side Image URL"],
+          ["imageTop", "Top Image"],
+          ["imageBottom", "Bottom Image"],
+          ["imageSide", "Side Image"],
         ].map(([key, label]) => (
-          <div key={key} className="grid gap-2 md:grid-cols-[1fr_auto]">
-            <label className="grid gap-1">
-              {label}
-              <input
-                className="rounded-xl border border-slate-200 px-3 py-2"
-                defaultValue={toLine(props[key as string] as string)}
-                onBlur={(event) =>
-                  updateBlockProps(index, { [key]: event.target.value })
-                }
-              />
-            </label>
-            <label className="grid gap-1">
-              📤 Upload New Image
-              <input
-                type="file"
-                accept="image/*"
-                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-                onChange={async (event) => {
-                  const file = event.target.files?.[0];
-                  if (!file) return;
-                  const url = await uploadImage(file);
-                  updateBlockProps(index, { [key]: url });
-                }}
-              />
-            </label>
-          </div>
+          <label key={key} className="grid gap-1">
+            {label}
+            <ImageUploader
+              value={toLine(props[key as string] as string)}
+              onChange={(url) => updateBlockProps(index, { [key]: url })}
+              onUpload={uploadImage}
+            />
+          </label>
         ))}
       </div>
     );
@@ -4010,27 +3942,11 @@ export function BlockEditor({
                 />
               </label>
               <label className="grid gap-1">
-                Icon URL
-                <input
-                  className="rounded-xl border border-slate-200 px-3 py-2"
+                Icon
+                <ImageUploader
                   value={card.icon || ""}
-                  onChange={(event) =>
-                    updateCard(cardIndex, { icon: event.target.value })
-                  }
-                />
-              </label>
-              <label className="grid gap-1">
-                🎨 Upload New Icon
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-                  onChange={async (event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
-                    const url = await uploadImage(file);
-                    updateCard(cardIndex, { icon: url });
-                  }}
+                  onChange={(url) => updateCard(cardIndex, { icon: url })}
+                  onUpload={uploadImage}
                 />
               </label>
               <label className="grid gap-1">
@@ -4152,27 +4068,11 @@ export function BlockEditor({
                 />
               </label>
               <label className="grid gap-1">
-                Icon URL
-                <input
-                  className="rounded-xl border border-slate-200 px-3 py-2"
+                Icon
+                <ImageUploader
                   value={item.icon || ""}
-                  onChange={(event) =>
-                    updateItemValue(itemIndex, { icon: event.target.value })
-                  }
-                />
-              </label>
-              <label className="grid gap-1">
-                🎨 Upload New Icon
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-                  onChange={async (event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
-                    const url = await uploadImage(file);
-                    updateItemValue(itemIndex, { icon: url });
-                  }}
+                  onChange={(url) => updateItemValue(itemIndex, { icon: url })}
+                  onUpload={uploadImage}
                 />
               </label>
               <label className="grid gap-1">
@@ -4299,7 +4199,6 @@ export function BlockEditor({
         {[
           ["heading", "Heading"],
           ["subheading", "Subheading"],
-          ["icon", "Icon URL"],
         ].map(([key, label]) => (
           <label key={key} className="grid gap-1">
             {label}
@@ -4313,17 +4212,11 @@ export function BlockEditor({
           </label>
         ))}
         <label className="grid gap-1">
-          🎨 Upload New Icon
-          <input
-            type="file"
-            accept="image/*"
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
-              const url = await uploadImage(file);
-              updateBlockProps(index, { icon: url });
-            }}
+          Icon
+          <ImageUploader
+            value={toLine(props.icon as string)}
+            onChange={(url) => updateBlockProps(index, { icon: url })}
+            onUpload={uploadImage}
           />
         </label>
       </div>
@@ -4416,27 +4309,11 @@ export function BlockEditor({
                 />
               </label>
               <label className="grid gap-1">
-                Icon URL
-                <input
-                  className="rounded-xl border border-slate-200 px-3 py-2"
+                Icon
+                <ImageUploader
                   value={item.icon || ""}
-                  onChange={(event) =>
-                    updateItemValue(itemIndex, { icon: event.target.value })
-                  }
-                />
-              </label>
-              <label className="grid gap-1">
-                🎨 Upload New Icon
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-                  onChange={async (event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
-                    const url = await uploadImage(file);
-                    updateItemValue(itemIndex, { icon: url });
-                  }}
+                  onChange={(url) => updateItemValue(itemIndex, { icon: url })}
+                  onUpload={uploadImage}
                 />
               </label>
               <label className="grid gap-1">
@@ -4815,27 +4692,11 @@ export function BlockEditor({
                 />
               </label>
               <label className="grid gap-1">
-                Icon URL
-                <input
-                  className="rounded-xl border border-slate-200 px-3 py-2"
+                Icon
+                <ImageUploader
                   value={channel.icon || ""}
-                  onChange={(event) =>
-                    updateChannel(channelIndex, { icon: event.target.value })
-                  }
-                />
-              </label>
-              <label className="grid gap-1">
-                🎨 Upload New Icon
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-                  onChange={async (event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
-                    const url = await uploadImage(file);
-                    updateChannel(channelIndex, { icon: url });
-                  }}
+                  onChange={(url) => updateChannel(channelIndex, { icon: url })}
+                  onUpload={uploadImage}
                 />
               </label>
               <label className="grid gap-1">
@@ -5101,27 +4962,11 @@ export function BlockEditor({
                 />
               </label>
               <label className="grid gap-1">
-                Icon (emoji or URL)
-                <input
-                  className="rounded-xl border border-slate-200 px-3 py-2"
+                Icon
+                <ImageUploader
                   value={item.icon || ""}
-                  onChange={(event) =>
-                    updateItem(itemIndex, { icon: event.target.value })
-                  }
-                />
-              </label>
-              <label className="grid gap-1">
-                📤 Upload New Icon
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs"
-                  onChange={async (event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
-                    const url = await uploadImage(file);
-                    updateItem(itemIndex, { icon: url });
-                  }}
+                  onChange={(url) => updateItem(itemIndex, { icon: url })}
+                  onUpload={uploadImage}
                 />
               </label>
               <label className="grid gap-1">

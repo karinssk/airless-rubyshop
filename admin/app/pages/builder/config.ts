@@ -24,6 +24,12 @@ export const blockCatalog = [
     stripe: "bg-red-500",
   },
   {
+    type: "video-hls-01",
+    label: "Video HLS 01",
+    preview: "bg-slate-900",
+    stripe: "bg-emerald-400",
+  },
+  {
     type: "customer-reviews-images",
     label: "Customer Reviews Images",
     preview: "bg-white",
@@ -264,6 +270,7 @@ export const thumbnailMap: Record<string, string> = {
   "landing-hero-01": "/thumbnails/hero.svg",
   "hero-images": "/thumbnails/hero-images.svg",
   "youtube-embed": "/thumbnails/gallery.svg",
+  "video-hls-01": "/thumbnails/gallery.svg",
   "customer-reviews-images": "/thumbnails/gallery.svg",
   "hero-with-available-rooms-check": "/thumbnails/hero.svg",
   "contact-and-services": "/thumbnails/contact-and-services.svg",
@@ -326,6 +333,7 @@ export const defaultProps: Record<string, Record<string, unknown>> = {
     buttonHref: "https://line.me/R/ti/p/~rubyshop168",
     backgroundImage:
       "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=80",
+    backgroundImageMobile: "",
     overlayOpacity: 0.55,
     logoUrl: "",
   },
@@ -343,6 +351,14 @@ export const defaultProps: Record<string, Record<string, unknown>> = {
   "youtube-embed": {
     heading: "วิดีโอแนะนำ",
     videoUrl: "https://www.youtube.com/watch?v=Lq8aMdPJStU",
+  },
+  "video-hls-01": {
+    backgroundColor: "#ffffff",
+    heading: "วิดีโอสินค้า",
+    description: "วิดีโอสาธิตการใช้งานพร้อมระบบ HLS โหลดไว",
+    hlsUrlDesktop: "",
+    hlsUrlMobile: "",
+    posterImage: "",
   },
   "customer-reviews-images": {
     heading: "รีวิวจากลูกค้า",

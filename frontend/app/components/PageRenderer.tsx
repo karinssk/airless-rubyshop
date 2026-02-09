@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { resolveUploadUrl } from "@/lib/urls";
+import HlsVideoPlayer from "./HlsVideoPlayer";
 
 // Loading skeleton for blocks
 function BlockSkeleton({ height = "h-64" }: { height?: string }) {
@@ -159,6 +160,8 @@ export default function PageRenderer({ page }: { page: Page }) {
             return <HeroImages key={index} {...block.props} />;
           case "youtube-embed":
             return <YouTubeEmbed key={index} {...block.props} />;
+          case "video-hls-01":
+            return <VideoHls01 key={index} {...block.props} />;
           case "customer-reviews-images":
             return <CustomerReviewsImages key={index} {...block.props} />;
           case "hero-with-available-rooms-check":
@@ -245,6 +248,7 @@ export default function PageRenderer({ page }: { page: Page }) {
 
 function LandingHero01(props: Record<string, any>) {
   const backgroundImage = resolveImage(props.backgroundImage);
+  const backgroundImageMobile = resolveImage(props.backgroundImageMobile);
   const overlayOpacity = Math.min(
     0.85,
     Math.max(0.2, Number(props.overlayOpacity) || 0.55)
@@ -253,7 +257,18 @@ function LandingHero01(props: Record<string, any>) {
 
   return (
     <section className="relative min-h-[300px] overflow-hidden sm:min-h-[380px] lg:min-h-[600px]">
-      {backgroundImage ? (
+      {backgroundImageMobile ? (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center md:hidden"
+            style={{ backgroundImage: `url(${backgroundImageMobile})` }}
+          />
+          <div
+            className="absolute inset-0 hidden bg-cover bg-center md:block"
+            style={{ backgroundImage: `url(${backgroundImage})` }}
+          />
+        </>
+      ) : backgroundImage ? (
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${backgroundImage})` }}
@@ -1483,6 +1498,70 @@ function YouTubeEmbed(props: Record<string, any>) {
               Invalid YouTube URL.
             </div>
           )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function VideoHls01(props: Record<string, any>) {
+  const heading = safeList(props.heading);
+  const description = safeList(props.description);
+  const backgroundStyle = safeList(props.backgroundColor)
+    ? { backgroundColor: safeList(props.backgroundColor) }
+    : undefined;
+  const hlsDesktop = safeList(props.hlsUrlDesktop || props.hlsUrl);
+  const hlsMobile = safeList(props.hlsUrlMobile || props.hlsUrl);
+  const resolvedHlsDesktop = hlsDesktop ? resolveUploadUrl(hlsDesktop) : "";
+  const resolvedHlsMobile = hlsMobile ? resolveUploadUrl(hlsMobile) : "";
+  const fallbackHls = resolvedHlsDesktop || resolvedHlsMobile;
+  const posterImage = safeList(props.posterImage);
+  const resolvedPoster = posterImage ? resolveUploadUrl(posterImage) : "";
+
+  return (
+    <section className="py-16" style={backgroundStyle}>
+      <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6">
+        {heading ? (
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold text-[var(--brand-navy)] whitespace-pre-line">
+              {heading}
+            </h2>
+            {description ? (
+              <p className="mt-2 text-sm text-slate-600 whitespace-pre-line">
+                {description}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+      <div className="mt-6">
+        <div className="mx-auto w-full max-w-5xl px-6 md:max-w-none md:px-0">
+          <div className="relative w-full overflow-hidden rounded-3xl bg-slate-900/10 shadow-xl shadow-slate-900/10 md:rounded-none md:shadow-none">
+          {fallbackHls ? (
+            <>
+              <HlsVideoPlayer
+                src={resolvedHlsDesktop || fallbackHls}
+                poster={resolvedPoster}
+                className="hidden aspect-video w-full md:block"
+                autoPlayOnView
+                muted
+              />
+              <div className="mx-auto w-full max-w-[420px] md:hidden">
+                <HlsVideoPlayer
+                  src={resolvedHlsMobile || fallbackHls}
+                  poster={resolvedPoster}
+                  className="aspect-[9/16] w-full"
+                  autoPlayOnView
+                  muted
+                />
+              </div>
+            </>
+          ) : (
+            <div className="flex aspect-video items-center justify-center text-sm text-slate-400">
+              No HLS video available.
+            </div>
+          )}
+          </div>
         </div>
       </div>
     </section>

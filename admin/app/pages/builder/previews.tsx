@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Block } from "./types";
 import { safeText } from "./utils";
 import { resolveUploadUrl } from "@/lib/urls";
+import { HlsVideoPlayer } from "./HlsVideoPlayer";
 
 type LivePreviewProps = {
   blocks: Block[];
@@ -338,6 +339,7 @@ export function LivePreview({
 
     if (block.type === "landing-hero-01") {
       const backgroundImage = resolvePreviewImage(props.backgroundImage);
+      const backgroundImageMobile = resolvePreviewImage(props.backgroundImageMobile);
       const overlayOpacity = Math.min(
         0.85,
         Math.max(0.2, Number(props.overlayOpacity) || 0.55)
@@ -345,12 +347,23 @@ export function LivePreview({
       const logoUrl = resolvePreviewImage(props.logoUrl);
       return wrap(
         <section className="relative min-h-[300px] overflow-hidden sm:min-h-[380px] lg:min-h-[600px]">
-          {backgroundImage && (
+          {backgroundImageMobile ? (
+            <>
+              <div
+                className="absolute inset-0 bg-cover bg-center md:hidden"
+                style={{ backgroundImage: `url(${backgroundImageMobile})` }}
+              />
+              <div
+                className="absolute inset-0 hidden bg-cover bg-center md:block"
+                style={{ backgroundImage: `url(${backgroundImage})` }}
+              />
+            </>
+          ) : backgroundImage ? (
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${backgroundImage})` }}
             />
-          )}
+          ) : null}
           <div
             className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/70 to-transparent"
             style={{ opacity: overlayOpacity }}
@@ -442,6 +455,84 @@ export function LivePreview({
                   Paste a valid YouTube URL to preview the video.
                 </div>
               )}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    if (block.type === "video-hls-01") {
+      const heading = safeText(props.heading);
+      const description = safeText(props.description);
+      const backgroundColor = safeText(props.backgroundColor) || "#ffffff";
+      const hlsDesktop = resolvePreviewImage(
+        (props.hlsUrlDesktop || props.hlsUrl) as string
+      );
+      const hlsMobile = resolvePreviewImage(
+        (props.hlsUrlMobile || props.hlsUrl) as string
+      );
+      const posterImage = resolvePreviewImage(props.posterImage);
+      return wrap(
+        <section className="py-16" style={{ backgroundColor }}>
+          <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6">
+            <div className="space-y-2 text-center">
+              <h2 className="text-2xl font-semibold text-[var(--brand-navy)]">
+                <EditableText
+                  value={heading}
+                  onCommit={(value) => onUpdateBlock(index, { heading: value })}
+                  className="text-[var(--brand-navy)]"
+                />
+              </h2>
+              <p className="text-sm text-slate-600">
+                <EditableText
+                  value={description}
+                  onCommit={(value) =>
+                    onUpdateBlock(index, { description: value })
+                  }
+                  className="text-slate-600"
+                  multiline
+                />
+              </p>
+            </div>
+          </div>
+          <div className="mt-6">
+            <div className="mx-auto w-full max-w-5xl px-6 md:max-w-none md:px-0">
+              <div className="grid gap-4 md:grid-cols-2 md:rounded-none">
+                <div className="overflow-hidden rounded-3xl bg-slate-900/10 shadow-xl shadow-slate-900/10">
+                  <div className="border-b border-slate-200/60 px-4 py-2 text-xs font-semibold text-slate-600">
+                    Desktop
+                  </div>
+                {hlsDesktop ? (
+                  <HlsVideoPlayer
+                    src={hlsDesktop}
+                    poster={posterImage}
+                    className="aspect-video w-full"
+                  />
+                  ) : (
+                    <div className="flex aspect-video items-center justify-center text-sm text-slate-400">
+                      Upload a desktop video.
+                    </div>
+                  )}
+                </div>
+                <div className="overflow-hidden rounded-3xl bg-slate-900/10 shadow-xl shadow-slate-900/10">
+                  <div className="border-b border-slate-200/60 px-4 py-2 text-xs font-semibold text-slate-600">
+                    Mobile
+                  </div>
+                {hlsMobile ? (
+                  <div className="mx-auto w-full max-w-[320px]">
+                    <HlsVideoPlayer
+                      src={hlsMobile}
+                      poster={posterImage}
+                      className="aspect-[9/16] w-full"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex aspect-video items-center justify-center text-sm text-slate-400">
+                    Upload a mobile video.
+                  </div>
+                )}
+                </div>
+              </div>
             </div>
           </div>
         </section>

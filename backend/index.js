@@ -95,6 +95,7 @@ app.use("/forms", require("./routes/forms"));
 app.use("/pages", require("./routes/pages"));
 app.use("/posts", require("./routes/posts"));
 app.use("/uploads", require("./routes/uploads"));
+app.use("/uploads/hls", require("./routes/uploads-hls"));
 app.use("/chat", require("./routes/chat")(io, adminPresence));
 app.use("/api/calendar", require("./routes/calendar")(io));
 app.use("/api", require("./routes/sheets"));

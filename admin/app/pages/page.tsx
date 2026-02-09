@@ -57,6 +57,20 @@ export default function PagesBuilder() {
     return data.path as string;
   };
 
+  const uploadVideoHls = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch(`${API_URL}/uploads/hls`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error("Upload failed");
+    }
+    const data = await response.json();
+    return data.path as string;
+  };
+
   // Handle save with SweetAlert notification
   const handleSave = async () => {
     await savePage();
@@ -351,6 +365,7 @@ export default function PagesBuilder() {
                 onReorder={reorderBlocks}
                 updateBlockProps={updateBlockProps}
                 uploadImage={uploadImage}
+                uploadVideo={uploadVideoHls}
               />
             </>
           )}
