@@ -3,6 +3,7 @@ import Script from "next/script";
 import { notFound } from "next/navigation";
 import PageRenderer from "../../components/PageRenderer";
 import DeferredChatWidget from "../../components/DeferredChatWidget";
+import GoogleAdsConversion from "../../components/GoogleAdsConversion";
 import Navbar, { type NavItem } from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
@@ -119,6 +120,7 @@ export default async function Page({
   if (!page) return notFound();
   const menu = await fetchMenu(locale);
   const footer = await fetchFooter();
+  const isContactConversionPage = slug === "contact";
   const canonical = frontendBaseUrl
     ? `${frontendBaseUrl}/${locale}/${page.slug}`
     : `/${locale}/${page.slug}`;
@@ -152,6 +154,7 @@ export default async function Page({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+      {isContactConversionPage && <GoogleAdsConversion />}
       <PageRenderer page={page} />
       {footer && <Footer footer={footer} />}
       <DeferredChatWidget />

@@ -2,6 +2,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { resolveUploadUrl } from "@/lib/urls";
 import HlsVideoPlayer from "./HlsVideoPlayer";
+import GoogleAdsPhoneConversionLink from "./GoogleAdsPhoneConversionLink";
 
 // Loading skeleton for blocks
 function BlockSkeleton({ height = "h-64" }: { height?: string }) {
@@ -544,6 +545,7 @@ function ContactInfoCard(props: Record<string, any>) {
                 const iconIsImage = icon && isProbablyImage(icon);
                 const value = safeList(item.value);
                 const href = safeList(item.href);
+                const isPhoneLink = Boolean(href && href.startsWith("tel:"));
                 return (
                   <div
                     key={item.id || `${item.title}-${itemIndex}`}
@@ -569,12 +571,21 @@ function ContactInfoCard(props: Record<string, any>) {
                         {safeList(item.title)}
                       </p>
                       {href ? (
-                        <a
-                          href={href}
-                          className="text-slate-800 underline-offset-2 hover:underline whitespace-pre-line"
-                        >
-                          {value}
-                        </a>
+                        isPhoneLink ? (
+                          <GoogleAdsPhoneConversionLink
+                            href={href}
+                            className="text-slate-800 underline-offset-2 hover:underline whitespace-pre-line"
+                          >
+                            {value}
+                          </GoogleAdsPhoneConversionLink>
+                        ) : (
+                          <a
+                            href={href}
+                            className="text-slate-800 underline-offset-2 hover:underline whitespace-pre-line"
+                          >
+                            {value}
+                          </a>
+                        )
                       ) : (
                         <p className="text-slate-800 whitespace-pre-line">
                           {value}
