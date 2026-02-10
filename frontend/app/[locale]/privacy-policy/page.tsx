@@ -40,6 +40,7 @@ async function fetchFooter() {
   } catch {
     return null;
   }
+}
 
 export default async function PrivacyPolicyPage({
   params,
