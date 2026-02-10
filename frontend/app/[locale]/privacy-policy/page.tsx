@@ -15,7 +15,7 @@ export async function generateMetadata({
     : `/${locale}/privacy-policy`;
   return {
     title: "Privacy Policy | RUBYSHOP",
-    description: "Privacy Policy for RUBYSHOP Hotel - Learn how we collect, use, and protect your personal information.",
+    description: "Privacy Policy for RUBYSHOP  - Learn how we collect, use, and protect your personal information.",
     alternates: { canonical },
   };
 }
@@ -40,7 +40,6 @@ async function fetchFooter() {
   } catch {
     return null;
   }
-}
 
 export default async function PrivacyPolicyPage({
   params,
@@ -79,7 +78,7 @@ export default async function PrivacyPolicyPage({
           <section className="mt-8">
             <h2 className="text-xl font-semibold text-gray-900">1. Introduction</h2>
             <p className="mt-4 text-gray-700">
-              Welcome to RUBYSHOP Hotel (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website at <strong>airless-spray.rubyshop.co.th</strong> and use our room reservation services.
+              Welcome to RUBYSHOP  (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website at <strong>airless-spray.rubyshop.co.th</strong> and use our room reservation services.
             </p>
           </section>
 

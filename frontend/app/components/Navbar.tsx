@@ -637,10 +637,10 @@ export default function Navbar({
                   RUBYSHOP
                 </h3>
                 <p className="text-sm text-slate-500">
-                  ยินดีต้อนรับสู่โรงแรมเดอะวังเยาวราช
+                     Welcome to RUBYSHOP 
                 </p>
                 <p className="mt-4 text-xs text-slate-400">
-                  Welcome to RUBYSHOP Hotel
+                  Welcome to RUBYSHOP 
                 </p>
               </div>
               <div className="border-l border-slate-100 px-6 py-10">
