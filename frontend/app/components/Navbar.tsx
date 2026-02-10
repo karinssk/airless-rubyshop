@@ -489,7 +489,7 @@ export default function Navbar({
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+                className="hidden rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
               >
                 Sign-in
               </button>
