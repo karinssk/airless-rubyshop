@@ -3,6 +3,9 @@
 import Script from "next/script";
 
 export default function DeferredChatWidget() {
+  const tawkEnabled = process.env.NEXT_PUBLIC_TAWK_ENABLED === "true";
+  if (!tawkEnabled) return null;
+
   return (
     <Script
       id="tawk-to"

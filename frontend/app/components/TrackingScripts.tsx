@@ -6,6 +6,8 @@ import GoogleAnalytics from "./GoogleAnalytics";
 
 const GTM_ID = "GTM-N6CNLKHW";
 const META_PIXEL_ID = "1559144322039457";
+const FB_PAGE_ID = "816184855086392";
+const FB_MESSENGER_LOCALE = "th_TH";
 
 export default function TrackingScripts() {
   const [enabled, setEnabled] = useState(false);
@@ -25,10 +27,35 @@ export default function TrackingScripts() {
     return () => window.removeEventListener("cookieConsentAccepted", handleConsent);
   }, [isProd]);
 
-  if (!enabled && !gaEnabled) return null;
-
   return (
     <>
+      <div id="fb-root"></div>
+      <div id="fb-customer-chat" className="fb-customerchat"></div>
+      <Script
+        id="fb-messenger-sdk"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `var chatbox = document.getElementById('fb-customer-chat');
+chatbox.setAttribute('page_id', '${FB_PAGE_ID}');
+chatbox.setAttribute('attribution', 'biz_inbox');
+
+window.fbAsyncInit = function() {
+  FB.init({
+    xfbml            : true,
+    version          : 'v18.0'
+  });
+};
+
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = 'https://connect.facebook.net/${FB_MESSENGER_LOCALE}/sdk/xfbml.customerchat.js';
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));`,
+        }}
+      />
+
       {enabled && (
         <>
           {/* Google Tag Manager */}
