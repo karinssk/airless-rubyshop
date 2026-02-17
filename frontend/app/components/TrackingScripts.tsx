@@ -40,70 +40,27 @@ chatbox.setAttribute('page_id', '${FB_PAGE_ID}');
 chatbox.setAttribute('attribution', 'biz_inbox');
 
 window.fbAsyncInit = function() {
-  console.log('[Messenger] FB SDK init start', {
-    pageId: '${FB_PAGE_ID}',
-    locale: '${FB_MESSENGER_LOCALE}',
-    origin: window.location.origin,
-    chatboxFound: Boolean(document.getElementById('fb-customer-chat')),
-  });
+  console.log('[Messenger] FB SDK initializing', { version: 'v21.0' });
   FB.init({
     xfbml            : true,
-    version          : 'v18.0'
+    version          : 'v21.0'
   });
   console.log('[Messenger] FB SDK initialized');
-  try {
-    FB.getLoginStatus(function(response) {
-      console.log('[Messenger] FB.getLoginStatus response', response);
-    });
-  } catch (err) {
-    console.log('[Messenger] FB.getLoginStatus failed', err);
-  }
 };
-
-(function pollChatVisibility(){
-  var attempts = 0;
-  var maxAttempts = 20;
-  var intervalMs = 1000;
-  var timer = setInterval(function(){
-    attempts++;
-    var chatbox = document.getElementById('fb-customer-chat');
-    var iframe = document.querySelector('iframe[title="fb:customer_chat"], iframe[src*="facebook.com"]');
-    var isVisible = false;
-    if (chatbox) {
-      var style = window.getComputedStyle(chatbox);
-      isVisible = style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-    }
-    console.log('[Messenger] Chat visibility check', {
-      attempt: attempts,
-      chatboxFound: Boolean(chatbox),
-      iframeFound: Boolean(iframe),
-      chatboxVisible: isVisible,
-    });
-    if (iframe || isVisible || attempts >= maxAttempts) {
-      clearInterval(timer);
-      console.log('[Messenger] Chat visibility polling stopped', { attempts: attempts });
-    }
-  }, intervalMs);
-})();
 
 (function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = 'https://connect.facebook.net/${FB_MESSENGER_LOCALE}/sdk/xfbml.customerchat.js';
+  js.src = 'https://connect.facebook.net/${FB_MESSENGER_LOCALE}/sdk.js';
+  js.async = true;
+  js.defer = true;
+  js.crossOrigin = 'anonymous';
   js.onload = function() {
-    console.log('[Messenger] SDK script loaded', {
-      src: js.src,
-      readyState: js.readyState,
-    });
+    console.log('[Messenger] SDK script loaded', { src: js.src });
   };
   js.onerror = function(event) {
-    console.log('[Messenger] SDK script failed to load', {
-      src: js.src,
-      readyState: js.readyState,
-      event,
-      online: typeof navigator !== 'undefined' ? navigator.onLine : undefined,
-    });
+    console.error('[Messenger] SDK script failed to load', { src: js.src, event: event });
   };
   console.log('[Messenger] Injecting SDK script', { src: js.src });
   fjs.parentNode.insertBefore(js, fjs);
