@@ -44,6 +44,7 @@ window.fbAsyncInit = function() {
     xfbml            : true,
     version          : 'v18.0'
   });
+  console.log('[Messenger] FB SDK initialized');
 };
 
 (function(d, s, id) {
@@ -51,6 +52,12 @@ window.fbAsyncInit = function() {
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
   js.src = 'https://connect.facebook.net/${FB_MESSENGER_LOCALE}/sdk/xfbml.customerchat.js';
+  js.onload = function() {
+    console.log('[Messenger] SDK script loaded');
+  };
+  js.onerror = function() {
+    console.log('[Messenger] SDK script failed to load');
+  };
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));`,
         }}
