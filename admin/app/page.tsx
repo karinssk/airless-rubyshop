@@ -3,16 +3,26 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { backendBaseUrl } from "@/lib/urls";
+import { getAdminAuthHeaders } from "@/lib/auth";
 
 type VisitorStats = {
   totalViews: number;
   totalVisitors: number;
 };
 
+type MessengerStats = {
+  totalClicks: number;
+  todayClicks: number;
+};
+
 export default function Dashboard() {
   const [stats, setStats] = useState<VisitorStats>({
     totalViews: 0,
     totalVisitors: 0,
+  });
+  const [messengerStats, setMessengerStats] = useState<MessengerStats>({
+    totalClicks: 0,
+    todayClicks: 0,
   });
 
   useEffect(() => {
@@ -32,7 +42,26 @@ export default function Dashboard() {
         console.error("Failed to fetch visitor stats", error);
       }
     };
+    const fetchMessengerStats = async () => {
+      try {
+        const response = await fetch(
+          `${backendBaseUrl}/stats/messenger-clicks`,
+          { headers: getAdminAuthHeaders() }
+        );
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data?.ok) {
+          setMessengerStats({
+            totalClicks: Number(data.totalClicks || 0),
+            todayClicks: Number(data.todayClicks || 0),
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch messenger stats", error);
+      }
+    };
     fetchStats();
+    fetchMessengerStats();
   }, []);
 
   return (
@@ -42,7 +71,7 @@ export default function Dashboard() {
         <p className="text-slate-500 mt-1">Welcome back to RUBYSHOP Panel</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <div className="flex items-center justify-between rounded-3xl border border-slate-200 bg-white px-6 py-4 shadow-sm">
           <div>
             <p className="text-sm text-slate-500">หน้าที่เข้าชม</p>
@@ -60,6 +89,24 @@ export default function Dashboard() {
             </p>
           </div>
           <span className="text-xs text-slate-400">Unique Visitors</span>
+        </div>
+        <div className="flex items-center justify-between rounded-3xl border border-blue-100 bg-blue-50/50 px-6 py-4 shadow-sm">
+          <div>
+            <p className="text-sm text-blue-600">Messenger คลิก</p>
+            <p className="mt-1 text-2xl font-semibold text-slate-900">
+              {messengerStats.totalClicks.toLocaleString()} ครั้ง
+            </p>
+          </div>
+          <span className="text-xs text-blue-400">All Time</span>
+        </div>
+        <div className="flex items-center justify-between rounded-3xl border border-blue-100 bg-blue-50/50 px-6 py-4 shadow-sm">
+          <div>
+            <p className="text-sm text-blue-600">Messenger วันนี้</p>
+            <p className="mt-1 text-2xl font-semibold text-slate-900">
+              {messengerStats.todayClicks.toLocaleString()} ครั้ง
+            </p>
+          </div>
+          <span className="text-xs text-blue-400">Today</span>
         </div>
       </div>
 

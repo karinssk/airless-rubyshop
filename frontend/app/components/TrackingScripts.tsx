@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Script from "next/script";
 import GoogleAnalytics from "./GoogleAnalytics";
+import { backendBaseUrl } from "@/lib/urls";
 
 const GTM_ID = "GTM-N6CNLKHW";
 const META_PIXEL_ID = "1559144322039457";
 const FB_PAGE_ID = "816184855086392";
-const FB_MESSENGER_LOCALE = "th_TH";
 
 export default function TrackingScripts() {
   const [enabled, setEnabled] = useState(false);
@@ -27,46 +27,66 @@ export default function TrackingScripts() {
     return () => window.removeEventListener("cookieConsentAccepted", handleConsent);
   }, [isProd]);
 
+  const trackMessengerClick = useCallback(() => {
+    if (!backendBaseUrl) return;
+    fetch(`${backendBaseUrl}/stats/messenger-click`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ referrer: window.location.href }),
+    }).catch(() => {});
+  }, []);
+
   return (
     <>
-      <div id="fb-root"></div>
-      <div id="fb-customer-chat" className="fb-customerchat"></div>
-      <Script
-        id="fb-messenger-sdk"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `var chatbox = document.getElementById('fb-customer-chat');
-chatbox.setAttribute('page_id', '${FB_PAGE_ID}');
-chatbox.setAttribute('attribution', 'biz_inbox');
-
-window.fbAsyncInit = function() {
-  console.log('[Messenger] FB SDK initializing', { version: 'v21.0' });
-  FB.init({
-    xfbml            : true,
-    version          : 'v21.0'
-  });
-  console.log('[Messenger] FB SDK initialized');
-};
-
-(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = 'https://connect.facebook.net/${FB_MESSENGER_LOCALE}/sdk.js';
-  js.async = true;
-  js.defer = true;
-  js.crossOrigin = 'anonymous';
-  js.onload = function() {
-    console.log('[Messenger] SDK script loaded', { src: js.src });
-  };
-  js.onerror = function(event) {
-    console.error('[Messenger] SDK script failed to load', { src: js.src, event: event });
-  };
-  console.log('[Messenger] Injecting SDK script', { src: js.src });
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));`,
+      {/* Floating Messenger Button */}
+      <a
+        href={`https://m.me/${FB_PAGE_ID}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat on Messenger"
+        onClick={trackMessengerClick}
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          zIndex: 9999,
+          width: "60px",
+          height: "60px",
+          borderRadius: "50%",
+          backgroundColor: "#0084FF",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          cursor: "pointer",
+          transition: "transform 0.2s ease, box-shadow 0.2s ease",
         }}
-      />
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "scale(1.1)";
+          e.currentTarget.style.boxShadow = "0 6px 20px rgba(0, 0, 0, 0.25)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+        }}
+      >
+        <svg
+          width="36"
+          height="36"
+          viewBox="0 0 36 36"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18 3C9.716 3 3 9.216 3 16.95c0 4.394 2.16 8.312 5.534 10.878V33l4.91-2.697A16.19 16.19 0 0018 30.9c8.284 0 15-6.216 15-13.95S26.284 3 18 3z"
+            fill="#fff"
+          />
+          <path
+            d="M8.727 21.273L14.182 14l5.09 4.636L24.546 14l-5.455 7.273-5.09-4.636-5.274 4.636z"
+            fill="#0084FF"
+          />
+        </svg>
+      </a>
 
       {enabled && (
         <>
