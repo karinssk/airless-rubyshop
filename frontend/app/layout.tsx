@@ -3,10 +3,11 @@
 import { Prompt } from "next/font/google";
 import TrackingScripts from "./components/TrackingScripts";
 
-// Load Prompt font (Thai + Latin)
+// Prompt is loaded here so --font-prompt CSS variable is available on <html>
+// for the body { font-family: var(--font-prompt) } rule in globals.css
 const prompt = Prompt({
   subsets: ["latin", "thai"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "600", "700"],
   display: "swap",
   variable: "--font-prompt",
 });
@@ -18,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th" className={prompt.variable}>
-      <body className={prompt.className}>
+      <body>
         <TrackingScripts />
         {children}
       </body>

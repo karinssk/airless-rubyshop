@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Hls from "hls.js";
+import type Hls from "hls.js";
 
 type HlsVideoPlayerProps = {
   src?: string;
@@ -41,21 +41,24 @@ export default function HlsVideoPlayer({
       return undefined;
     }
 
-    if (Hls.isSupported()) {
-      const hls = new Hls({
-        enableWorker: true,
-      });
-      hls.loadSource(src);
-      hls.attachMedia(video);
-      hlsRef.current = hls;
-      return () => {
-        hls.destroy();
-        hlsRef.current = null;
-      };
-    }
+    let cancelled = false;
+    import("hls.js").then(({ default: Hls }) => {
+      if (cancelled || !video) return;
+      if (Hls.isSupported()) {
+        const hls = new Hls({ enableWorker: true });
+        hls.loadSource(src);
+        hls.attachMedia(video);
+        hlsRef.current = hls;
+      } else {
+        video.src = src;
+      }
+    });
 
-    video.src = src;
-    return undefined;
+    return () => {
+      cancelled = true;
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
+    };
   }, [src]);
 
   useEffect(() => {

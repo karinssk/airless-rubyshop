@@ -76,6 +76,7 @@ export default function OurCoreServices({
                     src={resolveImage(item.image)}
                     alt={safeText(item.title)}
                     className="h-full w-full object-cover"
+                    loading="lazy"
                   />
                 )}
               </div>
@@ -86,6 +87,7 @@ export default function OurCoreServices({
                       src={resolveImage(item.icon)}
                       alt=""
                       className="h-5 w-5 object-contain brightness-0 invert"
+                      loading="lazy"
                     />
                   ) : (
                     <span className="text-xs">★</span>

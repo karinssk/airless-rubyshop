@@ -6,8 +6,8 @@ import DeferredChatWidget from "../../components/DeferredChatWidget";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 import { Link } from "@/lib/navigation";
 
-// Cache revalidation time in seconds (60 = 1 minute)
-const REVALIDATE_TIME = 60;
+// Cache revalidation time in seconds (300 = 5 minutes)
+const REVALIDATE_TIME = 300;
 
 type ProductCategory = {
     id: string;
@@ -256,6 +256,7 @@ export default async function ProductsPage({
                                         src={resolveUploadUrl(item.logo)}
                                         alt=""
                                         className={`h-4 w-4 object-contain ${activeCategory === item.slug ? "brightness-0 invert" : ""}`}
+                                        loading="lazy"
                                     />
                                 )}
                                 <span className="min-w-0 flex-1 truncate">
@@ -360,6 +361,7 @@ export default async function ProductsPage({
                                                     src={resolveUploadUrl(product.images[0])}
                                                     alt={product.name}
                                                     className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+                                                    loading="lazy"
                                                 />
                                             ) : (
                                                 <div className="flex h-full items-center justify-center text-xs text-slate-400">

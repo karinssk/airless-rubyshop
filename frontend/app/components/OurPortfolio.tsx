@@ -67,6 +67,7 @@ export default function OurPortfolio({
                   alt={safeText(item.title)}
                   className="w-full object-cover"
                   style={{ height: resolvedTileHeight }}
+                  loading="lazy"
                 />
               )}
               <div

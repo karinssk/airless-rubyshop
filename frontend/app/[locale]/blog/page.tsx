@@ -4,8 +4,8 @@ import Footer from "@/app/components/Footer";
 import DeferredChatWidget from "@/app/components/DeferredChatWidget";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 
-// Cache revalidation time in seconds (60 = 1 minute)
-const REVALIDATE_TIME = 60;
+// Cache revalidation time in seconds (300 = 5 minutes)
+const REVALIDATE_TIME = 300;
 
 type PostSummary = {
   id: string;

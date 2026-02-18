@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import DeferredChatWidget from "../components/DeferredChatWidget";
 import DeferredPopupImage from "../components/DeferredPopupImage";
 import Footer from "../components/Footer";
-import Navbar, { type NavItem } from "../components/Navbar";
+import Navbar from "../components/Navbar";
 import ContactBar from "../components/ContactBar";
 import PageRenderer from "../components/PageRenderer";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
@@ -39,8 +39,8 @@ const fallbackPage: PageData = {
   layout: [],
 };
 
-// Cache revalidation time in seconds (60 = 1 minute)
-const REVALIDATE_TIME = 60;
+// Cache revalidation time in seconds (300 = 5 minutes)
+const REVALIDATE_TIME = 300;
 
 const getLocaleValue = (
   value: string | Record<string, string> | undefined,
@@ -142,9 +142,11 @@ export default async function Home({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const page = await fetchPage(locale);
-  const menu = await fetchMenu(locale);
-  const footer = await fetchFooter();
+  const [page, menu, footer] = await Promise.all([
+    fetchPage(locale),
+    fetchMenu(locale),
+    fetchFooter(),
+  ]);
   const faqBlock = page.layout.find((block) => block.type === "faq");
   const faqItems = (faqBlock?.props?.items || []) as Array<{
     question: string;

@@ -331,6 +331,7 @@ function AboutUsImages(props: Record<string, any>) {
               src={resolveImage(props.image)}
               alt={safeList(props.heading) || "About RUBYSHOP"}
               className="h-full w-full object-cover"
+              loading="lazy"
             />
           ) : (
             <div className="flex h-64 items-center justify-center text-sm text-slate-400">
@@ -558,6 +559,7 @@ function ContactInfoCard(props: Record<string, any>) {
                             src={resolveImage(icon)}
                             alt=""
                             className="h-5 w-5 object-contain"
+                            loading="lazy"
                           />
                         ) : (
                           <span className="text-lg">{icon}</span>
@@ -621,6 +623,7 @@ function ContactInfoCard(props: Record<string, any>) {
                           src={resolveImage(icon)}
                           alt={safeList(social.label)}
                           className="h-4 w-4 object-contain"
+                          loading="lazy"
                         />
                       ) : (
                         <span className="text-sm">{icon}</span>
@@ -690,6 +693,7 @@ function OurVision(props: Record<string, any>) {
                   src={resolveImage(card.icon)}
                   alt=""
                   className="h-6 w-6 object-contain brightness-0 invert"
+                  loading="lazy"
                 />
               ) : (
                 <span className="text-sm">★</span>
@@ -736,6 +740,7 @@ function OurCoreValues(props: Record<string, any>) {
                     src={resolveImage(item.icon)}
                     alt=""
                     className="h-6 w-6 object-contain brightness-0 invert"
+                    loading="lazy"
                   />
                 ) : (
                   <span className="text-sm">★</span>
@@ -806,6 +811,7 @@ function WorkWithUs(props: Record<string, any>) {
               src={icon}
               alt=""
               className="h-7 w-7 object-contain brightness-0 invert"
+              loading="lazy"
             />
           </div>
         ) : (
@@ -847,6 +853,7 @@ function WelfareAndBenefits(props: Record<string, any>) {
                     src={resolveImage(item.icon)}
                     alt=""
                     className="h-6 w-6 object-contain brightness-0 invert"
+                    loading="lazy"
                   />
                 ) : (
                   <span className="text-sm">★</span>
@@ -974,6 +981,7 @@ function ContactChannels(props: Record<string, any>) {
                     src={resolveImage(channel.icon)}
                     alt=""
                     className="h-6 w-6 object-contain brightness-0 invert"
+                    loading="lazy"
                   />
                 ) : (
                   <span className="text-sm">★</span>
@@ -1022,6 +1030,7 @@ function ContactChannels(props: Record<string, any>) {
                     src={resolveImage(cta.icon)}
                     alt=""
                     className="h-4 w-4 object-contain"
+                    loading="lazy"
                   />
                 ) : (
                   <span>☎️</span>
@@ -1154,6 +1163,7 @@ function OurWork(props: Record<string, any>) {
                     src={resolveImage(item.image)}
                     alt={safeList(item.title)}
                     className="h-full w-full object-cover"
+                    loading="lazy"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-xs text-slate-400">
@@ -1205,6 +1215,7 @@ function OurWorkGallery(props: Record<string, any>) {
                     src={resolveImage(image.url)}
                     alt={safeList(image.caption)}
                     className="h-full w-full object-cover"
+                    loading="lazy"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-xs text-slate-400">
@@ -1257,6 +1268,7 @@ function GrandEvents(props: Record<string, any>) {
                   src={resolveImage(props.imageTop)}
                   alt={safeList(props.heading)}
                   className="h-full w-full object-cover"
+                  loading="lazy"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-xs text-slate-400">
@@ -1272,6 +1284,7 @@ function GrandEvents(props: Record<string, any>) {
                   src={resolveImage(props.imageSide)}
                   alt={safeList(props.heading)}
                   className="h-full w-full object-cover"
+                  loading="lazy"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-xs text-slate-400">
@@ -1287,6 +1300,7 @@ function GrandEvents(props: Record<string, any>) {
                   src={resolveImage(props.imageBottom)}
                   alt={safeList(props.heading)}
                   className="h-full w-full object-cover"
+                  loading="lazy"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-xs text-slate-400">
@@ -1340,6 +1354,7 @@ function WellnessFacilities(props: Record<string, any>) {
                       src={resolveImage(item.image)}
                       alt={safeList(item.title)}
                       className="h-64 w-full object-cover md:h-72"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="flex h-64 items-center justify-center text-xs text-slate-400">
@@ -1601,6 +1616,7 @@ function CustomerReviewsImages(props: Record<string, any>) {
                 src={imageLeft}
                 alt="Customer review 1"
                 className="aspect-[4/5] w-full object-cover"
+                loading="lazy"
               />
             ) : (
               <div className="flex aspect-[4/5] items-center justify-center text-sm text-slate-400">
@@ -1614,6 +1630,7 @@ function CustomerReviewsImages(props: Record<string, any>) {
                 src={imageRight}
                 alt="Customer review 2"
                 className="aspect-[4/5] w-full object-cover"
+                loading="lazy"
               />
             ) : (
               <div className="flex aspect-[4/5] items-center justify-center text-sm text-slate-400">
@@ -1707,6 +1724,7 @@ function ProductsSectionImages(props: Record<string, any>) {
                       src={resolveImage(item.image)}
                       alt={safeList(item.title)}
                       className="h-52 w-full object-cover"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="flex h-52 items-center justify-center text-sm text-slate-400">

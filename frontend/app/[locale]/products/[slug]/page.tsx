@@ -9,8 +9,8 @@ import ExpandableContent from "../../../components/ExpandableContent";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 import { Link } from "@/lib/navigation";
 
-// Cache revalidation time in seconds (60 = 1 minute)
-const REVALIDATE_TIME = 60;
+// Cache revalidation time in seconds (300 = 5 minutes)
+const REVALIDATE_TIME = 300;
 
 type ProductDetail = {
     id: string;

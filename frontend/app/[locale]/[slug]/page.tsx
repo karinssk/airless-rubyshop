@@ -8,8 +8,8 @@ import Navbar, { type NavItem } from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { backendBaseUrl, frontendBaseUrl, resolveUploadUrl } from "@/lib/urls";
 
-// Cache revalidation time in seconds (60 = 1 minute)
-const REVALIDATE_TIME = 60;
+// Cache revalidation time in seconds (300 = 5 minutes)
+const REVALIDATE_TIME = 300;
 
 type PageData = {
   title: string | Record<string, string>;

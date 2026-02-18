@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
+import Image from "next/image";
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { locales, type Locale } from "@/i18n";
@@ -356,10 +357,13 @@ export default function Navbar({
             <Link href="/" className="flex items-center gap-3 text-lg font-semibold">
               <span className="flex h-10 w-[140px] items-center justify-center rounded-md bg-white px-1">
                 {logoUrl || fallbackLogo ? (
-                  <img
+                  <Image
                     src={resolveUploadUrl(logoUrl || fallbackLogo)}
                     alt="Logo"
+                    width={140}
+                    height={40}
                     className="h-full w-full object-contain"
+                    priority
                   />
                 ) : null}
               </span>
@@ -627,10 +631,13 @@ export default function Navbar({
             <div className="grid md:grid-cols-[1.1fr_1fr]">
               <div className="flex flex-col items-center justify-center gap-3 bg-white px-6 py-10 text-center">
                 <div className="h-20 w-20 overflow-hidden rounded-full border border-slate-100 bg-white p-1">
-                  <img
+                  <Image
                     src={resolveUploadUrl(logoUrl || fallbackLogo)}
                     alt="RUBYSHOP"
+                    width={80}
+                    height={80}
                     className="h-full w-full object-contain rounded-full"
+                    loading="lazy"
                   />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">

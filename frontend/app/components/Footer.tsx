@@ -56,6 +56,7 @@ export default function Footer({ footer }: { footer: FooterData }) {
                 src={resolveUploadUrl(safeText(footer.brand?.logoUrl) || fallbackLogo)}
                 alt={safeText(footer.brand?.name) || fallbackBrand}
                 className="h-10 w-auto max-w-[160px] object-contain"
+                loading="lazy"
               />
             ) : (
               <div className="h-10 w-24 rounded bg-white/10" />
@@ -80,6 +81,7 @@ export default function Footer({ footer }: { footer: FooterData }) {
                     src={resolveUploadUrl(safeText(item.icon))}
                     alt=""
                     className="h-4 w-4 brightness-0 invert"
+                    loading="lazy"
                   />
                 ) : (
                   <span className="text-xs">•</span>
@@ -126,6 +128,7 @@ export default function Footer({ footer }: { footer: FooterData }) {
                       src={resolveUploadUrl(safeText(item.icon))}
                       alt=""
                       className="h-3.5 w-3.5 brightness-0 invert"
+                      loading="lazy"
                     />
                   ) : (
                     <span className="text-[10px]">•</span>

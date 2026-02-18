@@ -45,6 +45,7 @@ export default function GalleryLightbox({ items }: { items: GalleryItem[] }) {
                 src={thumbFor(item.url)}
                 alt={item.caption || "gallery"}
                 className="h-48 w-full object-cover transition duration-200 group-hover:scale-105"
+                loading="lazy"
               />
             ) : (
               <div className="h-48 w-full bg-slate-100" />
