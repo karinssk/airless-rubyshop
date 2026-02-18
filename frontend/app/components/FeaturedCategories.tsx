@@ -1,19 +1,12 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import { backendBaseUrl, resolveUploadUrl } from "@/lib/urls";
+import { resolveUploadUrl } from "@/lib/urls";
 
 type SelectedCategory = {
-  id: string;
-  name: string;
-  slug: string;
-  logo?: string;
-};
-
-type CategoryData = {
   id: string;
   name: string;
   slug: string;
@@ -27,50 +20,16 @@ type FeaturedCategoriesProps = {
   selectedCategories?: SelectedCategory[];
 };
 
-export default function FeaturedCategories(props: FeaturedCategoriesProps) {
+export default function FeaturedCategories({
+  backgroundColor = "",
+  heading = "Featured Categories",
+  exploreText = "EXPLORE ALL",
+  selectedCategories = [],
+}: FeaturedCategoriesProps) {
   const locale = useLocale();
-  const [categories, setCategories] = useState<CategoryData[]>([]);
-  const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-
-  const {
-    backgroundColor = "",
-    heading = "Featured Categories",
-    exploreText = "EXPLORE ALL",
-    selectedCategories = [],
-  } = props;
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      if (selectedCategories.length === 0) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch(`${backendBaseUrl}/product-categories`);
-        if (response.ok) {
-          const data = await response.json();
-          const allCategories = data.categories || [];
-
-          const categoryMap = new Map(allCategories.map((c: CategoryData) => [c.id, c]));
-          const orderedCategories = selectedCategories
-            .map(sc => categoryMap.get(sc.id))
-            .filter(Boolean) as CategoryData[];
-
-          setCategories(orderedCategories);
-        }
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, [selectedCategories]);
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -84,49 +43,30 @@ export default function FeaturedCategories(props: FeaturedCategoriesProps) {
     checkScroll();
     window.addEventListener("resize", checkScroll);
     return () => window.removeEventListener("resize", checkScroll);
-  }, [categories]);
+  }, [selectedCategories]);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = 280;
       scrollRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
+        left: direction === "left" ? -280 : 280,
         behavior: "smooth",
       });
       setTimeout(checkScroll, 300);
     }
   };
 
+  if (selectedCategories.length === 0) return null;
+
   const backgroundStyle = backgroundColor ? { backgroundColor } : undefined;
-
-  if (loading) {
-    return (
-      <section className="py-12" style={backgroundStyle}>
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800"></div>
-            <p className="mt-2 text-sm text-slate-500">กำลังโหลดหมวดหมู่...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (categories.length === 0) {
-    return null;
-  }
 
   return (
     <section className="py-12" style={backgroundStyle}>
       <div className="mx-auto max-w-7xl px-6">
-        {/* Header */}
         {heading && (
           <h2 className="mb-8 text-2xl font-bold text-slate-900">{heading}</h2>
         )}
 
-        {/* Categories Slider */}
         <div className="relative">
-          {/* Left Arrow */}
           {canScrollLeft && (
             <button
               onClick={() => scroll("left")}
@@ -139,21 +79,19 @@ export default function FeaturedCategories(props: FeaturedCategoriesProps) {
             </button>
           )}
 
-          {/* Categories Container */}
           <div
             ref={scrollRef}
             onScroll={checkScroll}
             className="flex gap-6 overflow-x-auto scroll-smooth pb-4 scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {categories.map((category) => (
+            {selectedCategories.map((category) => (
               <Link
                 key={category.id}
                 href={`/${locale}/products/category/${category.slug}`}
                 className="group flex-shrink-0 rounded-xl p-3 transition-all hover:bg-slate-50 hover:shadow-lg"
                 style={{ width: "220px" }}
               >
-                {/* Category Image */}
                 <div className="relative aspect-square overflow-hidden bg-[#f5f5f5]">
                   {category.logo ? (
                     <Image
@@ -163,32 +101,21 @@ export default function FeaturedCategories(props: FeaturedCategoriesProps) {
                       sizes="220px"
                       className="object-contain p-4 transition-transform group-hover:scale-105"
                       unoptimized={resolveUploadUrl(category.logo).includes("localhost")}
+                      loading="lazy"
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-slate-300">
-                      <svg
-                        className="h-16 w-16"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1}
-                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                        />
+                      <svg className="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                       </svg>
                     </div>
                   )}
                 </div>
 
-                {/* Category Name */}
                 <h3 className="mt-4 text-center text-sm font-bold uppercase tracking-wide text-slate-900">
                   {category.name}
                 </h3>
 
-                {/* Explore Link */}
                 <p className="mt-1 text-center text-xs font-medium uppercase tracking-wider text-slate-500 group-hover:text-slate-700">
                   {exploreText} »
                 </p>
@@ -196,7 +123,6 @@ export default function FeaturedCategories(props: FeaturedCategoriesProps) {
             ))}
           </div>
 
-          {/* Right Arrow */}
           {canScrollRight && (
             <button
               onClick={() => scroll("right")}
@@ -210,7 +136,6 @@ export default function FeaturedCategories(props: FeaturedCategoriesProps) {
           )}
         </div>
 
-        {/* Progress Bar */}
         <div className="mt-6 h-1 w-full overflow-hidden rounded-full bg-slate-200">
           <div
             className="h-full bg-slate-800 transition-all duration-300"

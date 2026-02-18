@@ -19,6 +19,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th" className={prompt.variable}>
+      <head>
+        <link rel="preconnect" href="https://api-airless-spray.rubyshop.co.th" />
+        <link rel="dns-prefetch" href="https://api-airless-spray.rubyshop.co.th" />
+        <link rel="preconnect" href="https://www.youtube.com" />
+        <link rel="preconnect" href="https://i.ytimg.com" />
+      </head>
       <body>
         <TrackingScripts />
         {children}
