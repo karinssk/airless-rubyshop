@@ -196,6 +196,7 @@ export default async function ProductsPage({
     return (
         <div>
             <Navbar items={menu?.items || []} cta={menu?.cta} logoUrl={menu?.logoUrl} />
+            <main>
             <section className="bg-slate-50 py-12">
                 <div className="mx-auto max-w-6xl px-6">
                     <nav className="text-xs text-slate-400">
@@ -359,7 +360,7 @@ export default async function ProductsPage({
                                             {product.images && product.images.length > 0 ? (
                                                 <img
                                                     src={resolveUploadUrl(product.images[0])}
-                                                    alt={product.name}
+                                                    alt=""
                                                     className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
                                                     loading="lazy"
                                                 />
@@ -428,6 +429,7 @@ export default async function ProductsPage({
 
                 </div>
             </section>
+            </main>
             <div className="fixed bottom-4 left-1/2 z-30 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-3 py-2 shadow-lg backdrop-blur">
                 <a
                     href="#category-filters"

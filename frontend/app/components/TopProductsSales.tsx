@@ -58,7 +58,7 @@ export default function TopProductsSales({
                   {productImage ? (
                     <Image
                       src={productImage}
-                      alt={product.name}
+                      alt=""
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
                       className="object-contain p-4"
