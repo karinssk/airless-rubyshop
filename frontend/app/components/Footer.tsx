@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { resolveUploadUrl } from "@/lib/urls";
 
 type FooterLink = {
@@ -52,9 +53,11 @@ export default function Footer({ footer }: { footer: FooterData }) {
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             {footer.brand?.logoUrl || fallbackLogo ? (
-              <img
+              <Image
                 src={resolveUploadUrl(safeText(footer.brand?.logoUrl) || fallbackLogo)}
                 alt={safeText(footer.brand?.name) || fallbackBrand}
+                width={160}
+                height={40}
                 className="h-10 w-auto max-w-[160px] object-contain"
                 loading="lazy"
               />
