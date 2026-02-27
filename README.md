@@ -1,3 +1,20 @@
+
+
+
+
+how to start project >>
+cd /Users/mac/Desktop/ailress-v3/airless-rubyshop && ./start.sh
+
+
+
+
+
+
+
+
+
+
+
 # airless-rubyshop
 
 ## Local MongoDB (Docker)

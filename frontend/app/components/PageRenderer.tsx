@@ -3,6 +3,7 @@ import Image from "next/image";
 import { resolveUploadUrl } from "@/lib/urls";
 import HlsVideoPlayer from "./HlsVideoPlayer";
 import GoogleAdsPhoneConversionLink from "./GoogleAdsPhoneConversionLink";
+import GoogleAdsConversionLink from "./GoogleAdsConversionLink";
 
 // Loading skeleton for blocks
 function BlockSkeleton({ height = "h-64" }: { height?: string }) {
@@ -296,12 +297,15 @@ function LandingHero01(props: Record<string, any>) {
               {safeList(props.description)}
             </p>
             {props.buttonText ? (
-              <a
+              <GoogleAdsConversionLink
                 href={safeList(props.buttonHref) || "#"}
+                sendTo="AW-1065750118/2OqdCMSD8f8bEOacmPwD"
+                value={110.0}
+                currency="THB"
                 className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-black/20 sm:px-5 sm:py-3 sm:text-sm"
               >
                 {safeList(props.buttonText)}
-              </a>
+              </GoogleAdsConversionLink>
             ) : null}
           </div>
         </div>
@@ -611,26 +615,39 @@ function ContactInfoCard(props: Record<string, any>) {
                 const icon = safeList(social.icon);
                 const iconIsImage = icon && isProbablyImage(icon);
                 const href = safeList(social.href) || "#";
-                return (
+                const isLineLink = href.includes("line.me") || href.includes("lin.ee");
+                const iconContent = icon ? (
+                  iconIsImage ? (
+                    <img
+                      src={resolveImage(icon)}
+                      alt={safeList(social.label)}
+                      className="h-4 w-4 object-contain"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className="text-sm">{icon}</span>
+                  )
+                ) : (
+                  <span className="text-sm">★</span>
+                );
+                return isLineLink ? (
+                  <GoogleAdsConversionLink
+                    key={social.id || `${social.label}-${socialIndex}`}
+                    href={href}
+                    sendTo="AW-1065750118/HXjpCK-f5_8bEOacmPwD"
+                    value={100.0}
+                    currency="THB"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600"
+                  >
+                    {iconContent}
+                  </GoogleAdsConversionLink>
+                ) : (
                   <a
                     key={social.id || `${social.label}-${socialIndex}`}
                     href={href}
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600"
                   >
-                    {icon ? (
-                      iconIsImage ? (
-                        <img
-                          src={resolveImage(icon)}
-                          alt={safeList(social.label)}
-                          className="h-4 w-4 object-contain"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className="text-sm">{icon}</span>
-                      )
-                    ) : (
-                      <span className="text-sm">★</span>
-                    )}
+                    {iconContent}
                   </a>
                 );
               })}

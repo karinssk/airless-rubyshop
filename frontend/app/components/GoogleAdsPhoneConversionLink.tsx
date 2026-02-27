@@ -2,7 +2,7 @@
 
 import type { ReactNode, MouseEvent } from "react";
 
-const ADS_SEND_TO = process.env.NEXT_PUBLIC_ADS_PHONE_CONVERSION_SEND_TO || "AW-10932591325/0n9CIPGQkL8YEOyKj5so";
+const ADS_SEND_TO = process.env.NEXT_PUBLIC_ADS_PHONE_CONVERSION_SEND_TO || "AW-1065750118/qgqqCNfz5v8bEOacmPwD";
 
 type Props = {
   href: string;
@@ -24,7 +24,7 @@ export default function GoogleAdsPhoneConversionLink({
       function () {
         w.dataLayer.push(arguments);
       };
-    w.gtag("event", "conversion", { send_to: ADS_SEND_TO });
+    w.gtag("event", "conversion", { send_to: ADS_SEND_TO, value: 120.0, currency: "THB" });
   };
 
   return (
