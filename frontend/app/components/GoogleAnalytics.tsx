@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Script from "next/script";
 
 const GA_MEASUREMENT_ID =
-  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-0PWGSWH0P4";
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-QWB950CVZ6";
 const GA_DEBUG = process.env.NEXT_PUBLIC_GA_DEBUG === "true";
 
 export default function GoogleAnalytics() {
