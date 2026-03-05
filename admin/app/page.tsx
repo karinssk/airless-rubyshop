@@ -4,6 +4,26 @@ import { useEffect, useState } from "react";
 import { backendBaseUrl } from "@/lib/urls";
 import { getAdminAuthHeaders } from "@/lib/auth";
 
+type DeviceFilter = "all" | "iphone" | "android" | "pc" | "linux" | "mac";
+type DateRangeFilter = "all" | "today" | "7d" | "30d" | "custom";
+
+const deviceLabels: Record<DeviceFilter, string> = {
+  all: "All",
+  iphone: "iPhone",
+  android: "Android",
+  pc: "PC",
+  linux: "Linux",
+  mac: "Mac",
+};
+
+const dateRangeLabels: Record<DateRangeFilter, string> = {
+  all: "All Time",
+  today: "Today",
+  "7d": "Last 7 Days",
+  "30d": "Last 30 Days",
+  custom: "Custom",
+};
+
 type VisitorStats = {
   totalViews: number;
   totalVisitors: number;
@@ -16,6 +36,8 @@ type MessengerStats = {
   page: number;
   limit: number;
   totalPages: number;
+  filteredTotalClicks: number;
+  deviceBreakdown: Record<string, number>;
 };
 
 type MessengerClickLog = {
@@ -24,6 +46,7 @@ type MessengerClickLog = {
   userAgent: string;
   referrer: string;
   createdAt: string;
+  device: string;
 };
 
 export default function Dashboard() {
@@ -38,9 +61,16 @@ export default function Dashboard() {
     page: 1,
     limit: 50,
     totalPages: 1,
+    filteredTotalClicks: 0,
+    deviceBreakdown: { all: 0, iphone: 0, android: 0, pc: 0, linux: 0, mac: 0 },
   });
   const [logsPage, setLogsPage] = useState(1);
   const [isLogsLoading, setIsLogsLoading] = useState(false);
+  const [deviceFilter, setDeviceFilter] = useState<DeviceFilter>("all");
+  const [dateRangeFilter, setDateRangeFilter] = useState<DateRangeFilter>("all");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+  const [selectedLog, setSelectedLog] = useState<MessengerClickLog | null>(null);
 
   useEffect(() => {
     if (!backendBaseUrl) return;
@@ -67,8 +97,18 @@ export default function Dashboard() {
     const fetchMessengerStats = async () => {
       setIsLogsLoading(true);
       try {
+        const query = new URLSearchParams({
+          page: String(logsPage),
+          limit: "50",
+          device: deviceFilter,
+          dateRange: dateRangeFilter,
+        });
+        if (dateRangeFilter === "custom") {
+          if (customStartDate) query.set("startDate", customStartDate);
+          if (customEndDate) query.set("endDate", customEndDate);
+        }
         const response = await fetch(
-          `${backendBaseUrl}/stats/messenger-clicks?page=${logsPage}&limit=50`,
+          `${backendBaseUrl}/stats/messenger-clicks?${query.toString()}`,
           { headers: getAdminAuthHeaders() }
         );
         if (!response.ok) return;
@@ -81,6 +121,11 @@ export default function Dashboard() {
             page: Number(data.page || 1),
             limit: Number(data.limit || 50),
             totalPages: Number(data.totalPages || 1),
+            filteredTotalClicks: Number(data.filteredTotalClicks || 0),
+            deviceBreakdown:
+              typeof data.deviceBreakdown === "object" && data.deviceBreakdown
+                ? data.deviceBreakdown
+                : { all: 0, iphone: 0, android: 0, pc: 0, linux: 0, mac: 0 },
           });
         }
       } catch (error) {
@@ -90,7 +135,7 @@ export default function Dashboard() {
       }
     };
     fetchMessengerStats();
-  }, [logsPage]);
+  }, [logsPage, deviceFilter, dateRangeFilter, customStartDate, customEndDate]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -143,12 +188,94 @@ export default function Dashboard() {
           <div>
             <h2 className="text-lg font-semibold text-slate-900">Messenger Click Logs</h2>
             <p className="text-sm text-slate-500">
-              Track who clicked (by IP) and the exact time of each click.
+              Track who clicked (IP), when they clicked, and what device they used.
             </p>
           </div>
           <div className="text-sm text-slate-600">
-            {messengerStats.totalClicks.toLocaleString()} total clicks
+            {messengerStats.filteredTotalClicks.toLocaleString()} filtered /{" "}
+            {messengerStats.totalClicks.toLocaleString()} total
           </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 border-b border-slate-100 px-5 py-3 sm:px-6">
+          {(Object.keys(deviceLabels) as DeviceFilter[]).map((device) => {
+            const isActive = deviceFilter === device;
+            return (
+              <button
+                key={device}
+                type="button"
+                onClick={() => {
+                  setDeviceFilter(device);
+                  setLogsPage(1);
+                  setSelectedLog(null);
+                }}
+                className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                  isActive
+                    ? "border-blue-200 bg-blue-50 text-blue-700"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {deviceLabels[device]} ({Number(messengerStats.deviceBreakdown[device] || 0).toLocaleString()})
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-5 py-3 sm:px-6">
+          {(Object.keys(dateRangeLabels) as DateRangeFilter[]).map((range) => {
+            const isActive = dateRangeFilter === range;
+            return (
+              <button
+                key={range}
+                type="button"
+                onClick={() => {
+                  setDateRangeFilter(range);
+                  setLogsPage(1);
+                  setSelectedLog(null);
+                }}
+                className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                  isActive
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {dateRangeLabels[range]}
+              </button>
+            );
+          })}
+          {dateRangeFilter === "custom" && (
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="date"
+                value={customStartDate}
+                onChange={(event) => {
+                  setCustomStartDate(event.target.value);
+                  setLogsPage(1);
+                  setSelectedLog(null);
+                }}
+                className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm text-slate-700"
+              />
+              <span className="text-sm text-slate-500">to</span>
+              <input
+                type="date"
+                value={customEndDate}
+                onChange={(event) => {
+                  setCustomEndDate(event.target.value);
+                  setLogsPage(1);
+                  setSelectedLog(null);
+                }}
+                className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm text-slate-700"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="border-b border-slate-100 px-5 py-2 text-sm text-slate-500 sm:px-6">
+          Active filter: <span className="font-medium text-slate-700">{deviceLabels[deviceFilter]}</span>
+          {" • "}
+          Date: <span className="font-medium text-slate-700">{dateRangeLabels[dateRangeFilter]}</span>
+          {" • "}
+          Click a row to view full detail
         </div>
 
         <div className="overflow-x-auto">
@@ -156,6 +283,7 @@ export default function Dashboard() {
             <thead className="bg-slate-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">#</th>
+                <th className="px-4 py-3 text-left font-medium text-slate-600">Device</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">IP Address</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Timestamp</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Referrer</th>
@@ -165,22 +293,27 @@ export default function Dashboard() {
             <tbody className="divide-y divide-slate-100">
               {isLogsLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
                     Loading logs...
                   </td>
                 </tr>
               ) : messengerStats.clickLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                    No messenger click logs found.
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                    No messenger click logs found for {deviceLabels[deviceFilter]}.
                   </td>
                 </tr>
               ) : (
                 messengerStats.clickLogs.map((log, index) => (
-                  <tr key={log._id}>
+                  <tr
+                    key={log._id}
+                    onClick={() => setSelectedLog(log)}
+                    className="cursor-pointer hover:bg-slate-50"
+                  >
                     <td className="px-4 py-3 text-slate-600">
                       {(messengerStats.page - 1) * messengerStats.limit + index + 1}
                     </td>
+                    <td className="px-4 py-3 text-slate-700">{log.device || "-"}</td>
                     <td className="px-4 py-3 font-mono text-xs text-slate-700">
                       {log.ip || "-"}
                     </td>
@@ -200,6 +333,47 @@ export default function Dashboard() {
           </table>
         </div>
 
+        {selectedLog && (
+          <div className="border-t border-slate-100 bg-slate-50/60 px-5 py-4 sm:px-6">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-900">Click Log Detail</h3>
+              <button
+                type="button"
+                onClick={() => setSelectedLog(null)}
+                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-700"
+              >
+                Close
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-3 text-sm text-slate-700 md:grid-cols-2">
+              <div>
+                <p className="text-slate-500">Log ID</p>
+                <p className="font-mono text-xs">{selectedLog._id}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Device</p>
+                <p>{selectedLog.device || "-"}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">IP Address</p>
+                <p className="font-mono text-xs">{selectedLog.ip || "-"}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Timestamp</p>
+                <p>{selectedLog.createdAt ? new Date(selectedLog.createdAt).toLocaleString() : "-"}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-slate-500">Referrer</p>
+                <p className="break-all">{selectedLog.referrer || "-"}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-slate-500">User Agent</p>
+                <p className="break-all font-mono text-xs">{selectedLog.userAgent || "-"}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between border-t border-slate-100 px-5 py-4 sm:px-6">
           <p className="text-sm text-slate-500">
             Page {messengerStats.page} of {messengerStats.totalPages}
@@ -207,7 +381,10 @@ export default function Dashboard() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setLogsPage((current) => Math.max(1, current - 1))}
+              onClick={() => {
+                setLogsPage((current) => Math.max(1, current - 1));
+                setSelectedLog(null);
+              }}
               disabled={logsPage <= 1 || isLogsLoading}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -215,11 +392,12 @@ export default function Dashboard() {
             </button>
             <button
               type="button"
-              onClick={() =>
+              onClick={() => {
                 setLogsPage((current) =>
                   Math.min(messengerStats.totalPages, current + 1)
-                )
-              }
+                );
+                setSelectedLog(null);
+              }}
               disabled={logsPage >= messengerStats.totalPages || isLogsLoading}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
             >

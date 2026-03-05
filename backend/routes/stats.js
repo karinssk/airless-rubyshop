@@ -4,6 +4,139 @@ const { recordVisit, getStats } = require("../utils/visitorStats");
 const MessengerClick = require("../models/MessengerClick");
 const { requireAdmin } = require("../utils/auth");
 
+const supportedDeviceFilters = new Set([
+  "all",
+  "iphone",
+  "android",
+  "pc",
+  "linux",
+  "mac",
+]);
+
+const supportedDateRangeFilters = new Set([
+  "all",
+  "today",
+  "7d",
+  "30d",
+  "custom",
+]);
+
+const normalizeDeviceFilter = (value) => {
+  const normalized = String(value || "all").trim().toLowerCase();
+  return supportedDeviceFilters.has(normalized) ? normalized : "all";
+};
+
+const normalizeDateRangeFilter = (value) => {
+  const normalized = String(value || "all").trim().toLowerCase();
+  return supportedDateRangeFilters.has(normalized) ? normalized : "all";
+};
+
+const parseDateInput = (value) => {
+  if (!value) return null;
+  const input = String(value).trim();
+  const matched = input.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (matched) {
+    const year = Number(matched[1]);
+    const monthIndex = Number(matched[2]) - 1;
+    const day = Number(matched[3]);
+    const localDate = new Date(year, monthIndex, day);
+    if (!Number.isNaN(localDate.getTime())) return localDate;
+  }
+  const date = new Date(input);
+  if (Number.isNaN(date.getTime())) return null;
+  return date;
+};
+
+const startOfDay = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const endOfDay = (date) => {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+};
+
+const buildDateRangeQuery = (range, customStartDate, customEndDate) => {
+  const now = new Date();
+
+  if (range === "today") {
+    return {
+      createdAt: {
+        $gte: startOfDay(now),
+        $lte: endOfDay(now),
+      },
+    };
+  }
+
+  if (range === "7d") {
+    const start = startOfDay(now);
+    start.setDate(start.getDate() - 6);
+    return {
+      createdAt: {
+        $gte: start,
+        $lte: endOfDay(now),
+      },
+    };
+  }
+
+  if (range === "30d") {
+    const start = startOfDay(now);
+    start.setDate(start.getDate() - 29);
+    return {
+      createdAt: {
+        $gte: start,
+        $lte: endOfDay(now),
+      },
+    };
+  }
+
+  if (range === "custom") {
+    const dateQuery = {};
+    let parsedStart = parseDateInput(customStartDate);
+    let parsedEnd = parseDateInput(customEndDate);
+    if (parsedStart && parsedEnd && parsedStart > parsedEnd) {
+      const temp = parsedStart;
+      parsedStart = parsedEnd;
+      parsedEnd = temp;
+    }
+    if (parsedStart) dateQuery.$gte = startOfDay(parsedStart);
+    if (parsedEnd) dateQuery.$lte = endOfDay(parsedEnd);
+    if (Object.keys(dateQuery).length > 0) return { createdAt: dateQuery };
+  }
+
+  return {};
+};
+
+const getDeviceQuery = (device) => {
+  switch (device) {
+    case "iphone":
+      return { userAgent: /iphone/i };
+    case "android":
+      return { userAgent: /android/i };
+    case "pc":
+      return { userAgent: /windows nt/i };
+    case "linux":
+      return { $and: [{ userAgent: /linux/i }, { userAgent: { $not: /android/i } }] };
+    case "mac":
+      return { userAgent: /macintosh/i };
+    default:
+      return {};
+  }
+};
+
+const detectDeviceFromUserAgent = (userAgent) => {
+  const ua = String(userAgent || "").toLowerCase();
+  if (ua.includes("iphone")) return "iphone";
+  if (ua.includes("android")) return "android";
+  if (ua.includes("windows nt")) return "pc";
+  if (ua.includes("macintosh")) return "mac";
+  if (ua.includes("linux")) return "linux";
+  return "other";
+};
+
 router.post("/stats/visit", async (req, res) => {
   try {
     const newVisitor = Boolean(req.body?.newVisitor);
@@ -47,9 +180,32 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
   try {
     const page = Math.max(1, Number(req.query?.page) || 1);
     const limit = Math.min(500, Math.max(1, Number(req.query?.limit) || 50));
+    const selectedDevice = normalizeDeviceFilter(req.query?.device);
+    const selectedDateRange = normalizeDateRangeFilter(req.query?.dateRange);
+    const customStartDate = String(req.query?.startDate || "").trim();
+    const customEndDate = String(req.query?.endDate || "").trim();
     const skip = (page - 1) * limit;
+    const dateRangeQuery = buildDateRangeQuery(
+      selectedDateRange,
+      customStartDate,
+      customEndDate
+    );
+    const deviceQuery = getDeviceQuery(selectedDevice);
+    const filterParts = [dateRangeQuery, deviceQuery].filter(
+      (query) => Object.keys(query).length > 0
+    );
+    const logsFilterQuery =
+      filterParts.length === 0
+        ? {}
+        : filterParts.length === 1
+          ? filterParts[0]
+          : { $and: filterParts };
 
     const totalClicks = await MessengerClick.countDocuments();
+    const filteredTotalClicks = await MessengerClick.countDocuments(logsFilterQuery);
+    const dateFilteredTotalClicks = await MessengerClick.countDocuments(
+      dateRangeQuery
+    );
 
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -71,19 +227,111 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
       { $project: { _id: 0, date: "$_id", count: 1 } },
     ]);
 
-    const clickLogs = await MessengerClick.find()
+    const clickLogsRaw = await MessengerClick.find(logsFilterQuery)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean();
 
-    const totalPages = Math.max(1, Math.ceil(totalClicks / limit));
+    const clickLogs = clickLogsRaw.map((log) => ({
+      ...log,
+      device: detectDeviceFromUserAgent(log.userAgent),
+    }));
+
+    const deviceAggregation = await MessengerClick.aggregate([
+      ...(Object.keys(dateRangeQuery).length > 0
+        ? [{ $match: dateRangeQuery }]
+        : []),
+      {
+        $project: {
+          _id: 0,
+          device: {
+            $switch: {
+              branches: [
+                {
+                  case: {
+                    $regexMatch: {
+                      input: { $ifNull: ["$userAgent", ""] },
+                      regex: /iphone/i,
+                    },
+                  },
+                  then: "iphone",
+                },
+                {
+                  case: {
+                    $regexMatch: {
+                      input: { $ifNull: ["$userAgent", ""] },
+                      regex: /android/i,
+                    },
+                  },
+                  then: "android",
+                },
+                {
+                  case: {
+                    $regexMatch: {
+                      input: { $ifNull: ["$userAgent", ""] },
+                      regex: /windows nt/i,
+                    },
+                  },
+                  then: "pc",
+                },
+                {
+                  case: {
+                    $regexMatch: {
+                      input: { $ifNull: ["$userAgent", ""] },
+                      regex: /macintosh/i,
+                    },
+                  },
+                  then: "mac",
+                },
+                {
+                  case: {
+                    $regexMatch: {
+                      input: { $ifNull: ["$userAgent", ""] },
+                      regex: /linux/i,
+                    },
+                  },
+                  then: "linux",
+                },
+              ],
+              default: "other",
+            },
+          },
+        },
+      },
+      { $group: { _id: "$device", count: { $sum: 1 } } },
+    ]);
+
+    const deviceBreakdown = {
+      all: dateFilteredTotalClicks,
+      iphone: 0,
+      android: 0,
+      pc: 0,
+      linux: 0,
+      mac: 0,
+      other: 0,
+    };
+
+    deviceAggregation.forEach((item) => {
+      if (item?._id && Object.prototype.hasOwnProperty.call(deviceBreakdown, item._id)) {
+        deviceBreakdown[item._id] = Number(item.count || 0);
+      }
+    });
+
+    const totalPages = Math.max(1, Math.ceil(filteredTotalClicks / limit));
 
     res.json({
       ok: true,
       totalClicks,
+      filteredTotalClicks,
+      dateFilteredTotalClicks,
       todayClicks,
       last30Days,
+      selectedDevice,
+      selectedDateRange,
+      customStartDate,
+      customEndDate,
+      deviceBreakdown,
       clickLogs,
       recentClicks: clickLogs,
       page,

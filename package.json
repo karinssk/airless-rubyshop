@@ -1,0 +1,11 @@
+{
+  "name": "airless-rubyshop",
+  "private": true,
+  "scripts": {
+    "dev": "./start.sh",
+    "start": "./start.sh",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:admin": "npm --prefix admin run dev"
+  }
+}
