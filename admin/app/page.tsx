@@ -59,6 +59,43 @@ type MessengerClickLog = {
   referrer: string;
   createdAt: string;
   device: string;
+  jsSignals?: JsSignals;
+  botAssessment?: BotAssessment;
+};
+
+type JsSignals = {
+  webdriver?: boolean;
+  platform?: string;
+  language?: string;
+  languages?: string[];
+  pluginsLength?: number;
+  mimeTypesLength?: number;
+  hardwareConcurrency?: number;
+  deviceMemory?: number;
+  maxTouchPoints?: number;
+  screenWidth?: number;
+  screenHeight?: number;
+  viewportWidth?: number;
+  viewportHeight?: number;
+  pixelRatio?: number;
+  timezone?: string;
+  timezoneOffset?: number;
+  hasChromeObject?: boolean;
+  hasPlaywright?: boolean;
+  hasPuppeteer?: boolean;
+  hasSelenium?: boolean;
+  hasPhantom?: boolean;
+  doNotTrack?: string;
+  cookieEnabled?: boolean;
+  touchSupport?: boolean;
+  colorDepth?: number;
+};
+
+type BotAssessment = {
+  score?: number;
+  suspected?: boolean;
+  level?: string;
+  reasons?: string[];
 };
 
 const deviceColors: Record<DeviceFilter, string> = {
@@ -502,6 +539,7 @@ export default function Dashboard() {
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Device</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">IP Address</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Timestamp</th>
+                <th className="px-4 py-3 text-left font-medium text-slate-600">Warning</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Referrer</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">User Agent</th>
               </tr>
@@ -509,13 +547,13 @@ export default function Dashboard() {
             <tbody className="divide-y divide-slate-100">
               {isLogsLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
                     Loading logs...
                   </td>
                 </tr>
               ) : messengerStats.clickLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
                     No messenger click logs found for {deviceLabels[deviceFilter]}.
                   </td>
                 </tr>
@@ -536,6 +574,15 @@ export default function Dashboard() {
                     <td className="px-4 py-3 text-slate-700">
                       {log.createdAt ? new Date(log.createdAt).toLocaleString() : "-"}
                     </td>
+                    <td className="px-4 py-3">
+                      {log.botAssessment?.suspected ? (
+                        <span className="text-xs font-semibold text-amber-600">
+                          Bot warning
+                        </span>
+                      ) : (
+                        <span className="text-xs text-slate-400">-</span>
+                      )}
+                    </td>
                     <td className="max-w-xs truncate px-4 py-3 text-slate-700" title={log.referrer || "-"}>
                       {log.referrer || "-"}
                     </td>
@@ -548,47 +595,6 @@ export default function Dashboard() {
             </tbody>
           </table>
         </div>
-
-        {selectedLog && (
-          <div className="border-t border-slate-100 bg-slate-50/60 px-5 py-4 sm:px-6">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-900">Click Log Detail</h3>
-              <button
-                type="button"
-                onClick={() => setSelectedLog(null)}
-                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-700"
-              >
-                Close
-              </button>
-            </div>
-            <div className="grid grid-cols-1 gap-3 text-sm text-slate-700 md:grid-cols-2">
-              <div>
-                <p className="text-slate-500">Log ID</p>
-                <p className="font-mono text-xs">{selectedLog._id}</p>
-              </div>
-              <div>
-                <p className="text-slate-500">Device</p>
-                <p>{selectedLog.device || "-"}</p>
-              </div>
-              <div>
-                <p className="text-slate-500">IP Address</p>
-                <p className="font-mono text-xs">{selectedLog.ip || "-"}</p>
-              </div>
-              <div>
-                <p className="text-slate-500">Timestamp</p>
-                <p>{selectedLog.createdAt ? new Date(selectedLog.createdAt).toLocaleString() : "-"}</p>
-              </div>
-              <div className="md:col-span-2">
-                <p className="text-slate-500">Referrer</p>
-                <p className="break-all">{selectedLog.referrer || "-"}</p>
-              </div>
-              <div className="md:col-span-2">
-                <p className="text-slate-500">User Agent</p>
-                <p className="break-all font-mono text-xs">{selectedLog.userAgent || "-"}</p>
-              </div>
-            </div>
-          </div>
-        )}
 
         <div className="flex items-center justify-between border-t border-slate-100 px-5 py-4 sm:px-6">
           <p className="text-sm text-slate-500">
@@ -622,6 +628,117 @@ export default function Dashboard() {
           </div>
         </div>
       </section>
+
+      {selectedLog && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-white/85 p-4"
+          onClick={() => setSelectedLog(null)}
+        >
+          <div
+            className="max-h-[88vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl sm:p-6"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-slate-900">Click Log Detail</h3>
+              <button
+                type="button"
+                onClick={() => setSelectedLog(null)}
+                className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-700"
+              >
+                Close
+              </button>
+            </div>
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <span className="text-xs text-slate-500">Bot Detection</span>
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                  selectedLog.botAssessment?.suspected
+                    ? "bg-rose-100 text-rose-700"
+                    : "bg-emerald-100 text-emerald-700"
+                }`}
+              >
+                {selectedLog.botAssessment?.suspected ? "Suspected Bot" : "Likely Human"}
+              </span>
+              <span className="text-xs text-slate-500">
+                Score: {Number(selectedLog.botAssessment?.score || 0)}
+              </span>
+              <span className="text-xs text-slate-500">
+                Level: {selectedLog.botAssessment?.level || "low"}
+              </span>
+            </div>
+
+            {Array.isArray(selectedLog.botAssessment?.reasons) &&
+              selectedLog.botAssessment?.reasons.length > 0 && (
+                <div className="mb-4 rounded-xl border border-rose-100 bg-rose-50/40 p-3 text-xs text-rose-700">
+                  {selectedLog.botAssessment?.reasons.map((reason, index) => (
+                    <p key={`${reason}-${index}`}>• {reason}</p>
+                  ))}
+                </div>
+              )}
+
+            <div className="grid grid-cols-1 gap-3 text-sm text-slate-700 md:grid-cols-2">
+              <div>
+                <p className="text-slate-500">Log ID</p>
+                <p className="font-mono text-xs">{selectedLog._id}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Device</p>
+                <p>{selectedLog.device || "-"}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">IP Address</p>
+                <p className="font-mono text-xs">{selectedLog.ip || "-"}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Timestamp</p>
+                <p>{selectedLog.createdAt ? new Date(selectedLog.createdAt).toLocaleString() : "-"}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-slate-500">Referrer</p>
+                <p className="break-all">{selectedLog.referrer || "-"}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-slate-500">User Agent</p>
+                <p className="break-all font-mono text-xs">{selectedLog.userAgent || "-"}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-slate-500">JS Signals</p>
+                <div className="mt-1 grid grid-cols-1 gap-1 rounded-xl border border-slate-200 bg-white p-3 text-xs sm:grid-cols-2">
+                  <p>webdriver: {String(Boolean(selectedLog.jsSignals?.webdriver))}</p>
+                  <p>platform: {selectedLog.jsSignals?.platform || "-"}</p>
+                  <p>language: {selectedLog.jsSignals?.language || "-"}</p>
+                  <p>languages: {(selectedLog.jsSignals?.languages || []).join(", ") || "-"}</p>
+                  <p>plugins: {Number(selectedLog.jsSignals?.pluginsLength || 0)}</p>
+                  <p>mimeTypes: {Number(selectedLog.jsSignals?.mimeTypesLength || 0)}</p>
+                  <p>hardwareConcurrency: {Number(selectedLog.jsSignals?.hardwareConcurrency || 0)}</p>
+                  <p>deviceMemory: {Number(selectedLog.jsSignals?.deviceMemory || 0)}</p>
+                  <p>maxTouchPoints: {Number(selectedLog.jsSignals?.maxTouchPoints || 0)}</p>
+                  <p>
+                    screen: {Number(selectedLog.jsSignals?.screenWidth || 0)}x
+                    {Number(selectedLog.jsSignals?.screenHeight || 0)}
+                  </p>
+                  <p>
+                    viewport: {Number(selectedLog.jsSignals?.viewportWidth || 0)}x
+                    {Number(selectedLog.jsSignals?.viewportHeight || 0)}
+                  </p>
+                  <p>pixelRatio: {Number(selectedLog.jsSignals?.pixelRatio || 0)}</p>
+                  <p>timezone: {selectedLog.jsSignals?.timezone || "-"}</p>
+                  <p>timezoneOffset: {Number(selectedLog.jsSignals?.timezoneOffset || 0)}</p>
+                  <p>hasChromeObject: {String(Boolean(selectedLog.jsSignals?.hasChromeObject))}</p>
+                  <p>hasPlaywright: {String(Boolean(selectedLog.jsSignals?.hasPlaywright))}</p>
+                  <p>hasPuppeteer: {String(Boolean(selectedLog.jsSignals?.hasPuppeteer))}</p>
+                  <p>hasSelenium: {String(Boolean(selectedLog.jsSignals?.hasSelenium))}</p>
+                  <p>hasPhantom: {String(Boolean(selectedLog.jsSignals?.hasPhantom))}</p>
+                  <p>doNotTrack: {selectedLog.jsSignals?.doNotTrack || "-"}</p>
+                  <p>cookieEnabled: {String(Boolean(selectedLog.jsSignals?.cookieEnabled))}</p>
+                  <p>touchSupport: {String(Boolean(selectedLog.jsSignals?.touchSupport))}</p>
+                  <p>colorDepth: {Number(selectedLog.jsSignals?.colorDepth || 0)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

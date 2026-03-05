@@ -137,6 +137,108 @@ const detectDeviceFromUserAgent = (userAgent) => {
   return "other";
 };
 
+const truncateString = (value, maxLength = 200) =>
+  String(value || "").slice(0, maxLength);
+
+const toSafeNumber = (value, fallback = 0) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const sanitizeJsSignals = (signals) => {
+  const payload = signals && typeof signals === "object" ? signals : {};
+  const languages = Array.isArray(payload.languages)
+    ? payload.languages
+      .slice(0, 10)
+      .map((item) => truncateString(item, 20))
+      .filter(Boolean)
+    : [];
+
+  return {
+    webdriver: Boolean(payload.webdriver),
+    platform: truncateString(payload.platform, 80),
+    language: truncateString(payload.language, 20),
+    languages,
+    pluginsLength: Math.max(0, Math.floor(toSafeNumber(payload.pluginsLength))),
+    mimeTypesLength: Math.max(0, Math.floor(toSafeNumber(payload.mimeTypesLength))),
+    hardwareConcurrency: Math.max(
+      0,
+      Math.floor(toSafeNumber(payload.hardwareConcurrency))
+    ),
+    deviceMemory: Math.max(0, toSafeNumber(payload.deviceMemory)),
+    maxTouchPoints: Math.max(0, Math.floor(toSafeNumber(payload.maxTouchPoints))),
+    screenWidth: Math.max(0, Math.floor(toSafeNumber(payload.screenWidth))),
+    screenHeight: Math.max(0, Math.floor(toSafeNumber(payload.screenHeight))),
+    viewportWidth: Math.max(0, Math.floor(toSafeNumber(payload.viewportWidth))),
+    viewportHeight: Math.max(0, Math.floor(toSafeNumber(payload.viewportHeight))),
+    pixelRatio: Math.max(0, toSafeNumber(payload.pixelRatio)),
+    timezone: truncateString(payload.timezone, 100),
+    timezoneOffset: Math.floor(toSafeNumber(payload.timezoneOffset)),
+    hasChromeObject: Boolean(payload.hasChromeObject),
+    hasPlaywright: Boolean(payload.hasPlaywright),
+    hasPuppeteer: Boolean(payload.hasPuppeteer),
+    hasSelenium: Boolean(payload.hasSelenium),
+    hasPhantom: Boolean(payload.hasPhantom),
+    doNotTrack: truncateString(payload.doNotTrack, 30),
+    cookieEnabled: Boolean(payload.cookieEnabled),
+    touchSupport: Boolean(payload.touchSupport),
+    colorDepth: Math.max(0, Math.floor(toSafeNumber(payload.colorDepth))),
+  };
+};
+
+const assessBotSignals = ({ userAgent, jsSignals }) => {
+  const ua = String(userAgent || "").toLowerCase();
+  const reasons = [];
+  let score = 0;
+
+  if (/headless|phantomjs|selenium|puppeteer|playwright/.test(ua)) {
+    score += 80;
+    reasons.push("User-Agent contains known automation keyword");
+  }
+  if (jsSignals.webdriver) {
+    score += 70;
+    reasons.push("navigator.webdriver is true");
+  }
+  if (jsSignals.hasPlaywright) {
+    score += 60;
+    reasons.push("Playwright marker detected");
+  }
+  if (jsSignals.hasPuppeteer) {
+    score += 60;
+    reasons.push("Puppeteer marker detected");
+  }
+  if (jsSignals.hasSelenium) {
+    score += 60;
+    reasons.push("Selenium marker detected");
+  }
+  if (jsSignals.hasPhantom) {
+    score += 60;
+    reasons.push("PhantomJS marker detected");
+  }
+  if (jsSignals.languages.length === 0) {
+    score += 10;
+    reasons.push("No navigator languages");
+  }
+  if (jsSignals.pluginsLength === 0 && !/iphone|android/.test(ua)) {
+    score += 10;
+    reasons.push("No navigator plugins on desktop-like UA");
+  }
+  if (jsSignals.timezone === "") {
+    score += 5;
+    reasons.push("Missing timezone");
+  }
+  if (jsSignals.screenWidth <= 0 || jsSignals.screenHeight <= 0) {
+    score += 10;
+    reasons.push("Invalid screen dimensions");
+  }
+
+  score = Math.min(100, score);
+  const suspected = score >= 50;
+  const level = score >= 80 ? "high" : score >= 50 ? "medium" : "low";
+
+  return { score, suspected, level, reasons: reasons.slice(0, 10) };
+};
+
 router.post("/stats/visit", async (req, res) => {
   try {
     const newVisitor = Boolean(req.body?.newVisitor);
@@ -168,7 +270,15 @@ router.post("/stats/messenger-click", async (req, res) => {
       "";
     const userAgent = req.headers["user-agent"] || "";
     const referrer = req.body?.referrer || "";
-    await MessengerClick.create({ ip, userAgent, referrer });
+    const jsSignals = sanitizeJsSignals(req.body?.jsSignals);
+    const botAssessment = assessBotSignals({ userAgent, jsSignals });
+    await MessengerClick.create({
+      ip,
+      userAgent,
+      referrer,
+      jsSignals,
+      botAssessment,
+    });
     res.json({ ok: true });
   } catch (error) {
     console.error("Failed to record messenger click", error);

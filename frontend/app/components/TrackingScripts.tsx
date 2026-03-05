@@ -8,18 +8,55 @@ import { backendBaseUrl } from "@/lib/urls";
 const META_PIXEL_ID = "1559144322039457";
 const FB_PAGE_ID = "816184855086392";
 
+const collectJsSignals = () => {
+  if (typeof window === "undefined") return {};
+  const nav = window.navigator;
+  const screenRef = window.screen;
+
+  return {
+    webdriver: Boolean(nav.webdriver),
+    platform: nav.platform || "",
+    language: nav.language || "",
+    languages: Array.isArray(nav.languages) ? nav.languages : [],
+    pluginsLength: nav.plugins?.length || 0,
+    mimeTypesLength: nav.mimeTypes?.length || 0,
+    hardwareConcurrency: nav.hardwareConcurrency || 0,
+    deviceMemory: (nav as Navigator & { deviceMemory?: number }).deviceMemory || 0,
+    maxTouchPoints: nav.maxTouchPoints || 0,
+    screenWidth: screenRef?.width || 0,
+    screenHeight: screenRef?.height || 0,
+    viewportWidth: window.innerWidth || 0,
+    viewportHeight: window.innerHeight || 0,
+    pixelRatio: window.devicePixelRatio || 1,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+    timezoneOffset: new Date().getTimezoneOffset(),
+    hasChromeObject: Boolean((window as Window & { chrome?: unknown }).chrome),
+    hasPlaywright: Boolean((window as Window & { __playwright__binding__?: unknown }).__playwright__binding__),
+    hasPuppeteer: Boolean((window as Window & { __puppeteer_evaluation_script__?: unknown }).__puppeteer_evaluation_script__),
+    hasSelenium: Boolean(
+      (window as Window & { _selenium?: unknown; __selenium_unwrapped?: unknown; __webdriver_script_fn?: unknown })._selenium ||
+      (window as Window & { _selenium?: unknown; __selenium_unwrapped?: unknown; __webdriver_script_fn?: unknown }).__selenium_unwrapped ||
+      (window as Window & { _selenium?: unknown; __selenium_unwrapped?: unknown; __webdriver_script_fn?: unknown }).__webdriver_script_fn
+    ),
+    hasPhantom: Boolean((window as Window & { _phantom?: unknown; callPhantom?: unknown })._phantom || (window as Window & { _phantom?: unknown; callPhantom?: unknown }).callPhantom),
+    doNotTrack: nav.doNotTrack || "",
+    cookieEnabled: Boolean(nav.cookieEnabled),
+    touchSupport: "ontouchstart" in window || (nav.maxTouchPoints || 0) > 0,
+    colorDepth: screenRef?.colorDepth || 0,
+  };
+};
+
 export default function TrackingScripts() {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(() => {
+    if (typeof window === "undefined") return false;
+    if (process.env.NODE_ENV !== "production") return false;
+    return localStorage.getItem("cookieConsent") === "accepted";
+  });
   const isProd = process.env.NODE_ENV === "production";
   const gaEnabled = isProd; // Temporarily load GA without consent
 
   useEffect(() => {
     if (!isProd) return;
-
-    const consent = localStorage.getItem("cookieConsent");
-    if (consent === "accepted") {
-      setEnabled(true);
-    }
 
     const handleConsent = () => setEnabled(true);
     window.addEventListener("cookieConsentAccepted", handleConsent);
@@ -28,10 +65,22 @@ export default function TrackingScripts() {
 
   const trackMessengerClick = useCallback(() => {
     if (!backendBaseUrl) return;
+    const payload = JSON.stringify({
+      referrer: window.location.href,
+      jsSignals: collectJsSignals(),
+    });
+
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: "application/json" });
+      navigator.sendBeacon(`${backendBaseUrl}/stats/messenger-click`, blob);
+      return;
+    }
+
     fetch(`${backendBaseUrl}/stats/messenger-click`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ referrer: window.location.href }),
+      body: payload,
+      keepalive: true,
     }).catch(() => {});
   }, []);
 
