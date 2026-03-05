@@ -592,16 +592,19 @@ export default function Dashboard() {
           <div className="mt-4">
             <div className="flex h-40 items-end gap-2">
               {weekdayChart.data.map((item) => (
-                <div key={item.label} className="flex flex-1 flex-col items-center gap-1">
-                  <div
-                    className="w-full rounded-t bg-indigo-400/80"
-                    style={{
-                      height: `${Math.max(4, (item.count / weekdayChart.maxCount) * 100)}%`,
-                    }}
-                    title={`${item.label}: ${item.count.toLocaleString()} clicks`}
-                  />
-                  <span className="text-[11px] text-slate-500">{item.label}</span>
-                </div>
+                <div
+                  key={item.label}
+                  className="flex-1 rounded-t bg-indigo-400/80"
+                  style={{
+                    height: `${Math.max(4, (item.count / weekdayChart.maxCount) * 100)}%`,
+                  }}
+                  title={`${item.label}: ${item.count.toLocaleString()} clicks`}
+                />
+              ))}
+            </div>
+            <div className="mt-2 grid grid-cols-7 text-center text-[11px] text-slate-500">
+              {weekdayChart.data.map((item) => (
+                <span key={`${item.label}-label`}>{item.label}</span>
               ))}
             </div>
           </div>
