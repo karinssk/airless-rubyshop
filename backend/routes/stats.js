@@ -468,6 +468,90 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
       }
     });
 
+    const botAggregation = await MessengerClick.aggregate([
+      ...(Object.keys(logsFilterQuery).length > 0
+        ? [{ $match: logsFilterQuery }]
+        : []),
+      {
+        $project: {
+          bucket: {
+            $cond: [{ $eq: ["$botAssessment.suspected", true] }, "suspected", "human"],
+          },
+        },
+      },
+      { $group: { _id: "$bucket", count: { $sum: 1 } } },
+    ]);
+
+    const botBreakdown = {
+      suspected: 0,
+      human: 0,
+    };
+
+    botAggregation.forEach((item) => {
+      if (item?._id && Object.prototype.hasOwnProperty.call(botBreakdown, item._id)) {
+        botBreakdown[item._id] = Number(item.count || 0);
+      }
+    });
+
+    const botLevelAggregation = await MessengerClick.aggregate([
+      ...(Object.keys(logsFilterQuery).length > 0
+        ? [{ $match: logsFilterQuery }]
+        : []),
+      {
+        $project: {
+          level: {
+            $switch: {
+              branches: [
+                { case: { $eq: ["$botAssessment.level", "high"] }, then: "high" },
+                { case: { $eq: ["$botAssessment.level", "medium"] }, then: "medium" },
+              ],
+              default: "low",
+            },
+          },
+        },
+      },
+      { $group: { _id: "$level", count: { $sum: 1 } } },
+    ]);
+
+    const botLevelBreakdown = {
+      low: 0,
+      medium: 0,
+      high: 0,
+    };
+
+    botLevelAggregation.forEach((item) => {
+      if (item?._id && Object.prototype.hasOwnProperty.call(botLevelBreakdown, item._id)) {
+        botLevelBreakdown[item._id] = Number(item.count || 0);
+      }
+    });
+
+    const weekdayAggregation = await MessengerClick.aggregate([
+      ...(Object.keys(logsFilterQuery).length > 0
+        ? [{ $match: logsFilterQuery }]
+        : []),
+      {
+        $group: {
+          _id: { $subtract: [{ $dayOfWeek: "$createdAt" }, 1] },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const weekdayBreakdown = weekdayLabels.map((label, dayIndex) => ({
+      dayIndex,
+      label,
+      count: 0,
+    }));
+
+    weekdayAggregation.forEach((item) => {
+      const dayIndex = Number(item._id);
+      if (Number.isInteger(dayIndex) && dayIndex >= 0 && dayIndex <= 6) {
+        weekdayBreakdown[dayIndex].count = Number(item.count || 0);
+      }
+    });
+
     const totalPages = Math.max(1, Math.ceil(filteredTotalClicks / limit));
 
     res.json({
@@ -484,6 +568,9 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
       dailyBreakdown,
       hourlyBreakdown,
       deviceBreakdown,
+      botBreakdown,
+      botLevelBreakdown,
+      weekdayBreakdown,
       clickLogs,
       recentClicks: clickLogs,
       page,

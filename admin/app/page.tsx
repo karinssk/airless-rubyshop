@@ -40,6 +40,9 @@ type MessengerStats = {
   dailyBreakdown: DailyCount[];
   hourlyBreakdown: HourlyCount[];
   deviceBreakdown: Record<string, number>;
+  botBreakdown: BotBreakdown;
+  botLevelBreakdown: BotLevelBreakdown;
+  weekdayBreakdown: WeekdayCount[];
 };
 
 type DailyCount = {
@@ -50,6 +53,23 @@ type DailyCount = {
 type HourlyCount = {
   hour: number;
   count: number;
+};
+
+type WeekdayCount = {
+  dayIndex: number;
+  label: string;
+  count: number;
+};
+
+type BotBreakdown = {
+  suspected: number;
+  human: number;
+};
+
+type BotLevelBreakdown = {
+  low: number;
+  medium: number;
+  high: number;
 };
 
 type MessengerClickLog = {
@@ -123,6 +143,9 @@ export default function Dashboard() {
     dailyBreakdown: [],
     hourlyBreakdown: [],
     deviceBreakdown: { all: 0, iphone: 0, android: 0, pc: 0, linux: 0, mac: 0 },
+    botBreakdown: { suspected: 0, human: 0 },
+    botLevelBreakdown: { low: 0, medium: 0, high: 0 },
+    weekdayBreakdown: [],
   });
   const [logsPage, setLogsPage] = useState(1);
   const [isLogsLoading, setIsLogsLoading] = useState(false);
@@ -192,6 +215,17 @@ export default function Dashboard() {
               typeof data.deviceBreakdown === "object" && data.deviceBreakdown
                 ? data.deviceBreakdown
                 : { all: 0, iphone: 0, android: 0, pc: 0, linux: 0, mac: 0 },
+            botBreakdown:
+              typeof data.botBreakdown === "object" && data.botBreakdown
+                ? data.botBreakdown
+                : { suspected: 0, human: 0 },
+            botLevelBreakdown:
+              typeof data.botLevelBreakdown === "object" && data.botLevelBreakdown
+                ? data.botLevelBreakdown
+                : { low: 0, medium: 0, high: 0 },
+            weekdayBreakdown: Array.isArray(data.weekdayBreakdown)
+              ? data.weekdayBreakdown
+              : [],
           });
         }
       } catch (error) {
@@ -283,6 +317,53 @@ export default function Dashboard() {
     const maxCount = Math.max(1, ...mapped.map((item) => item.count));
     return { data: mapped, maxCount };
   }, [messengerStats.hourlyBreakdown]);
+
+  const botShareChart = useMemo(() => {
+    const suspected = Number(messengerStats.botBreakdown.suspected || 0);
+    const human = Number(messengerStats.botBreakdown.human || 0);
+    const total = suspected + human;
+    const suspectedPct = total > 0 ? (suspected / total) * 100 : 0;
+    return {
+      suspected,
+      human,
+      total,
+      gradient: `#f59e0b 0% ${suspectedPct}%, #10b981 ${suspectedPct}% 100%`,
+    };
+  }, [messengerStats.botBreakdown]);
+
+  const botLevelChart = useMemo(() => {
+    const items = [
+      { key: "low", label: "Low", color: "#22c55e", count: Number(messengerStats.botLevelBreakdown.low || 0) },
+      { key: "medium", label: "Medium", color: "#f59e0b", count: Number(messengerStats.botLevelBreakdown.medium || 0) },
+      { key: "high", label: "High", color: "#ef4444", count: Number(messengerStats.botLevelBreakdown.high || 0) },
+    ];
+    const maxCount = Math.max(1, ...items.map((item) => item.count));
+    return { items, maxCount };
+  }, [messengerStats.botLevelBreakdown]);
+
+  const weekdayChart = useMemo(() => {
+    const fallback = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+      (label, index) => ({
+        dayIndex: index,
+        label,
+        count: 0,
+      })
+    );
+    const source = Array.isArray(messengerStats.weekdayBreakdown) &&
+      messengerStats.weekdayBreakdown.length > 0
+      ? messengerStats.weekdayBreakdown
+      : fallback;
+    const data = source
+      .slice()
+      .sort((a, b) => Number(a.dayIndex) - Number(b.dayIndex))
+      .map((item) => ({
+        dayIndex: Number(item.dayIndex),
+        label: item.label,
+        count: Number(item.count || 0),
+      }));
+    const maxCount = Math.max(1, ...data.map((item) => item.count));
+    return { data, maxCount };
+  }, [messengerStats.weekdayBreakdown]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -431,6 +512,97 @@ export default function Dashboard() {
               <span className="text-center">06:00</span>
               <span className="text-center">12:00</span>
               <span className="text-right">18:00</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-3">
+        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h3 className="text-base font-semibold text-slate-900">Bot vs Human</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            Suspected bots compared with likely human clicks.
+          </p>
+          <div className="mt-4 flex items-center gap-5">
+            <div
+              className="relative h-36 w-36 rounded-full"
+              style={{ background: `conic-gradient(${botShareChart.gradient})` }}
+            >
+              <div className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-white text-center">
+                <span className="text-xs text-slate-500">Total</span>
+                <span className="text-sm font-semibold text-slate-900">
+                  {botShareChart.total.toLocaleString()}
+                </span>
+              </div>
+            </div>
+            <div className="grid flex-1 gap-2 text-sm">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
+                  <span className="text-slate-600">Suspected Bot</span>
+                </div>
+                <span className="font-medium text-slate-800">
+                  {botShareChart.suspected.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                  <span className="text-slate-600">Likely Human</span>
+                </div>
+                <span className="font-medium text-slate-800">
+                  {botShareChart.human.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h3 className="text-base font-semibold text-slate-900">Bot Risk Levels</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            Distribution of low, medium, and high risk scores.
+          </p>
+          <div className="mt-4 grid gap-3">
+            {botLevelChart.items.map((item) => (
+              <div key={item.key}>
+                <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
+                  <span>{item.label}</span>
+                  <span>{item.count.toLocaleString()}</span>
+                </div>
+                <div className="h-2.5 w-full rounded-full bg-slate-100">
+                  <div
+                    className="h-2.5 rounded-full"
+                    style={{
+                      width: `${Math.max(4, (item.count / botLevelChart.maxCount) * 100)}%`,
+                      backgroundColor: item.color,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h3 className="text-base font-semibold text-slate-900">Weekday Activity</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            Click volume by day of week for current filters.
+          </p>
+          <div className="mt-4">
+            <div className="flex h-40 items-end gap-2">
+              {weekdayChart.data.map((item) => (
+                <div key={item.label} className="flex flex-1 flex-col items-center gap-1">
+                  <div
+                    className="w-full rounded-t bg-indigo-400/80"
+                    style={{
+                      height: `${Math.max(4, (item.count / weekdayChart.maxCount) * 100)}%`,
+                    }}
+                    title={`${item.label}: ${item.count.toLocaleString()} clicks`}
+                  />
+                  <span className="text-[11px] text-slate-500">{item.label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
