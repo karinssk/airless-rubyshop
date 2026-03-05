@@ -227,6 +227,46 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
       { $project: { _id: 0, date: "$_id", count: 1 } },
     ]);
 
+    const dailyBreakdown = await MessengerClick.aggregate([
+      ...(Object.keys(logsFilterQuery).length > 0
+        ? [{ $match: logsFilterQuery }]
+        : []),
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, date: "$_id", count: 1 } },
+    ]);
+
+    const hourlyAggregation = await MessengerClick.aggregate([
+      ...(Object.keys(logsFilterQuery).length > 0
+        ? [{ $match: logsFilterQuery }]
+        : []),
+      {
+        $group: {
+          _id: { $hour: "$createdAt" },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+      { $project: { _id: 0, hour: "$_id", count: 1 } },
+    ]);
+
+    const hourlyBreakdown = Array.from({ length: 24 }, (_, hour) => ({
+      hour,
+      count: 0,
+    }));
+
+    hourlyAggregation.forEach((entry) => {
+      const hour = Number(entry.hour);
+      if (Number.isInteger(hour) && hour >= 0 && hour <= 23) {
+        hourlyBreakdown[hour].count = Number(entry.count || 0);
+      }
+    });
+
     const clickLogsRaw = await MessengerClick.find(logsFilterQuery)
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -331,6 +371,8 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
       selectedDateRange,
       customStartDate,
       customEndDate,
+      dailyBreakdown,
+      hourlyBreakdown,
       deviceBreakdown,
       clickLogs,
       recentClicks: clickLogs,

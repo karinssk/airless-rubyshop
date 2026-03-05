@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { backendBaseUrl } from "@/lib/urls";
 import { getAdminAuthHeaders } from "@/lib/auth";
 
@@ -37,7 +37,19 @@ type MessengerStats = {
   limit: number;
   totalPages: number;
   filteredTotalClicks: number;
+  dailyBreakdown: DailyCount[];
+  hourlyBreakdown: HourlyCount[];
   deviceBreakdown: Record<string, number>;
+};
+
+type DailyCount = {
+  date: string;
+  count: number;
+};
+
+type HourlyCount = {
+  hour: number;
+  count: number;
 };
 
 type MessengerClickLog = {
@@ -47,6 +59,15 @@ type MessengerClickLog = {
   referrer: string;
   createdAt: string;
   device: string;
+};
+
+const deviceColors: Record<DeviceFilter, string> = {
+  all: "#334155",
+  iphone: "#2563eb",
+  android: "#16a34a",
+  pc: "#f59e0b",
+  linux: "#8b5cf6",
+  mac: "#ef4444",
 };
 
 export default function Dashboard() {
@@ -62,6 +83,8 @@ export default function Dashboard() {
     limit: 50,
     totalPages: 1,
     filteredTotalClicks: 0,
+    dailyBreakdown: [],
+    hourlyBreakdown: [],
     deviceBreakdown: { all: 0, iphone: 0, android: 0, pc: 0, linux: 0, mac: 0 },
   });
   const [logsPage, setLogsPage] = useState(1);
@@ -122,6 +145,12 @@ export default function Dashboard() {
             limit: Number(data.limit || 50),
             totalPages: Number(data.totalPages || 1),
             filteredTotalClicks: Number(data.filteredTotalClicks || 0),
+            dailyBreakdown: Array.isArray(data.dailyBreakdown)
+              ? data.dailyBreakdown
+              : [],
+            hourlyBreakdown: Array.isArray(data.hourlyBreakdown)
+              ? data.hourlyBreakdown
+              : [],
             deviceBreakdown:
               typeof data.deviceBreakdown === "object" && data.deviceBreakdown
                 ? data.deviceBreakdown
@@ -136,6 +165,87 @@ export default function Dashboard() {
     };
     fetchMessengerStats();
   }, [logsPage, deviceFilter, dateRangeFilter, customStartDate, customEndDate]);
+
+  const trendChart = useMemo(() => {
+    const data = messengerStats.dailyBreakdown;
+    const width = 520;
+    const height = 180;
+    const padding = 20;
+    const maxCount = Math.max(1, ...data.map((item) => Number(item.count || 0)));
+
+    if (data.length === 0) {
+      return {
+        width,
+        height,
+        maxCount,
+        linePoints: "",
+        areaPoints: "",
+        firstDate: "",
+        lastDate: "",
+      };
+    }
+
+    const stepX = data.length > 1 ? (width - padding * 2) / (data.length - 1) : 0;
+    const plotted = data.map((item, index) => {
+      const x = padding + index * stepX;
+      const y =
+        height - padding - (Number(item.count || 0) / maxCount) * (height - padding * 2);
+      return { x, y };
+    });
+
+    const linePoints = plotted.map((point) => `${point.x},${point.y}`).join(" ");
+    const areaPoints = `${padding},${height - padding} ${linePoints} ${
+      padding + stepX * (data.length - 1)
+    },${height - padding}`;
+
+    return {
+      width,
+      height,
+      maxCount,
+      linePoints,
+      areaPoints,
+      firstDate: data[0]?.date || "",
+      lastDate: data[data.length - 1]?.date || "",
+    };
+  }, [messengerStats.dailyBreakdown]);
+
+  const deviceChart = useMemo(() => {
+    const items = (Object.keys(deviceLabels) as DeviceFilter[])
+      .filter((key) => key !== "all")
+      .map((key) => ({
+        key,
+        label: deviceLabels[key],
+        color: deviceColors[key],
+        value: Number(messengerStats.deviceBreakdown[key] || 0),
+      }));
+    const total = items.reduce((sum, item) => sum + item.value, 0);
+    let running = 0;
+    const gradient = items
+      .map((item) => {
+        const start = running;
+        const share = total > 0 ? (item.value / total) * 100 : 0;
+        running += share;
+        return `${item.color} ${start}% ${running}%`;
+      })
+      .join(", ");
+
+    return {
+      items,
+      total,
+      gradient: gradient || "#e2e8f0 0% 100%",
+    };
+  }, [messengerStats.deviceBreakdown]);
+
+  const hourlyChart = useMemo(() => {
+    const mapped = Array.from({ length: 24 }, (_, hour) => {
+      const row = messengerStats.hourlyBreakdown.find(
+        (entry) => Number(entry.hour) === hour
+      );
+      return { hour, count: Number(row?.count || 0) };
+    });
+    const maxCount = Math.max(1, ...mapped.map((item) => item.count));
+    return { data: mapped, maxCount };
+  }, [messengerStats.hourlyBreakdown]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -181,6 +291,112 @@ export default function Dashboard() {
           </div>
           <span className="text-xs text-blue-400">Today</span>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-3">
+        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h3 className="text-base font-semibold text-slate-900">Click Trend</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            Daily clicks for the active device/date filters.
+          </p>
+          {trendChart.linePoints ? (
+            <div className="mt-4">
+              <svg
+                viewBox={`0 0 ${trendChart.width} ${trendChart.height}`}
+                className="h-44 w-full"
+                role="img"
+                aria-label="Clicks trend chart"
+              >
+                <polyline
+                  points={trendChart.areaPoints}
+                  fill="rgba(37, 99, 235, 0.15)"
+                  stroke="none"
+                />
+                <polyline
+                  points={trendChart.linePoints}
+                  fill="none"
+                  stroke="#2563eb"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+                <span>{trendChart.firstDate || "-"}</span>
+                <span>Max {trendChart.maxCount.toLocaleString()}</span>
+                <span>{trendChart.lastDate || "-"}</span>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-8 text-sm text-slate-500">No trend data for this filter.</p>
+          )}
+        </section>
+
+        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h3 className="text-base font-semibold text-slate-900">Device Share</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            Breakdown by device for the active date filter.
+          </p>
+          <div className="mt-4 flex items-center gap-5">
+            <div
+              className="relative h-36 w-36 rounded-full"
+              style={{ background: `conic-gradient(${deviceChart.gradient})` }}
+            >
+              <div className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full bg-white text-center">
+                <span className="text-xs text-slate-500">Total</span>
+                <span className="text-sm font-semibold text-slate-900">
+                  {deviceChart.total.toLocaleString()}
+                </span>
+              </div>
+            </div>
+            <div className="grid flex-1 gap-2 text-sm">
+              {deviceChart.items.map((item) => (
+                <div key={item.key} className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="text-slate-600">{item.label}</span>
+                  </div>
+                  <span className="font-medium text-slate-800">
+                    {item.value.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h3 className="text-base font-semibold text-slate-900">Hourly Activity</h3>
+          <p className="mt-1 text-xs text-slate-500">
+            Click distribution across 24 hours.
+          </p>
+          <div className="mt-4">
+            <div className="flex h-40 items-end gap-1">
+              {hourlyChart.data.map((item) => {
+                const barHeight = Math.max(
+                  2,
+                  (item.count / hourlyChart.maxCount) * 100
+                );
+                return (
+                  <div
+                    key={item.hour}
+                    className="group relative flex-1 rounded-t bg-emerald-400/80 hover:bg-emerald-500"
+                    style={{ height: `${barHeight}%` }}
+                    title={`${item.hour.toString().padStart(2, "0")}:00 - ${item.count.toLocaleString()} clicks`}
+                  />
+                );
+              })}
+            </div>
+            <div className="mt-2 grid grid-cols-4 text-[11px] text-slate-500">
+              <span>00:00</span>
+              <span className="text-center">06:00</span>
+              <span className="text-center">12:00</span>
+              <span className="text-right">18:00</span>
+            </div>
+          </div>
+        </section>
       </div>
 
       <section className="rounded-3xl border border-slate-200 bg-white shadow-sm">
