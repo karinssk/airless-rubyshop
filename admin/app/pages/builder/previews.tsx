@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import type { Block } from "./types";
 import { safeText } from "./utils";
 import { resolveUploadUrl } from "@/lib/urls";
@@ -91,6 +91,117 @@ const extractYouTubeId = (value?: string) => {
   }
   return "";
 };
+
+const clampNonNegative = (value: unknown) => Math.max(0, Number(value) || 0);
+
+function PromotionCountdownPreview({
+  props,
+  onUpdateMessage,
+  onUpdateCtaText,
+}: {
+  props: Record<string, any>;
+  onUpdateMessage: (value: string) => void;
+  onUpdateCtaText: (value: string) => void;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+  const [targetTs, setTargetTs] = useState(() => {
+    const durationMs =
+      (clampNonNegative(props.endAfterDays) * 24 * 60 * 60 +
+        clampNonNegative(props.endAfterHours) * 60 * 60 +
+        clampNonNegative(props.endAfterMinutes) * 60) *
+      1000;
+    return Date.now() + durationMs;
+  });
+
+  useEffect(() => {
+    const durationMs =
+      (clampNonNegative(props.endAfterDays) * 24 * 60 * 60 +
+        clampNonNegative(props.endAfterHours) * 60 * 60 +
+        clampNonNegative(props.endAfterMinutes) * 60) *
+      1000;
+    setTargetTs(Date.now() + durationMs);
+    setNow(Date.now());
+  }, [props.endAfterDays, props.endAfterHours, props.endAfterMinutes]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  const totalSeconds = Math.max(0, Math.floor((targetTs - now) / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const textColor = safeText(props.textColor) || "#ffffff";
+  const sectionBg = safeText(props.backgroundColor) || "#b91c1c";
+  const timerBg = safeText(props.timerBoxColor) || "#ffffff";
+  const timerTextColor = safeText(props.timerTextColor) || "#b91c1c";
+  const ctaBg = safeText(props.ctaBgColor) || "#ffffff";
+  const ctaTextColor = safeText(props.ctaTextColor) || "#b91c1c";
+  const dayLabel = safeText(props.dayLabel) || "วัน";
+
+  const cellClass =
+    "inline-flex min-w-9 items-center justify-center rounded-md px-2 py-1 text-lg font-extrabold tabular-nums sm:min-w-10 sm:text-xl";
+
+  return (
+    <section className="py-2.5" style={{ backgroundColor: sectionBg }}>
+      <div className="mx-auto w-full max-w-6xl px-3 sm:px-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p
+          className="flex items-start gap-2 text-sm font-bold leading-tight sm:items-center"
+          style={{ color: textColor }}
+        >
+          <span className="text-base">🔥</span>
+          <EditableText
+            value={safeText(props.message)}
+            onCommit={onUpdateMessage}
+            style={{ color: textColor }}
+          />
+        </p>
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+          <div className="flex items-center gap-1.5">
+            <span className={cellClass} style={{ backgroundColor: timerBg, color: timerTextColor }}>
+              {String(days).padStart(2, "0")}
+            </span>
+            <span className="text-xs font-semibold" style={{ color: textColor }}>
+              {dayLabel}
+            </span>
+            <span className={cellClass} style={{ backgroundColor: timerBg, color: timerTextColor }}>
+              {String(hours).padStart(2, "0")}
+            </span>
+            <span className="text-lg font-extrabold sm:text-xl" style={{ color: textColor }}>
+              :
+            </span>
+            <span className={cellClass} style={{ backgroundColor: timerBg, color: timerTextColor }}>
+              {String(minutes).padStart(2, "0")}
+            </span>
+            <span className="text-lg font-extrabold sm:text-xl" style={{ color: textColor }}>
+              :
+            </span>
+            <span className={cellClass} style={{ backgroundColor: timerBg, color: timerTextColor }}>
+              {String(seconds).padStart(2, "0")}
+            </span>
+          </div>
+          <a
+            href={safeText(props.ctaHref) || "#"}
+            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold shadow-sm"
+            style={{ backgroundColor: ctaBg, color: ctaTextColor }}
+          >
+            <EditableText
+              value={safeText(props.ctaText)}
+              onCommit={onUpdateCtaText}
+              style={{ color: ctaTextColor }}
+            />
+            <span className="ml-2">→</span>
+          </a>
+        </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function ImageSliderPreview({
   images,
@@ -3422,18 +3533,236 @@ export function LivePreview({
       );
     }
 
+    if (block.type === "hero-with-2-cta-btn") {
+      const backgroundImage = resolvePreviewImage(props.backgroundImage);
+      const backgroundImageMobile = resolvePreviewImage(props.backgroundImageMobile);
+      const desktopHeroImage = backgroundImage || backgroundImageMobile;
+      const mobileHeroImage = backgroundImageMobile || backgroundImage;
+      const overlayOpacity = Math.min(
+        0.85,
+        Math.max(0.2, Number(props.overlayOpacity) || 0.52)
+      );
+      const titleColor = safeText(props.titleColor) || "#ffffff";
+      const titleHighlightColor = safeText(props.titleHighlightColor) || "#fb7185";
+      const subtitleColor = safeText(props.subtitleColor) || "#d1d5db";
+      const descriptionColor = safeText(props.descriptionColor) || "#f3f4f6";
+      const button1BgColor = safeText(props.button1BgColor) || "#dc2626";
+      const button1TextColor = safeText(props.button1TextColor) || "#ffffff";
+      const button2BgColor = safeText(props.button2BgColor) || "rgba(255,255,255,0.20)";
+      const button2TextColor = safeText(props.button2TextColor) || "#ffffff";
+      const button2BorderColor = safeText(props.button2BorderColor) || "#bae6fd";
+      const hideHeadingOnMobile =
+        props.hideHeadingOnMobile === true || props.hideHeadingOnMobile === "true";
+      const hideSubtitleOnMobile =
+        props.hideSubtitleOnMobile === true || props.hideSubtitleOnMobile === "true";
+      const hideDescriptionOnMobile =
+        props.hideDescriptionOnMobile === true || props.hideDescriptionOnMobile === "true";
+      const hideButton1OnMobile =
+        props.hideButton1OnMobile === true || props.hideButton1OnMobile === "true";
+      const hideButton2OnMobile =
+        props.hideButton2OnMobile === true || props.hideButton2OnMobile === "true";
+      const hideButtonsWrapOnMobile = hideButton1OnMobile && hideButton2OnMobile;
+      return wrap(
+        <section className="relative aspect-square min-h-[320px] overflow-hidden sm:aspect-auto sm:min-h-[440px] lg:min-h-[560px]">
+          {mobileHeroImage ? (
+            <>
+              <div
+                className="absolute inset-0 bg-cover bg-center md:hidden"
+                style={{ backgroundImage: `url(${mobileHeroImage})` }}
+              />
+              <div
+                className="absolute inset-0 hidden bg-cover bg-center md:block"
+                style={{ backgroundImage: `url(${desktopHeroImage})` }}
+              />
+            </>
+          ) : desktopHeroImage ? (
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${desktopHeroImage})` }}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-slate-800" />
+          )}
+
+          <div className="absolute inset-0 bg-black" style={{ opacity: overlayOpacity }} />
+
+          <div className="relative z-10 mx-auto flex h-full min-h-[320px] w-full max-w-6xl flex-col justify-start px-4 py-8 sm:min-h-[440px] sm:px-6 sm:py-14 lg:min-h-[560px] lg:px-8 lg:py-16">
+            <div className="max-w-[760px] space-y-2 sm:space-y-4 lg:text-left">
+              <h1
+                className={`${hideHeadingOnMobile ? "hidden md:block" : ""} text-[2rem] font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl`}
+              >
+                <EditableText
+                  value={safeText(props.title)}
+                  onCommit={(value) => onUpdateBlock(index, { title: value })}
+                  className="whitespace-pre-line"
+                  style={{ color: titleColor }}
+                  multiline
+                />
+              </h1>
+              <p
+                className={`${hideHeadingOnMobile ? "hidden md:block" : ""} text-[2rem] font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl`}
+              >
+                <EditableText
+                  value={safeText(props.titleHighlight)}
+                  onCommit={(value) =>
+                    onUpdateBlock(index, { titleHighlight: value })
+                  }
+                  className="whitespace-pre-line"
+                  style={{ color: titleHighlightColor }}
+                  multiline
+                />
+              </p>
+              <p className={`${hideSubtitleOnMobile ? "hidden md:block" : ""} text-xs sm:text-xl`}>
+                <EditableText
+                  value={safeText(props.subtitle)}
+                  onCommit={(value) => onUpdateBlock(index, { subtitle: value })}
+                  className="whitespace-pre-line"
+                  style={{ color: subtitleColor }}
+                  multiline
+                />
+              </p>
+              <p
+                className={`${hideDescriptionOnMobile ? "hidden md:block" : ""} text-base font-semibold leading-snug sm:text-3xl`}
+              >
+                <EditableText
+                  value={safeText(props.description)}
+                  onCommit={(value) =>
+                    onUpdateBlock(index, { description: value })
+                  }
+                  className="whitespace-pre-line"
+                  style={{ color: descriptionColor }}
+                  multiline
+                />
+              </p>
+              <div
+                className={`${hideButtonsWrapOnMobile ? "hidden md:flex" : "flex"} flex-col gap-3 pt-2 sm:flex-row sm:items-center lg:justify-start`}
+              >
+                <span
+                  className={`${hideButton1OnMobile ? "hidden md:inline-flex" : "inline-flex"} w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-lg shadow-black/30 sm:w-auto`}
+                  style={{ backgroundColor: button1BgColor, color: button1TextColor }}
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5.5A2.5 2.5 0 015.5 3h2A2.5 2.5 0 0110 5.5V7a2 2 0 01-2 2h-.5a12.5 12.5 0 007.5 7.5V16a2 2 0 012-2h1.5A2.5 2.5 0 0121 16.5v2a2.5 2.5 0 01-2.5 2.5C10.492 21 3 13.508 3 4.5v1z" />
+                  </svg>
+                  <EditableText
+                    value={safeText(props.button1Text)}
+                    onCommit={(value) => onUpdateBlock(index, { button1Text: value })}
+                    style={{ color: button1TextColor }}
+                  />
+                </span>
+                <span
+                  className={`${hideButton2OnMobile ? "hidden md:inline-flex" : "inline-flex"} w-full items-center justify-center rounded-full border px-6 py-3 text-sm font-semibold backdrop-blur sm:w-auto`}
+                  style={{
+                    backgroundColor: button2BgColor,
+                    borderColor: button2BorderColor,
+                    color: button2TextColor,
+                  }}
+                >
+                  <EditableText
+                    value={safeText(props.button2Text)}
+                    onCommit={(value) => onUpdateBlock(index, { button2Text: value })}
+                    style={{ color: button2TextColor }}
+                  />
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    if (block.type === "mobile-cta-button") {
+      const backgroundColor = safeText(props.backgroundColor);
+      const button1BgColor = safeText(props.button1BgColor) || "#dc2626";
+      const button1TextColor = safeText(props.button1TextColor) || "#ffffff";
+      const button2BgColor = safeText(props.button2BgColor) || "rgba(148,163,184,0.35)";
+      const button2TextColor = safeText(props.button2TextColor) || "#ffffff";
+      const button2BorderColor = safeText(props.button2BorderColor) || "#bae6fd";
+      return wrap(
+        <section
+          className="py-3"
+          style={backgroundColor ? { backgroundColor } : undefined}
+        >
+          <div className="mx-auto w-full max-w-6xl px-3 sm:px-6">
+            <div className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-300">
+              Mobile only block
+            </div>
+            <div className="grid grid-cols-[1.15fr_1fr] gap-2.5">
+              <a
+                href={safeText(props.button1Href) || "#"}
+                className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full px-3 py-3 text-[13px] font-semibold leading-none shadow-lg shadow-black/30"
+                style={{ backgroundColor: button1BgColor, color: button1TextColor }}
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5.5A2.5 2.5 0 015.5 3h2A2.5 2.5 0 0110 5.5V7a2 2 0 01-2 2h-.5a12.5 12.5 0 007.5 7.5V16a2 2 0 012-2h1.5A2.5 2.5 0 0121 16.5v2a2.5 2.5 0 01-2.5 2.5C10.492 21 3 13.508 3 4.5v1z" />
+                </svg>
+                <EditableText
+                  value={safeText(props.button1Text)}
+                  onCommit={(value) => onUpdateBlock(index, { button1Text: value })}
+                  className="whitespace-nowrap"
+                  style={{ color: button1TextColor }}
+                />
+              </a>
+              <a
+                href={safeText(props.button2Href) || "#"}
+                className="inline-flex min-h-[52px] items-center justify-center rounded-full border px-3 py-3 text-[13px] font-semibold leading-none"
+                style={{
+                  backgroundColor: button2BgColor,
+                  borderColor: button2BorderColor,
+                  color: button2TextColor,
+                }}
+              >
+                <EditableText
+                  value={safeText(props.button2Text)}
+                  onCommit={(value) => onUpdateBlock(index, { button2Text: value })}
+                  className="whitespace-nowrap"
+                  style={{ color: button2TextColor }}
+                />
+              </a>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    if (block.type === "promotion-countdown") {
+      return wrap(
+        <PromotionCountdownPreview
+          props={props}
+          onUpdateMessage={(value) => onUpdateBlock(index, { message: value })}
+          onUpdateCtaText={(value) => onUpdateBlock(index, { ctaText: value })}
+        />
+      );
+    }
+
     if (block.type === "hero-images-with-button") {
       const backgroundImage = resolvePreviewImage(props.backgroundImage);
+      const backgroundImageMobile = resolvePreviewImage(props.backgroundImageMobile);
+      const desktopImage = backgroundImage || backgroundImageMobile;
+      const mobileImage = backgroundImageMobile || backgroundImage;
       const overlayOpacity = (props.overlayOpacity as number) || 0.5;
       const buttonColor = safeText(props.buttonColor) || "#f59e0b";
       const buttonTextColor = safeText(props.buttonTextColor) || "#000000";
 
       return wrap(
-        <section className="relative min-h-[320px] overflow-hidden sm:min-h-[420px] md:min-h-[520px] lg:min-h-[600px]">
+        <section className="relative aspect-square min-h-[320px] overflow-hidden sm:aspect-auto sm:min-h-[420px] md:min-h-[520px] lg:min-h-[600px]">
           {/* Background Image */}
-          {backgroundImage ? (
+          {mobileImage ? (
+            <>
+              <img
+                src={resolveUploadUrl(mobileImage)}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover sm:hidden"
+              />
+              <img
+                src={resolveUploadUrl(desktopImage)}
+                alt=""
+                className="absolute inset-0 hidden h-full w-full object-cover sm:block"
+              />
+            </>
+          ) : desktopImage ? (
             <img
-              src={resolveUploadUrl(backgroundImage)}
+              src={resolveUploadUrl(desktopImage)}
               alt=""
               className="absolute inset-0 h-full w-full object-cover"
             />
@@ -3448,7 +3777,7 @@ export function LivePreview({
           />
 
           {/* Content */}
-          <div className="relative z-10 flex min-h-[320px] flex-col items-center justify-center px-4 py-12 text-center text-white sm:min-h-[420px] sm:px-6 sm:py-16 md:min-h-[520px] md:py-20 lg:min-h-[600px]">
+          <div className="relative z-10 flex h-full min-h-[320px] flex-col items-center justify-center px-4 py-12 text-center text-white sm:min-h-[420px] sm:px-6 sm:py-16 md:min-h-[520px] md:py-20 lg:min-h-[600px]">
             <h1 className="max-w-[720px] text-2xl font-bold uppercase tracking-wide sm:text-3xl md:text-4xl lg:text-5xl">
               <EditableText
                 value={safeText(props.title) || "BUILT FOR THE UNBREAKABLE™"}
@@ -3683,15 +4012,18 @@ function EditableText({
   onCommit,
   className,
   multiline,
+  style,
 }: {
   value: string;
   onCommit: (next: string) => void;
   className?: string;
   multiline?: boolean;
+  style?: CSSProperties;
 }) {
   return (
     <span
       className={`inline-block rounded-md px-1 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30 ${className || ""}`}
+      style={style}
       contentEditable
       suppressContentEditableWarning
       onKeyDown={(event) => {

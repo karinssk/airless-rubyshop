@@ -5720,16 +5720,581 @@ export function BlockEditor({
     );
   }
 
-  if (block.type === "hero-images-with-button") {
+  if (block.type === "hero-with-2-cta-btn") {
     return (
       <div className="mt-3 grid gap-3 text-xs text-slate-600">
         <label className="grid gap-1">
-          Background Image
+          Background Image (Desktop)
           <ImageUploader
             value={toLine(props.backgroundImage as string)}
             onChange={(url) => updateBlockProps(index, { backgroundImage: url })}
             onUpload={uploadImage}
           />
+        </label>
+        <label className="grid gap-1">
+          Background Image (Mobile)
+          <ImageUploader
+            value={toLine(props.backgroundImageMobile as string)}
+            onChange={(url) =>
+              updateBlockProps(index, { backgroundImageMobile: url })
+            }
+            onUpload={uploadImage}
+          />
+          <span className="text-[10px] text-slate-400">
+            If empty, desktop image will be used.
+          </span>
+        </label>
+        <label className="grid gap-1">
+          Overlay Opacity (0.2 - 0.85)
+          <input
+            type="number"
+            step="0.05"
+            min="0.2"
+            max="0.85"
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={props.overlayOpacity as number || 0.52}
+            onBlur={(event) =>
+              updateBlockProps(index, {
+                overlayOpacity: parseFloat(event.target.value) || 0.52,
+              })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Main Heading
+          <textarea
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            rows={3}
+            defaultValue={toLine(props.title as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { title: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Highlight Heading (Red)
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.titleHighlight as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { titleHighlight: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Sub Text
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.subtitle as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { subtitle: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          More Sub Text
+          <textarea
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            rows={3}
+            defaultValue={toLine(props.description as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { description: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Button 1 Text
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button1Text as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { button1Text: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Button 1 Link
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button1Href as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { button1Href: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Button 2 Text
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button2Text as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { button2Text: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Button 2 Link
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button2Href as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { button2Href: event.target.value })
+            }
+          />
+        </label>
+        <div className="grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+          <p className="text-[11px] font-semibold text-slate-700">Mobile Visibility</p>
+          <label className="flex items-center gap-2 text-xs text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(props.hideHeadingOnMobile)}
+              onChange={(event) =>
+                updateBlockProps(index, { hideHeadingOnMobile: event.target.checked })
+              }
+            />
+            Hide main + highlight heading on mobile
+          </label>
+          <label className="flex items-center gap-2 text-xs text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(props.hideSubtitleOnMobile)}
+              onChange={(event) =>
+                updateBlockProps(index, { hideSubtitleOnMobile: event.target.checked })
+              }
+            />
+            Hide sub text on mobile
+          </label>
+          <label className="flex items-center gap-2 text-xs text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(props.hideDescriptionOnMobile)}
+              onChange={(event) =>
+                updateBlockProps(index, { hideDescriptionOnMobile: event.target.checked })
+              }
+            />
+            Hide more sub text on mobile
+          </label>
+          <label className="flex items-center gap-2 text-xs text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(props.hideButton1OnMobile)}
+              onChange={(event) =>
+                updateBlockProps(index, { hideButton1OnMobile: event.target.checked })
+              }
+            />
+            Hide button 1 on mobile
+          </label>
+          <label className="flex items-center gap-2 text-xs text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(props.hideButton2OnMobile)}
+              onChange={(event) =>
+                updateBlockProps(index, { hideButton2OnMobile: event.target.checked })
+              }
+            />
+            Hide button 2 on mobile
+          </label>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="grid gap-1">
+            Main Heading Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.titleColor as string) || "#ffffff"}
+              onChange={(event) =>
+                updateBlockProps(index, { titleColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Highlight Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.titleHighlightColor as string) || "#fb7185"}
+              onChange={(event) =>
+                updateBlockProps(index, { titleHighlightColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Sub Text Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.subtitleColor as string) || "#d1d5db"}
+              onChange={(event) =>
+                updateBlockProps(index, { subtitleColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            More Sub Text Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.descriptionColor as string) || "#f3f4f6"}
+              onChange={(event) =>
+                updateBlockProps(index, { descriptionColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Button 1 BG Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.button1BgColor as string) || "#dc2626"}
+              onChange={(event) =>
+                updateBlockProps(index, { button1BgColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Button 1 Text Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.button1TextColor as string) || "#ffffff"}
+              onChange={(event) =>
+                updateBlockProps(index, { button1TextColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Button 2 Text Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.button2TextColor as string) || "#ffffff"}
+              onChange={(event) =>
+                updateBlockProps(index, { button2TextColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Button 2 Border Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.button2BorderColor as string) || "#bae6fd"}
+              onChange={(event) =>
+                updateBlockProps(index, { button2BorderColor: event.target.value })
+              }
+            />
+          </label>
+        </div>
+        <label className="grid gap-1">
+          Button 2 BG Color (supports rgba)
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button2BgColor as string) || "rgba(255,255,255,0.20)"}
+            onBlur={(event) =>
+              updateBlockProps(index, { button2BgColor: event.target.value })
+            }
+          />
+        </label>
+      </div>
+    );
+  }
+
+  if (block.type === "mobile-cta-button") {
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Section BG Color (supports rgba)
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.backgroundColor as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { backgroundColor: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Button 1 Text
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button1Text as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { button1Text: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Button 1 Link
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button1Href as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { button1Href: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Button 2 Text
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button2Text as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { button2Text: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          Button 2 Link
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button2Href as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { button2Href: event.target.value })
+            }
+          />
+        </label>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="grid gap-1">
+            Button 1 BG Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.button1BgColor as string) || "#dc2626"}
+              onChange={(event) =>
+                updateBlockProps(index, { button1BgColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Button 1 Text Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.button1TextColor as string) || "#ffffff"}
+              onChange={(event) =>
+                updateBlockProps(index, { button1TextColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Button 2 Text Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.button2TextColor as string) || "#ffffff"}
+              onChange={(event) =>
+                updateBlockProps(index, { button2TextColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Button 2 Border Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.button2BorderColor as string) || "#bae6fd"}
+              onChange={(event) =>
+                updateBlockProps(index, { button2BorderColor: event.target.value })
+              }
+            />
+          </label>
+        </div>
+        <label className="grid gap-1">
+          Button 2 BG Color (supports rgba)
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.button2BgColor as string) || "rgba(148,163,184,0.35)"}
+            onBlur={(event) =>
+              updateBlockProps(index, { button2BgColor: event.target.value })
+            }
+          />
+        </label>
+      </div>
+    );
+  }
+
+  if (block.type === "promotion-countdown") {
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Promo Message
+          <textarea
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            rows={2}
+            defaultValue={toLine(props.message as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { message: event.target.value })
+            }
+          />
+        </label>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <label className="grid gap-1">
+            End After Days (from now)
+            <input
+              type="number"
+              min="0"
+              className="rounded-xl border border-slate-200 px-3 py-2"
+              defaultValue={Number(props.endAfterDays) || 0}
+              onBlur={(event) =>
+                updateBlockProps(index, {
+                  endAfterDays: Math.max(0, Number(event.target.value) || 0),
+                })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            End After Hours
+            <input
+              type="number"
+              min="0"
+              className="rounded-xl border border-slate-200 px-3 py-2"
+              defaultValue={Number(props.endAfterHours) || 0}
+              onBlur={(event) =>
+                updateBlockProps(index, {
+                  endAfterHours: Math.max(0, Number(event.target.value) || 0),
+                })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            End After Minutes
+            <input
+              type="number"
+              min="0"
+              className="rounded-xl border border-slate-200 px-3 py-2"
+              defaultValue={Number(props.endAfterMinutes) || 0}
+              onBlur={(event) =>
+                updateBlockProps(index, {
+                  endAfterMinutes: Math.max(0, Number(event.target.value) || 0),
+                })
+              }
+            />
+          </label>
+        </div>
+        <label className="grid gap-1">
+          Day Label
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.dayLabel as string) || "วัน"}
+            onBlur={(event) =>
+              updateBlockProps(index, { dayLabel: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          CTA Text
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.ctaText as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { ctaText: event.target.value })
+            }
+          />
+        </label>
+        <label className="grid gap-1">
+          CTA Link
+          <input
+            className="rounded-xl border border-slate-200 px-3 py-2"
+            defaultValue={toLine(props.ctaHref as string)}
+            onBlur={(event) =>
+              updateBlockProps(index, { ctaHref: event.target.value })
+            }
+          />
+        </label>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="grid gap-1">
+            Section BG Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.backgroundColor as string) || "#b91c1c"}
+              onChange={(event) =>
+                updateBlockProps(index, { backgroundColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Text Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.textColor as string) || "#ffffff"}
+              onChange={(event) =>
+                updateBlockProps(index, { textColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Timer Box Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.timerBoxColor as string) || "#ffffff"}
+              onChange={(event) =>
+                updateBlockProps(index, { timerBoxColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            Timer Text Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.timerTextColor as string) || "#b91c1c"}
+              onChange={(event) =>
+                updateBlockProps(index, { timerTextColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            CTA BG Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.ctaBgColor as string) || "#ffffff"}
+              onChange={(event) =>
+                updateBlockProps(index, { ctaBgColor: event.target.value })
+              }
+            />
+          </label>
+          <label className="grid gap-1">
+            CTA Text Color
+            <input
+              type="color"
+              className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+              defaultValue={toLine(props.ctaTextColor as string) || "#b91c1c"}
+              onChange={(event) =>
+                updateBlockProps(index, { ctaTextColor: event.target.value })
+              }
+            />
+          </label>
+        </div>
+      </div>
+    );
+  }
+
+  if (block.type === "hero-images-with-button") {
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Background Image (Desktop)
+          <ImageUploader
+            value={toLine(props.backgroundImage as string)}
+            onChange={(url) => updateBlockProps(index, { backgroundImage: url })}
+            onUpload={uploadImage}
+          />
+        </label>
+        <label className="grid gap-1">
+          Background Image (Mobile 800x800 recommended)
+          <ImageUploader
+            value={toLine(props.backgroundImageMobile as string)}
+            onChange={(url) =>
+              updateBlockProps(index, { backgroundImageMobile: url })
+            }
+            onUpload={uploadImage}
+          />
+          <span className="text-[10px] text-slate-400">
+            If empty, desktop image will be used.
+          </span>
         </label>
         <label className="grid gap-1">
           Overlay Opacity (0-1)

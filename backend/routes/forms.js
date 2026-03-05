@@ -2,6 +2,65 @@ const express = require("express");
 const router = express.Router();
 const QuotationRequest = require("../models/QuotationRequest");
 
+const resolveLineConfig = () => ({
+    channelAccessToken:
+        process.env.CHANNEL_ACCESS_TOKEN ||
+        process.env.LINE_CHANNEL_ACCESS_TOKEN,
+    channelSecret:
+        process.env.CHANNEL_SECRET ||
+        process.env.LINE_CHANNEL_SECRET,
+    reportUserId: process.env.REPORT_LINE_USER_ID,
+});
+
+const formatSubmissionLineMessage = (submission) => {
+    const createdAt = new Date(submission.createdAt || Date.now()).toLocaleString("th-TH", {
+        timeZone: "Asia/Bangkok",
+    });
+    return [
+        "มีฟอร์มขอใบเสนอราคาใหม่",
+        `ชื่อ: ${submission.name || "-"}`,
+        `บริษัท: ${submission.company || "-"}`,
+        `อีเมล: ${submission.email || "-"}`,
+        `เบอร์โทร: ${submission.phone || "-"}`,
+        `บริการ: ${submission.service || "-"}`,
+        `รายละเอียด: ${submission.details || "-"}`,
+        `เวลา: ${createdAt}`,
+        `ID: ${submission._id || submission.id || "-"}`,
+    ].join("\n");
+};
+
+const pushLineMessage = async (messageText) => {
+    const { channelAccessToken, channelSecret, reportUserId } = resolveLineConfig();
+    if (!channelAccessToken || !reportUserId) {
+        throw new Error("LINE config missing (channel access token or report user id)");
+    }
+    if (!channelSecret) {
+        throw new Error("LINE config missing (channel secret)");
+    }
+
+    const text = String(messageText || "").slice(0, 5000);
+    if (!text) {
+        throw new Error("Cannot send empty LINE message");
+    }
+
+    const response = await fetch("https://api.line.me/v2/bot/message/push", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${channelAccessToken}`,
+        },
+        body: JSON.stringify({
+            to: reportUserId,
+            messages: [{ type: "text", text }],
+        }),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`LINE push failed (${response.status}): ${errorText}`);
+    }
+};
+
 router.post("/quotation", async (req, res) => {
     const payload = req.body || {};
     const requiredFields = ["name", "email", "phone", "service"];
@@ -17,7 +76,22 @@ router.post("/quotation", async (req, res) => {
         service: payload.service,
         details: payload.details || "",
     });
-    res.status(201).json({ submission: { ...submission.toObject(), id: submission._id } });
+
+    let lineNotificationSent = false;
+    let lineNotificationError = null;
+    try {
+        await pushLineMessage(formatSubmissionLineMessage(submission));
+        lineNotificationSent = true;
+    } catch (error) {
+        lineNotificationError = error?.message || "Failed to send LINE notification";
+        console.error("[forms] LINE notification failed", error);
+    }
+
+    res.status(201).json({
+        submission: { ...submission.toObject(), id: submission._id },
+        lineNotificationSent,
+        ...(lineNotificationError ? { lineNotificationError } : {}),
+    });
 });
 
 router.get("/quotation", async (_req, res) => {
@@ -58,6 +132,31 @@ router.delete("/quotation/:id", async (req, res) => {
         return res.status(404).json({ error: "Submission not found" });
     }
     res.json({ ok: true });
+});
+
+router.post("/quotation/:id/notify-line", async (req, res) => {
+    const submission = await QuotationRequest.findById(req.params.id).lean();
+    if (!submission) {
+        return res.status(404).json({ error: "Submission not found" });
+    }
+    await pushLineMessage(formatSubmissionLineMessage(submission));
+    res.json({ ok: true, sent: true });
+});
+
+router.post("/line/send", async (req, res) => {
+    const message = String(req.body?.message || "").trim();
+    if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+    }
+    await pushLineMessage(message);
+    res.json({ ok: true, sent: true });
+});
+
+router.post("/line/test", async (_req, res) => {
+    const { reportUserId } = resolveLineConfig();
+    const now = new Date().toLocaleString("th-TH", { timeZone: "Asia/Bangkok" });
+    await pushLineMessage(`✅ LINE test from RUBYSHOP admin\nเวลา: ${now}\nTarget: ${reportUserId}`);
+    res.json({ ok: true, sent: true, target: reportUserId });
 });
 
 module.exports = router;
