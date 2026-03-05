@@ -6,6 +6,7 @@ import { resolveUploadUrl } from "@/lib/urls";
 
 type HeroImagesWithButtonProps = {
   backgroundImage?: string;
+  backgroundImageMobile?: string;
   overlayOpacity?: number;
   title?: string;
   description?: string;
@@ -18,6 +19,7 @@ type HeroImagesWithButtonProps = {
 export default function HeroImagesWithButton(props: HeroImagesWithButtonProps) {
   const {
     backgroundImage = "",
+    backgroundImageMobile = "",
     overlayOpacity = 0.5,
     title = "BUILT FOR THE UNBREAKABLE™",
     description = "",
@@ -27,22 +29,41 @@ export default function HeroImagesWithButton(props: HeroImagesWithButtonProps) {
     buttonTextColor = "#000000",
   } = props;
 
-  const resolvedImage = backgroundImage ? resolveUploadUrl(backgroundImage) : "";
+  const resolvedImageDesktop = backgroundImage ? resolveUploadUrl(backgroundImage) : "";
+  const resolvedImageMobile = backgroundImageMobile
+    ? resolveUploadUrl(backgroundImageMobile)
+    : resolvedImageDesktop;
+  const resolvedImage = resolvedImageDesktop || resolvedImageMobile;
   const isExternalLink = buttonHref.startsWith("http");
 
   return (
-    <section className="relative min-h-[320px] overflow-hidden sm:min-h-[420px] md:min-h-[520px] lg:min-h-[600px]">
+    <section className="relative aspect-square min-h-[320px] overflow-hidden sm:aspect-auto sm:min-h-[420px] md:min-h-[520px] lg:min-h-[600px]">
       {/* Background Image */}
-      {resolvedImage ? (
-        <Image
-          src={resolvedImage}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-          unoptimized={resolvedImage.includes("localhost")}
-        />
+      {resolvedImageMobile || resolvedImage ? (
+        <>
+          {resolvedImageMobile ? (
+            <Image
+              src={resolvedImageMobile}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover sm:hidden"
+              unoptimized={resolvedImageMobile.includes("localhost")}
+            />
+          ) : null}
+          {resolvedImage ? (
+            <Image
+              src={resolvedImage}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className={resolvedImageMobile ? "hidden object-cover sm:block" : "object-cover"}
+              unoptimized={resolvedImage.includes("localhost")}
+            />
+          ) : null}
+        </>
       ) : (
         <div className="absolute inset-0 bg-slate-800" />
       )}
@@ -54,7 +75,7 @@ export default function HeroImagesWithButton(props: HeroImagesWithButtonProps) {
       />
 
       {/* Content */}
-      <div className="relative z-10 flex min-h-[320px] flex-col items-center justify-end px-4 pt-10 pb-8 text-center text-white sm:min-h-[420px] sm:px-6 sm:pt-16 sm:pb-12 md:min-h-[520px] md:pt-20 md:pb-16 lg:min-h-[600px]">
+      <div className="relative z-10 flex h-full min-h-[320px] flex-col items-center justify-end px-4 pb-8 pt-10 text-center text-white sm:min-h-[420px] sm:px-6 sm:pb-12 sm:pt-16 md:min-h-[520px] md:pb-16 md:pt-20 lg:min-h-[600px]">
         <h1 className="max-w-[720px] text-2xl font-bold uppercase tracking-wide sm:text-3xl md:text-4xl lg:text-5xl">
           {title}
         </h1>

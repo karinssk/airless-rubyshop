@@ -4,6 +4,7 @@ import { resolveUploadUrl } from "@/lib/urls";
 import HlsVideoPlayer from "./HlsVideoPlayer";
 import GoogleAdsPhoneConversionLink from "./GoogleAdsPhoneConversionLink";
 import GoogleAdsConversionLink from "./GoogleAdsConversionLink";
+import PromotionCountdown from "./PromotionCountdown";
 
 // Loading skeleton for blocks
 function BlockSkeleton({ height = "h-64" }: { height?: string }) {
@@ -108,6 +109,8 @@ type Page = {
 };
 
 const safeList = (value?: string) => (value ? String(value) : "");
+const toBool = (value: unknown) =>
+  value === true || value === "true" || value === 1 || value === "1";
 const resolveImage = (value?: string) => resolveUploadUrl(safeList(value));
 const extractMapEmbedSrc = (value?: string) => {
   const raw = safeList(value).trim();
@@ -238,6 +241,12 @@ export default function PageRenderer({ page }: { page: Page }) {
             return <TopProductsSales key={index} {...block.props} />;
           case "featured-categories":
             return <FeaturedCategories key={index} {...block.props} />;
+          case "hero-with-2-cta-btn":
+            return <HeroWith2CtaBtn key={index} {...block.props} />;
+          case "mobile-cta-button":
+            return <MobileCtaButton key={index} {...block.props} />;
+          case "promotion-countdown":
+            return <PromotionCountdown key={index} {...block.props} />;
           case "hero-images-with-button":
             return <HeroImagesWithButton key={index} {...block.props} />;
           default:
@@ -307,6 +316,157 @@ function LandingHero01(props: Record<string, any>) {
                 {safeList(props.buttonText)}
               </GoogleAdsConversionLink>
             ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function MobileCtaButton(props: Record<string, any>) {
+  const backgroundColor = safeList(props.backgroundColor);
+  const button1BgColor = safeList(props.button1BgColor) || "#dc2626";
+  const button1TextColor = safeList(props.button1TextColor) || "#ffffff";
+  const button2BgColor = safeList(props.button2BgColor) || "rgba(148,163,184,0.35)";
+  const button2TextColor = safeList(props.button2TextColor) || "#ffffff";
+  const button2BorderColor = safeList(props.button2BorderColor) || "#bae6fd";
+
+  return (
+    <section
+      className="py-3 md:hidden"
+      style={backgroundColor ? { backgroundColor } : undefined}
+    >
+      <div className="mx-auto w-full max-w-6xl px-3">
+        <div className="grid grid-cols-[1.15fr_1fr] gap-2.5">
+          <a
+            href={safeList(props.button1Href) || "#"}
+            className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full px-3 py-3 text-[13px] font-semibold leading-none shadow-lg shadow-black/30 transition"
+            style={{ backgroundColor: button1BgColor, color: button1TextColor }}
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 5.5A2.5 2.5 0 015.5 3h2A2.5 2.5 0 0110 5.5V7a2 2 0 01-2 2h-.5a12.5 12.5 0 007.5 7.5V16a2 2 0 012-2h1.5A2.5 2.5 0 0121 16.5v2a2.5 2.5 0 01-2.5 2.5C10.492 21 3 13.508 3 4.5v1z" />
+            </svg>
+            <span className="whitespace-nowrap">{safeList(props.button1Text)}</span>
+          </a>
+          <a
+            href={safeList(props.button2Href) || "#"}
+            className="inline-flex min-h-[52px] items-center justify-center rounded-full border px-3 py-3 text-[13px] font-semibold leading-none transition"
+            style={{
+              backgroundColor: button2BgColor,
+              borderColor: button2BorderColor,
+              color: button2TextColor,
+            }}
+          >
+            <span className="whitespace-nowrap">{safeList(props.button2Text)}</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HeroWith2CtaBtn(props: Record<string, any>) {
+  const backgroundImage = resolveImage(props.backgroundImage);
+  const backgroundImageMobile = resolveImage(props.backgroundImageMobile);
+  const desktopHeroImage = backgroundImage || backgroundImageMobile;
+  const mobileHeroImage = backgroundImageMobile || backgroundImage;
+  const overlayOpacity = Math.min(
+    0.85,
+    Math.max(0.2, Number(props.overlayOpacity) || 0.52)
+  );
+  const titleColor = safeList(props.titleColor) || "#ffffff";
+  const titleHighlightColor = safeList(props.titleHighlightColor) || "#fb7185";
+  const subtitleColor = safeList(props.subtitleColor) || "#d1d5db";
+  const descriptionColor = safeList(props.descriptionColor) || "#f3f4f6";
+  const button1BgColor = safeList(props.button1BgColor) || "#dc2626";
+  const button1TextColor = safeList(props.button1TextColor) || "#ffffff";
+  const button2BgColor = safeList(props.button2BgColor) || "rgba(255,255,255,0.20)";
+  const button2TextColor = safeList(props.button2TextColor) || "#ffffff";
+  const button2BorderColor = safeList(props.button2BorderColor) || "#bae6fd";
+  const button1Href = safeList(props.button1Href) || "#";
+  const button2Href = safeList(props.button2Href) || "#";
+  const hideHeadingOnMobile = toBool(props.hideHeadingOnMobile);
+  const hideSubtitleOnMobile = toBool(props.hideSubtitleOnMobile);
+  const hideDescriptionOnMobile = toBool(props.hideDescriptionOnMobile);
+  const hideButton1OnMobile = toBool(props.hideButton1OnMobile);
+  const hideButton2OnMobile = toBool(props.hideButton2OnMobile);
+  const hideButtonsWrapOnMobile = hideButton1OnMobile && hideButton2OnMobile;
+
+  return (
+    <section className="relative aspect-square min-h-[320px] overflow-hidden sm:aspect-auto sm:min-h-[460px] lg:min-h-[620px]">
+      {mobileHeroImage ? (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center md:hidden"
+            style={{ backgroundImage: `url(${mobileHeroImage})` }}
+          />
+          <div
+            className="absolute inset-0 hidden bg-cover bg-center md:block"
+            style={{ backgroundImage: `url(${desktopHeroImage})` }}
+          />
+        </>
+      ) : desktopHeroImage ? (
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${desktopHeroImage})` }}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-slate-800" />
+      )}
+
+      <div className="absolute inset-0 bg-black" style={{ opacity: overlayOpacity }} />
+
+      <div className="relative z-10 mx-auto flex h-full min-h-[320px] w-full max-w-6xl flex-col justify-start px-4 py-8 sm:min-h-[460px] sm:px-6 sm:py-14 lg:min-h-[620px] lg:px-8 lg:py-16">
+        <div className="max-w-[860px] space-y-2 sm:space-y-4 lg:text-left">
+          <h1
+            className={`${hideHeadingOnMobile ? "hidden md:block" : ""} whitespace-pre-line text-[2rem] font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl`}
+            style={{ color: titleColor }}
+          >
+            {safeList(props.title)}
+          </h1>
+          <p
+            className={`${hideHeadingOnMobile ? "hidden md:block" : ""} whitespace-pre-line text-[2rem] font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl`}
+            style={{ color: titleHighlightColor }}
+          >
+            {safeList(props.titleHighlight)}
+          </p>
+          <p
+            className={`${hideSubtitleOnMobile ? "hidden md:block" : ""} whitespace-pre-line text-xs sm:text-xl`}
+            style={{ color: subtitleColor }}
+          >
+            {safeList(props.subtitle)}
+          </p>
+          <p
+            className={`${hideDescriptionOnMobile ? "hidden md:block" : ""} whitespace-pre-line text-base font-semibold leading-snug sm:text-3xl`}
+            style={{ color: descriptionColor }}
+          >
+            {safeList(props.description)}
+          </p>
+
+          <div
+            className={`${hideButtonsWrapOnMobile ? "hidden md:flex" : "flex"} flex-col gap-3 pt-2 sm:flex-row sm:items-center lg:justify-start`}
+          >
+            <a
+              href={button1Href}
+              className={`${hideButton1OnMobile ? "hidden md:inline-flex" : "inline-flex"} w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-lg shadow-black/30 transition sm:w-auto`}
+              style={{ backgroundColor: button1BgColor, color: button1TextColor }}
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5.5A2.5 2.5 0 015.5 3h2A2.5 2.5 0 0110 5.5V7a2 2 0 01-2 2h-.5a12.5 12.5 0 007.5 7.5V16a2 2 0 012-2h1.5A2.5 2.5 0 0121 16.5v2a2.5 2.5 0 01-2.5 2.5C10.492 21 3 13.508 3 4.5v1z" />
+              </svg>
+              {safeList(props.button1Text)}
+            </a>
+            <a
+              href={button2Href}
+              className={`${hideButton2OnMobile ? "hidden md:inline-flex" : "inline-flex"} w-full items-center justify-center rounded-full border px-6 py-3 text-sm font-semibold backdrop-blur transition sm:w-auto`}
+              style={{
+                backgroundColor: button2BgColor,
+                borderColor: button2BorderColor,
+                color: button2TextColor,
+              }}
+            >
+              {safeList(props.button2Text)}
+            </a>
           </div>
         </div>
       </div>

@@ -138,8 +138,8 @@ export default function NavbarWithI18n({
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white text-black">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 lg:px-6 lg:py-4">
-        <div className="flex items-center gap-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-center lg:gap-6 lg:px-6 lg:py-4">
+        <div className="flex items-center gap-3 lg:justify-self-start">
           <button
             type="button"
             className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 lg:hidden"
@@ -189,10 +189,13 @@ export default function NavbarWithI18n({
             )}
           </div>
         </div>
-        <div className="hidden flex-wrap items-center gap-4 text-sm lg:flex">
+        <div className="hidden items-center gap-4 text-sm lg:flex lg:justify-self-center">
           {items.map((item) => (
             <NavDropdownItem key={item.id} item={item} locale={locale} />
           ))}
+        </div>
+
+        <div className="hidden items-center gap-3 lg:flex lg:justify-self-end">
           <div className="relative">
             <button
               type="button"
