@@ -414,7 +414,7 @@ function HeroWith2CtaBtn(props: Record<string, any>) {
         <div className="absolute inset-0 bg-slate-800" />
       )}
 
-      <div className="absolute inset-0 bg-black" style={{ opacity: overlayOpacity }} />
+      <div className="absolute inset-0 hidden bg-black md:block" style={{ opacity: overlayOpacity }} />
 
       <div className="relative z-10 mx-auto flex h-full min-h-[320px] w-full max-w-6xl flex-col justify-start px-4 py-8 sm:min-h-[460px] sm:px-6 sm:py-14 lg:min-h-[620px] lg:px-8 lg:py-16">
         <div className="max-w-[860px] space-y-2 sm:space-y-4 lg:text-left">
@@ -1418,28 +1418,28 @@ function GrandEvents(props: Record<string, any>) {
   const ctaBackground = safeList(props.ctaBackground) || "#6b6f2d";
   const ctaTextColor = safeList(props.ctaTextColor) || "#ffffff";
   return (
-    <section className="py-10 md:py-16" style={backgroundStyle}>
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+    <section className="py-8 sm:py-10 md:py-16" style={backgroundStyle}>
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:gap-8 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-10">
         <div className="space-y-4">
-          <h2 className="text-3xl font-semibold text-[var(--brand-navy)] whitespace-pre-line">
+          <h2 className="whitespace-pre-line text-2xl font-semibold leading-tight text-[var(--brand-navy)] sm:text-3xl">
             {safeList(props.heading)}
           </h2>
-          <p className="text-sm text-slate-700 whitespace-pre-line">
+          <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700 sm:text-base">
             {safeList(props.description)}
           </p>
           {safeList(props.ctaText) && (
             <a
               href={safeList(props.ctaHref) || "#"}
-              className="inline-flex rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-wide shadow-lg shadow-slate-900/10"
+              className="inline-flex w-full justify-center rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-wide shadow-lg shadow-slate-900/10 sm:w-auto"
               style={{ backgroundColor: ctaBackground, color: ctaTextColor }}
             >
               {safeList(props.ctaText)}
             </a>
           )}
         </div>
-        <div className="grid grid-cols-[1fr_0.9fr] grid-rows-2 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_0.9fr] sm:grid-rows-2 sm:gap-4">
           <div className="overflow-hidden rounded-3xl bg-white shadow-lg shadow-slate-900/10">
-            <div className="h-48 w-full overflow-hidden">
+            <div className="h-44 w-full overflow-hidden sm:h-48">
               {props.imageTop ? (
                 <img
                   src={resolveImage(props.imageTop)}
@@ -1454,8 +1454,8 @@ function GrandEvents(props: Record<string, any>) {
               )}
             </div>
           </div>
-          <div className="row-span-2 overflow-hidden rounded-3xl bg-white shadow-lg shadow-slate-900/10">
-            <div className="h-full min-h-[240px] w-full overflow-hidden">
+          <div className="overflow-hidden rounded-3xl bg-white shadow-lg shadow-slate-900/10 sm:row-span-2">
+            <div className="h-full min-h-[220px] w-full overflow-hidden sm:min-h-[240px]">
               {props.imageSide ? (
                 <img
                   src={resolveImage(props.imageSide)}
@@ -1471,7 +1471,7 @@ function GrandEvents(props: Record<string, any>) {
             </div>
           </div>
           <div className="overflow-hidden rounded-3xl bg-white shadow-lg shadow-slate-900/10">
-            <div className="h-48 w-full overflow-hidden">
+            <div className="h-44 w-full overflow-hidden sm:h-48">
               {props.imageBottom ? (
                 <img
                   src={resolveImage(props.imageBottom)}

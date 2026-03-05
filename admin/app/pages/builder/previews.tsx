@@ -2740,19 +2740,19 @@ export function LivePreview({
       const ctaTextColor = safeText(props.ctaTextColor) || "#ffffff";
       return wrap(
         <section
-          className="py-16"
+          className="py-8 sm:py-10 md:py-16"
           style={backgroundColor ? { backgroundColor } : undefined}
         >
-          <div className="mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:gap-8 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-10">
             <div className="space-y-4">
-              <h2 className="text-3xl font-semibold text-[var(--brand-navy)]">
+              <h2 className="text-2xl font-semibold leading-tight text-[var(--brand-navy)] sm:text-3xl">
                 <EditableText
                   value={safeText(props.heading)}
                   onCommit={(value) => onUpdateBlock(index, { heading: value })}
                   className="text-[var(--brand-navy)]"
                 />
               </h2>
-              <p className="text-sm text-slate-700">
+              <p className="text-sm leading-relaxed text-slate-700 sm:text-base">
                 <EditableText
                   value={safeText(props.description)}
                   onCommit={(value) =>
@@ -2763,7 +2763,7 @@ export function LivePreview({
                 />
               </p>
               <span
-                className="inline-flex rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-wide shadow-lg shadow-slate-900/10"
+                className="inline-flex w-full justify-center rounded-full px-6 py-3 text-xs font-semibold uppercase tracking-wide shadow-lg shadow-slate-900/10 sm:w-auto"
                 style={{ backgroundColor: ctaBackground, color: ctaTextColor }}
               >
                 <EditableText
@@ -2773,9 +2773,9 @@ export function LivePreview({
                 />
               </span>
             </div>
-            <div className="grid grid-cols-[1fr_0.9fr] grid-rows-2 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_0.9fr] sm:grid-rows-2 sm:gap-4">
               <div className="overflow-hidden rounded-3xl bg-white shadow-lg shadow-slate-900/10">
-                <div className="h-48 w-full overflow-hidden">
+                <div className="h-44 w-full overflow-hidden sm:h-48">
                   {props.imageTop ? (
                     <img
                       src={resolvePreviewImage(props.imageTop)}
@@ -2789,8 +2789,8 @@ export function LivePreview({
                   )}
                 </div>
               </div>
-              <div className="row-span-2 overflow-hidden rounded-3xl bg-white shadow-lg shadow-slate-900/10">
-                <div className="h-full min-h-[240px] w-full overflow-hidden">
+              <div className="overflow-hidden rounded-3xl bg-white shadow-lg shadow-slate-900/10 sm:row-span-2">
+                <div className="h-full min-h-[220px] w-full overflow-hidden sm:min-h-[240px]">
                   {props.imageSide ? (
                     <img
                       src={resolvePreviewImage(props.imageSide)}
@@ -2805,7 +2805,7 @@ export function LivePreview({
                 </div>
               </div>
               <div className="overflow-hidden rounded-3xl bg-white shadow-lg shadow-slate-900/10">
-                <div className="h-48 w-full overflow-hidden">
+                <div className="h-44 w-full overflow-hidden sm:h-48">
                   {props.imageBottom ? (
                     <img
                       src={resolvePreviewImage(props.imageBottom)}

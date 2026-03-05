@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Prompt } from "next/font/google";
 import "../globals.css";
 import { frontendBaseUrl } from "@/lib/urls";
 import { NextIntlClientProvider } from 'next-intl';
@@ -9,9 +9,10 @@ import { locales } from '@/i18n';
 import CookieConsent from "../components/CookieConsent";
 import PerformanceTracker from "../components/PerformanceTracker";
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
+const prompt = Prompt({
+  variable: "--font-prompt",
+  subsets: ["latin", "thai"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -78,7 +79,7 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <div className={`${montserrat.variable} antialiased`}>
+    <div className={`${prompt.variable} ${prompt.className} antialiased`}>
       <NextIntlClientProvider messages={messages}>
         {children}
         <CookieConsent />
