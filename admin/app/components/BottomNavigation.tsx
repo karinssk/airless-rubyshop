@@ -57,11 +57,15 @@ const navItems: NavItem[] = [
 
 export default function BottomNavigation() {
   const pathname = usePathname();
+  const hiddenNavIds = new Set(["rooms", "chat", "calendar", "bookings"]);
+  const visibleNavItems = navItems.filter((item) => !hiddenNavIds.has(item.id));
+
+  if (visibleNavItems.length === 0) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 px-2 py-2 sm:hidden shadow-lg">
       <nav className="flex items-center justify-around max-w-md mx-auto">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
 
           return (

@@ -43,8 +43,12 @@ router.post("/stats/messenger-click", async (req, res) => {
   }
 });
 
-router.get("/stats/messenger-clicks", requireAdmin, async (_req, res) => {
+router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
   try {
+    const page = Math.max(1, Number(req.query?.page) || 1);
+    const limit = Math.min(500, Math.max(1, Number(req.query?.limit) || 50));
+    const skip = (page - 1) * limit;
+
     const totalClicks = await MessengerClick.countDocuments();
 
     const todayStart = new Date();
@@ -67,12 +71,25 @@ router.get("/stats/messenger-clicks", requireAdmin, async (_req, res) => {
       { $project: { _id: 0, date: "$_id", count: 1 } },
     ]);
 
-    const recentClicks = await MessengerClick.find()
+    const clickLogs = await MessengerClick.find()
       .sort({ createdAt: -1 })
-      .limit(20)
+      .skip(skip)
+      .limit(limit)
       .lean();
 
-    res.json({ ok: true, totalClicks, todayClicks, last30Days, recentClicks });
+    const totalPages = Math.max(1, Math.ceil(totalClicks / limit));
+
+    res.json({
+      ok: true,
+      totalClicks,
+      todayClicks,
+      last30Days,
+      clickLogs,
+      recentClicks: clickLogs,
+      page,
+      limit,
+      totalPages,
+    });
   } catch (error) {
     console.error("Failed to fetch messenger click stats", error);
     res.status(500).json({ ok: false, error: "Failed to fetch stats" });

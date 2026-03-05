@@ -22,6 +22,35 @@ type AdminProfile = {
   color?: string;
 };
 
+const hiddenNavigationIds = new Set([
+  "rooms",
+  "chat",
+  "calendar",
+  "calendar-custom",
+  "bookings",
+]);
+
+const hiddenNavigationLabels = new Set(["rooms", "inbox", "chat", "calendar", "bookings"]);
+
+const hiddenNavigationHrefs = [
+  "/rooms",
+  "/chat",
+  "/calendar-reservation",
+  "/calendar-embedded",
+  "/calendar-customize",
+  "/bookings",
+];
+
+const shouldHideNavigationItem = (item: MenuItem) => {
+  if (hiddenNavigationIds.has(item.id)) return true;
+  if (hiddenNavigationLabels.has(item.label.trim().toLowerCase())) return true;
+  if (!item.href) return false;
+  return hiddenNavigationHrefs.some(
+    (hiddenHref) =>
+      item.href === hiddenHref || item.href.startsWith(`${hiddenHref}/`)
+  );
+};
+
 const fallbackAdminMenu: MenuItem[] = [
   { id: "overview", label: "Overview", href: "/", permission: "everyone" },
   { id: "pages", label: "Pages", href: "/pages", permission: "everyone" },
@@ -175,6 +204,7 @@ export default function AdminSidebar() {
     const filterItems = (items: MenuItem[]): MenuItem[] =>
       items
         .map((item) => {
+          if (shouldHideNavigationItem(item)) return null;
           const permission = item.permission || "everyone";
           if (permission === "owner-only" && !isOwner) return null;
           const children = item.children ? filterItems(item.children) : [];
