@@ -114,7 +114,7 @@ export function PageEditorPane({
   };
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-3">
       <PageHeader
         title={currentTitle}
         slug={page.slug}

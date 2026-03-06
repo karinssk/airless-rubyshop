@@ -18,8 +18,8 @@ export function PageHeader({
   onDelete,
 }: PageHeaderProps) {
   return (
-    <header className="rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <header className="rounded-2xl border border-slate-200 bg-slate-50 p-3 shadow-sm">
+      <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Page Settings

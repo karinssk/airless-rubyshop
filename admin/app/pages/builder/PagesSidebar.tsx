@@ -16,8 +16,8 @@ export function PagesSidebar({
   onCreatePage,
 }: PagesSidebarProps) {
   return (
-    <aside className="rounded-3xl border border-slate-200 bg-white p-6 shadow">
-      <div className="flex items-center justify-between mb-4">
+    <aside className="rounded-3xl border border-slate-200 bg-white p-3 shadow">
+      <div className="mb-2 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-slate-800">Pages</h2>
         <button
           onClick={onCreatePage}
@@ -28,19 +28,19 @@ export function PagesSidebar({
       </div>
       
       {pages.length === 0 ? (
-        <p className="text-xs text-slate-400 text-center py-8">No pages yet.</p>
+        <p className="py-6 text-center text-xs text-slate-400">No pages yet.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200">
-                <th className="text-left py-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-2 py-1.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Title
                 </th>
-                <th className="text-left py-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-2 py-1.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Slug
                 </th>
-                <th className="text-center py-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <th className="px-2 py-1.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Status
                 </th>
               </tr>
@@ -56,17 +56,17 @@ export function PagesSidebar({
                       : "hover:bg-slate-50"
                   }`}
                 >
-                  <td className="py-3 px-2">
+                  <td className="px-2 py-2 align-top">
                     <p className={`font-semibold ${
                       activePageId === page.id ? "text-blue-700" : "text-slate-700"
                     }`}>
                       {page.title}
                     </p>
                   </td>
-                  <td className="py-3 px-2">
+                  <td className="px-2 py-2 align-top">
                     <p className="text-xs text-slate-500">/{page.slug}</p>
                   </td>
-                  <td className="py-3 px-2 text-center">
+                  <td className="px-2 py-2 text-center align-top">
                     <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
                       page.status === "published"
                         ? "bg-emerald-100 text-emerald-700"

@@ -43,6 +43,9 @@ const botAssessmentSchema = new mongoose.Schema(
 
 const messengerClickSchema = new mongoose.Schema(
   {
+    source: { type: String, default: "messenger-floating-button" },
+    label: { type: String, default: "" },
+    targetHref: { type: String, default: "" },
     ip: { type: String, default: "" },
     userAgent: { type: String, default: "" },
     referrer: { type: String, default: "" },

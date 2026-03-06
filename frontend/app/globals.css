@@ -56,3 +56,11 @@ body {
   max-width: 100%;
   height: auto;
 }
+
+.page-builder-scope section,
+.page-builder-scope header {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}

@@ -2836,6 +2836,10 @@ export function LivePreview({
           <div className="mx-auto flex max-w-6xl flex-col gap-12 px-6">
             {items.map((item, itemIndex) => {
               const imageFirst = itemIndex % 2 === 1;
+              const descriptionLines = safeText(item.description)
+                .split(/\r?\n/)
+                .map((line) => line.trim())
+                .filter(Boolean);
               return (
                 <div
                   key={`${item.title}-${itemIndex}`}
@@ -2852,18 +2856,32 @@ export function LivePreview({
                           className="text-[var(--brand-navy)]"
                         />
                       </h3>
-                      <p className="text-sm text-slate-600">
-                        <EditableText
-                          value={safeText(item.description)}
-                          onCommit={(value) =>
-                            updateItem("items", itemIndex, {
-                              description: value,
-                            })
-                          }
-                          className="text-slate-600"
-                          multiline
-                        />
-                      </p>
+                      <div className="space-y-2 break-words text-slate-600">
+                        {(descriptionLines.length > 0 ? descriptionLines : [""]).map(
+                          (line, lineIndex) => (
+                            <p
+                              key={`${item.title}-desc-${lineIndex}`}
+                              className="text-sm leading-relaxed md:text-base"
+                            >
+                              <EditableText
+                                value={line}
+                                onCommit={(value) => {
+                                  const nextLines = (
+                                    descriptionLines.length > 0
+                                      ? [...descriptionLines]
+                                      : [""]
+                                  ).map((entry) => entry.trim());
+                                  nextLines[lineIndex] = value.trim();
+                                  updateItem("items", itemIndex, {
+                                    description: nextLines.filter(Boolean).join("\n"),
+                                  });
+                                }}
+                                className="text-slate-600"
+                              />
+                            </p>
+                          )
+                        )}
+                      </div>
                       <div className="flex items-center gap-2 text-sm font-semibold text-[var(--brand-orange)]">
                         <EditableText
                           value={safeText(item.ctaText)}
@@ -3845,6 +3863,13 @@ export function LivePreview({
           --brand-navy: #111111;
           --brand-yellow: #111111;
           --brand-orange: #111111;
+        }
+        .preview-scope section,
+        .preview-scope header {
+          margin-top: 0 !important;
+          margin-bottom: 0 !important;
+          padding-top: 0.5rem !important;
+          padding-bottom: 0.5rem !important;
         }
         .preview-scope [class*="text-white"] {
           color: #111111 !important;

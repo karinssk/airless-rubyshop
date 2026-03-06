@@ -70,14 +70,14 @@ export function PageSettingsPanel({
 
   return (
     <>
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="mb-4">
+      <section className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="mb-2">
           <h3 className="text-sm font-semibold text-slate-800">Page Details</h3>
           <p className="text-xs text-slate-500">
             ตั้งค่าชื่อหน้า, slug และสถานะการเผยแพร่
           </p>
         </div>
-        <div className="grid gap-4 text-sm text-slate-700 lg:grid-cols-3">
+        <div className="grid gap-2 text-sm text-slate-700 lg:grid-cols-3">
           <label className="grid gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               Title
@@ -114,14 +114,14 @@ export function PageSettingsPanel({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="mb-4">
+      <section className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div className="mb-2">
           <h3 className="text-sm font-semibold text-slate-800">SEO Settings</h3>
           <p className="text-xs text-slate-500">
             ข้อมูลสำหรับผลการค้นหาและการแชร์ลิงก์
           </p>
         </div>
-        <div className="mb-4 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600 sm:grid-cols-2">
+        <div className="mb-2 grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600 sm:grid-cols-2">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="font-semibold text-slate-700">SEO Title</p>
@@ -161,7 +161,7 @@ export function PageSettingsPanel({
             </span>
           </div>
         </div>
-        <div className="grid gap-4 text-sm text-slate-700">
+        <div className="grid gap-2 text-sm text-slate-700">
           <label className="grid gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               SEO Title
@@ -182,7 +182,7 @@ export function PageSettingsPanel({
               onChange={(event) => onSeoDescriptionChange(event.target.value)}
             />
           </label>
-          <div className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Social Share Image (OG Image)

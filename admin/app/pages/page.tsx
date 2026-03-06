@@ -336,8 +336,8 @@ export default function PagesBuilder() {
   };
 
   return (
-    <div>
-      <div className="mb-4 flex items-center gap-3">
+    <div className="w-full">
+      <div className="mb-2 flex items-center gap-3">
         <button
           type="button"
           onClick={handleBack}
@@ -349,7 +349,7 @@ export default function PagesBuilder() {
         <h1 className="text-sm font-semibold text-slate-700">Pages</h1>
       </div>
       {backendMissing && (
-        <div className="mx-auto mb-4 max-w-6xl rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
+        <div className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
           Backend URL ไม่พร้อมใช้งาน: ตั้งค่า{" "}
           <span className="font-semibold">
             NEXT_PUBLIC_BACKEND_DEVELOPMENT_URL
@@ -358,7 +358,7 @@ export default function PagesBuilder() {
           admin server
         </div>
       )}
-      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[300px_1fr]">
+      <div className="grid w-full gap-3 xl:grid-cols-[280px_minmax(0,1fr)]">
         <PagesSidebar
           pages={pages}
           activePageId={activePage?.id}
@@ -366,7 +366,7 @@ export default function PagesBuilder() {
           onCreatePage={createPage}
         />
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow">
+        <section className="rounded-3xl border border-slate-200 bg-white p-3 shadow">
           {!activePage ? (
             <p className="text-sm text-slate-500">
               เลือกหน้าเพื่อแก้ไข หรือสร้างหน้าใหม่

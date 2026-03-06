@@ -6,6 +6,7 @@ import { getAdminAuthHeaders } from "@/lib/auth";
 
 type DeviceFilter = "all" | "iphone" | "android" | "pc" | "linux" | "mac";
 type DateRangeFilter = "all" | "today" | "7d" | "30d" | "custom";
+type SourceFilter = "all" | "messenger" | "hero" | "promotion" | "other";
 
 const deviceLabels: Record<DeviceFilter, string> = {
   all: "All",
@@ -24,6 +25,14 @@ const dateRangeLabels: Record<DateRangeFilter, string> = {
   custom: "Custom",
 };
 
+const sourceLabels: Record<SourceFilter, string> = {
+  all: "All Sources",
+  messenger: "Messenger",
+  hero: "Hero CTA",
+  promotion: "Promotion CTA",
+  other: "Other",
+};
+
 type VisitorStats = {
   totalViews: number;
   totalVisitors: number;
@@ -40,6 +49,8 @@ type MessengerStats = {
   dailyBreakdown: DailyCount[];
   hourlyBreakdown: HourlyCount[];
   deviceBreakdown: Record<string, number>;
+  sourceBreakdown: Record<string, number>;
+  todaySourceBreakdown: Record<string, number>;
   botBreakdown: BotBreakdown;
   botLevelBreakdown: BotLevelBreakdown;
   weekdayBreakdown: WeekdayCount[];
@@ -74,6 +85,10 @@ type BotLevelBreakdown = {
 
 type MessengerClickLog = {
   _id: string;
+  source?: string;
+  sourceBucket?: string;
+  label?: string;
+  targetHref?: string;
   ip: string;
   userAgent: string;
   referrer: string;
@@ -127,6 +142,15 @@ const deviceColors: Record<DeviceFilter, string> = {
   mac: "#ef4444",
 };
 
+const normalizeSourceBucket = (value?: string): SourceFilter => {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "messenger") return "messenger";
+  if (normalized === "hero") return "hero";
+  if (normalized === "promotion") return "promotion";
+  if (normalized === "other") return "other";
+  return "messenger";
+};
+
 export default function Dashboard() {
   const [stats, setStats] = useState<VisitorStats>({
     totalViews: 0,
@@ -143,6 +167,8 @@ export default function Dashboard() {
     dailyBreakdown: [],
     hourlyBreakdown: [],
     deviceBreakdown: { all: 0, iphone: 0, android: 0, pc: 0, linux: 0, mac: 0 },
+    sourceBreakdown: { all: 0, messenger: 0, hero: 0, promotion: 0, other: 0 },
+    todaySourceBreakdown: { all: 0, messenger: 0, hero: 0, promotion: 0, other: 0 },
     botBreakdown: { suspected: 0, human: 0 },
     botLevelBreakdown: { low: 0, medium: 0, high: 0 },
     weekdayBreakdown: [],
@@ -150,6 +176,7 @@ export default function Dashboard() {
   const [logsPage, setLogsPage] = useState(1);
   const [isLogsLoading, setIsLogsLoading] = useState(false);
   const [deviceFilter, setDeviceFilter] = useState<DeviceFilter>("all");
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
   const [dateRangeFilter, setDateRangeFilter] = useState<DateRangeFilter>("all");
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
@@ -184,6 +211,7 @@ export default function Dashboard() {
           page: String(logsPage),
           limit: "50",
           device: deviceFilter,
+          source: sourceFilter,
           dateRange: dateRangeFilter,
         });
         if (dateRangeFilter === "custom") {
@@ -215,6 +243,14 @@ export default function Dashboard() {
               typeof data.deviceBreakdown === "object" && data.deviceBreakdown
                 ? data.deviceBreakdown
                 : { all: 0, iphone: 0, android: 0, pc: 0, linux: 0, mac: 0 },
+            sourceBreakdown:
+              typeof data.sourceBreakdown === "object" && data.sourceBreakdown
+                ? data.sourceBreakdown
+                : { all: 0, messenger: 0, hero: 0, promotion: 0, other: 0 },
+            todaySourceBreakdown:
+              typeof data.todaySourceBreakdown === "object" && data.todaySourceBreakdown
+                ? data.todaySourceBreakdown
+                : { all: 0, messenger: 0, hero: 0, promotion: 0, other: 0 },
             botBreakdown:
               typeof data.botBreakdown === "object" && data.botBreakdown
                 ? data.botBreakdown
@@ -235,7 +271,7 @@ export default function Dashboard() {
       }
     };
     fetchMessengerStats();
-  }, [logsPage, deviceFilter, dateRangeFilter, customStartDate, customEndDate]);
+  }, [logsPage, deviceFilter, sourceFilter, dateRangeFilter, customStartDate, customEndDate]);
 
   const trendChart = useMemo(() => {
     const data = messengerStats.dailyBreakdown;
@@ -372,7 +408,7 @@ export default function Dashboard() {
         <p className="text-slate-500 mt-1">Welcome back to RUBYSHOP Panel</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-6">
         <div className="flex items-center justify-between rounded-3xl border border-slate-200 bg-white px-6 py-4 shadow-sm">
           <div>
             <p className="text-sm text-slate-500">หน้าที่เข้าชม</p>
@@ -395,19 +431,46 @@ export default function Dashboard() {
           <div>
             <p className="text-sm text-blue-600">Messenger คลิก</p>
             <p className="mt-1 text-2xl font-semibold text-slate-900">
-              {messengerStats.totalClicks.toLocaleString()} ครั้ง
+              {Number(messengerStats.sourceBreakdown.messenger || 0).toLocaleString()} ครั้ง
+            </p>
+            <p className="mt-1 text-xs text-blue-500">
+              Today: {Number(messengerStats.todaySourceBreakdown.messenger || 0).toLocaleString()}
             </p>
           </div>
-          <span className="text-xs text-blue-400">All Time</span>
+          <span className="text-xs text-blue-400">Messenger</span>
         </div>
         <div className="flex items-center justify-between rounded-3xl border border-blue-100 bg-blue-50/50 px-6 py-4 shadow-sm">
           <div>
-            <p className="text-sm text-blue-600">Messenger วันนี้</p>
+            <p className="text-sm text-indigo-600">Hero CTA คลิก</p>
+            <p className="mt-1 text-2xl font-semibold text-slate-900">
+              {Number(messengerStats.sourceBreakdown.hero || 0).toLocaleString()} ครั้ง
+            </p>
+            <p className="mt-1 text-xs text-indigo-500">
+              Today: {Number(messengerStats.todaySourceBreakdown.hero || 0).toLocaleString()}
+            </p>
+          </div>
+          <span className="text-xs text-indigo-400">hero-with-2-cta-btn</span>
+        </div>
+        <div className="flex items-center justify-between rounded-3xl border border-rose-100 bg-rose-50/50 px-6 py-4 shadow-sm">
+          <div>
+            <p className="text-sm text-rose-600">Promotion CTA คลิก</p>
+            <p className="mt-1 text-2xl font-semibold text-slate-900">
+              {Number(messengerStats.sourceBreakdown.promotion || 0).toLocaleString()} ครั้ง
+            </p>
+            <p className="mt-1 text-xs text-rose-500">
+              Today: {Number(messengerStats.todaySourceBreakdown.promotion || 0).toLocaleString()}
+            </p>
+          </div>
+          <span className="text-xs text-rose-400">promotion-countdown</span>
+        </div>
+        <div className="flex items-center justify-between rounded-3xl border border-emerald-100 bg-emerald-50/50 px-6 py-4 shadow-sm">
+          <div>
+            <p className="text-sm text-emerald-600">Tracked Clicks วันนี้</p>
             <p className="mt-1 text-2xl font-semibold text-slate-900">
               {messengerStats.todayClicks.toLocaleString()} ครั้ง
             </p>
           </div>
-          <span className="text-xs text-blue-400">Today</span>
+          <span className="text-xs text-emerald-400">All Sources</span>
         </div>
       </div>
 
@@ -614,9 +677,9 @@ export default function Dashboard() {
       <section className="rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Messenger Click Logs</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Tracked Click Logs</h2>
             <p className="text-sm text-slate-500">
-              Track who clicked (IP), when they clicked, and what device they used.
+              Track who clicked (IP), when they clicked, which block they clicked, and what device they used.
             </p>
           </div>
           <div className="text-sm text-slate-600">
@@ -644,6 +707,30 @@ export default function Dashboard() {
                 }`}
               >
                 {deviceLabels[device]} ({Number(messengerStats.deviceBreakdown[device] || 0).toLocaleString()})
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-wrap gap-2 border-b border-slate-100 px-5 py-3 sm:px-6">
+          {(Object.keys(sourceLabels) as SourceFilter[]).map((source) => {
+            const isActive = sourceFilter === source;
+            return (
+              <button
+                key={source}
+                type="button"
+                onClick={() => {
+                  setSourceFilter(source);
+                  setLogsPage(1);
+                  setSelectedLog(null);
+                }}
+                className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                  isActive
+                    ? "border-indigo-200 bg-indigo-50 text-indigo-700"
+                    : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {sourceLabels[source]} ({Number(messengerStats.sourceBreakdown[source] || 0).toLocaleString()})
               </button>
             );
           })}
@@ -701,6 +788,8 @@ export default function Dashboard() {
         <div className="border-b border-slate-100 px-5 py-2 text-sm text-slate-500 sm:px-6">
           Active filter: <span className="font-medium text-slate-700">{deviceLabels[deviceFilter]}</span>
           {" • "}
+          Source: <span className="font-medium text-slate-700">{sourceLabels[sourceFilter]}</span>
+          {" • "}
           Date: <span className="font-medium text-slate-700">{dateRangeLabels[dateRangeFilter]}</span>
           {" • "}
           Click a row to view full detail
@@ -711,6 +800,7 @@ export default function Dashboard() {
             <thead className="bg-slate-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">#</th>
+                <th className="px-4 py-3 text-left font-medium text-slate-600">Source</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Device</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">IP Address</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Timestamp</th>
@@ -722,14 +812,14 @@ export default function Dashboard() {
             <tbody className="divide-y divide-slate-100">
               {isLogsLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
                     Loading logs...
                   </td>
                 </tr>
               ) : messengerStats.clickLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
-                    No messenger click logs found for {deviceLabels[deviceFilter]}.
+                  <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
+                    No tracked click logs found for {deviceLabels[deviceFilter]} / {sourceLabels[sourceFilter]}.
                   </td>
                 </tr>
               ) : (
@@ -741,6 +831,11 @@ export default function Dashboard() {
                   >
                     <td className="px-4 py-3 text-slate-600">
                       {(messengerStats.page - 1) * messengerStats.limit + index + 1}
+                    </td>
+                    <td className="px-4 py-3 text-slate-700">
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                        {sourceLabels[normalizeSourceBucket(log.sourceBucket)]}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-slate-700">{log.device || "-"}</td>
                     <td className="px-4 py-3 font-mono text-xs text-slate-700">
@@ -857,6 +952,14 @@ export default function Dashboard() {
                 <p className="font-mono text-xs">{selectedLog._id}</p>
               </div>
               <div>
+                <p className="text-slate-500">Source</p>
+                <p>{sourceLabels[normalizeSourceBucket(selectedLog.sourceBucket)]}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Source Key</p>
+                <p className="font-mono text-xs break-all">{selectedLog.source || "-"}</p>
+              </div>
+              <div>
                 <p className="text-slate-500">Device</p>
                 <p>{selectedLog.device || "-"}</p>
               </div>
@@ -867,6 +970,14 @@ export default function Dashboard() {
               <div>
                 <p className="text-slate-500">Timestamp</p>
                 <p>{selectedLog.createdAt ? new Date(selectedLog.createdAt).toLocaleString() : "-"}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Click Label</p>
+                <p>{selectedLog.label || "-"}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-slate-500">Target URL</p>
+                <p className="break-all">{selectedLog.targetHref || "-"}</p>
               </div>
               <div className="md:col-span-2">
                 <p className="text-slate-500">Referrer</p>

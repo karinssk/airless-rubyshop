@@ -21,6 +21,14 @@ const supportedDateRangeFilters = new Set([
   "custom",
 ]);
 
+const supportedSourceFilters = new Set([
+  "all",
+  "messenger",
+  "hero",
+  "promotion",
+  "other",
+]);
+
 const normalizeDeviceFilter = (value) => {
   const normalized = String(value || "all").trim().toLowerCase();
   return supportedDeviceFilters.has(normalized) ? normalized : "all";
@@ -29,6 +37,11 @@ const normalizeDeviceFilter = (value) => {
 const normalizeDateRangeFilter = (value) => {
   const normalized = String(value || "all").trim().toLowerCase();
   return supportedDateRangeFilters.has(normalized) ? normalized : "all";
+};
+
+const normalizeSourceFilter = (value) => {
+  const normalized = String(value || "all").trim().toLowerCase();
+  return supportedSourceFilters.has(normalized) ? normalized : "all";
 };
 
 const parseDateInput = (value) => {
@@ -139,6 +152,45 @@ const detectDeviceFromUserAgent = (userAgent) => {
 
 const truncateString = (value, maxLength = 200) =>
   String(value || "").slice(0, maxLength);
+
+const normalizeSourceValue = (value) =>
+  truncateString(value, 120).trim().toLowerCase();
+
+const getSourceBucket = (source) => {
+  const normalized = normalizeSourceValue(source);
+  if (!normalized || normalized.startsWith("messenger")) return "messenger";
+  if (normalized.startsWith("hero-with-2-cta-btn")) return "hero";
+  if (normalized.startsWith("promotion-countdown")) return "promotion";
+  return "other";
+};
+
+const getSourceQuery = (sourceFilter) => {
+  switch (sourceFilter) {
+    case "messenger":
+      return {
+        $or: [
+          { source: { $exists: false } },
+          { source: "" },
+          { source: /^messenger/i },
+        ],
+      };
+    case "hero":
+      return { source: /^hero-with-2-cta-btn/i };
+    case "promotion":
+      return { source: /^promotion-countdown/i };
+    case "other":
+      return {
+        $and: [
+          { source: { $exists: true, $ne: "" } },
+          { source: { $not: /^messenger/i } },
+          { source: { $not: /^hero-with-2-cta-btn/i } },
+          { source: { $not: /^promotion-countdown/i } },
+        ],
+      };
+    default:
+      return {};
+  }
+};
 
 const toSafeNumber = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -270,9 +322,15 @@ router.post("/stats/messenger-click", async (req, res) => {
       "";
     const userAgent = req.headers["user-agent"] || "";
     const referrer = req.body?.referrer || "";
+    const source = normalizeSourceValue(req.body?.source) || "messenger-floating-button";
+    const label = truncateString(req.body?.label, 120);
+    const targetHref = truncateString(req.body?.targetHref, 1000);
     const jsSignals = sanitizeJsSignals(req.body?.jsSignals);
     const botAssessment = assessBotSignals({ userAgent, jsSignals });
     await MessengerClick.create({
+      source,
+      label,
+      targetHref,
       ip,
       userAgent,
       referrer,
@@ -292,6 +350,7 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
     const limit = Math.min(500, Math.max(1, Number(req.query?.limit) || 50));
     const selectedDevice = normalizeDeviceFilter(req.query?.device);
     const selectedDateRange = normalizeDateRangeFilter(req.query?.dateRange);
+    const selectedSource = normalizeSourceFilter(req.query?.source);
     const customStartDate = String(req.query?.startDate || "").trim();
     const customEndDate = String(req.query?.endDate || "").trim();
     const skip = (page - 1) * limit;
@@ -301,7 +360,8 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
       customEndDate
     );
     const deviceQuery = getDeviceQuery(selectedDevice);
-    const filterParts = [dateRangeQuery, deviceQuery].filter(
+    const sourceQuery = getSourceQuery(selectedSource);
+    const filterParts = [dateRangeQuery, deviceQuery, sourceQuery].filter(
       (query) => Object.keys(query).length > 0
     );
     const logsFilterQuery =
@@ -386,6 +446,10 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
     const clickLogs = clickLogsRaw.map((log) => ({
       ...log,
       device: detectDeviceFromUserAgent(log.userAgent),
+      source: normalizeSourceValue(log.source) || "messenger-legacy",
+      sourceBucket: getSourceBucket(log.source),
+      label: truncateString(log.label, 120),
+      targetHref: truncateString(log.targetHref, 1000),
     }));
 
     const deviceAggregation = await MessengerClick.aggregate([
@@ -465,6 +529,90 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
     deviceAggregation.forEach((item) => {
       if (item?._id && Object.prototype.hasOwnProperty.call(deviceBreakdown, item._id)) {
         deviceBreakdown[item._id] = Number(item.count || 0);
+      }
+    });
+
+    const sourceProjectStage = {
+      $project: {
+        sourceBucket: {
+          $switch: {
+            branches: [
+              {
+                case: {
+                  $or: [
+                    { $eq: [{ $ifNull: ["$source", ""] }, ""] },
+                    {
+                      $regexMatch: {
+                        input: { $ifNull: ["$source", ""] },
+                        regex: /^messenger/i,
+                      },
+                    },
+                  ],
+                },
+                then: "messenger",
+              },
+              {
+                case: {
+                  $regexMatch: {
+                    input: { $ifNull: ["$source", ""] },
+                    regex: /^hero-with-2-cta-btn/i,
+                  },
+                },
+                then: "hero",
+              },
+              {
+                case: {
+                  $regexMatch: {
+                    input: { $ifNull: ["$source", ""] },
+                    regex: /^promotion-countdown/i,
+                  },
+                },
+                then: "promotion",
+              },
+            ],
+            default: "other",
+          },
+        },
+      },
+    };
+
+    const sourceAggregation = await MessengerClick.aggregate([
+      ...(Object.keys(dateRangeQuery).length > 0 ? [{ $match: dateRangeQuery }] : []),
+      sourceProjectStage,
+      { $group: { _id: "$sourceBucket", count: { $sum: 1 } } },
+    ]);
+
+    const sourceBreakdown = {
+      all: dateFilteredTotalClicks,
+      messenger: 0,
+      hero: 0,
+      promotion: 0,
+      other: 0,
+    };
+
+    sourceAggregation.forEach((item) => {
+      if (item?._id && Object.prototype.hasOwnProperty.call(sourceBreakdown, item._id)) {
+        sourceBreakdown[item._id] = Number(item.count || 0);
+      }
+    });
+
+    const todaySourceAggregation = await MessengerClick.aggregate([
+      { $match: { createdAt: { $gte: todayStart } } },
+      sourceProjectStage,
+      { $group: { _id: "$sourceBucket", count: { $sum: 1 } } },
+    ]);
+
+    const todaySourceBreakdown = {
+      all: todayClicks,
+      messenger: 0,
+      hero: 0,
+      promotion: 0,
+      other: 0,
+    };
+
+    todaySourceAggregation.forEach((item) => {
+      if (item?._id && Object.prototype.hasOwnProperty.call(todaySourceBreakdown, item._id)) {
+        todaySourceBreakdown[item._id] = Number(item.count || 0);
       }
     });
 
@@ -563,11 +711,14 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
       last30Days,
       selectedDevice,
       selectedDateRange,
+      selectedSource,
       customStartDate,
       customEndDate,
       dailyBreakdown,
       hourlyBreakdown,
       deviceBreakdown,
+      sourceBreakdown,
+      todaySourceBreakdown,
       botBreakdown,
       botLevelBreakdown,
       weekdayBreakdown,

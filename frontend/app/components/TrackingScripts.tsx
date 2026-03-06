@@ -63,9 +63,16 @@ export default function TrackingScripts() {
     return () => window.removeEventListener("cookieConsentAccepted", handleConsent);
   }, [isProd]);
 
-  const trackMessengerClick = useCallback(() => {
+  const sendClickEvent = useCallback((payloadInput: {
+    source: string;
+    label?: string;
+    targetHref?: string;
+  }) => {
     if (!backendBaseUrl) return;
     const payload = JSON.stringify({
+      source: payloadInput.source,
+      label: payloadInput.label || "",
+      targetHref: payloadInput.targetHref || "",
       referrer: window.location.href,
       jsSignals: collectJsSignals(),
     });
@@ -83,6 +90,42 @@ export default function TrackingScripts() {
       keepalive: true,
     }).catch(() => {});
   }, []);
+
+  const trackMessengerClick = useCallback(() => {
+    sendClickEvent({
+      source: "messenger-floating-button",
+      label: "floating-messenger",
+      targetHref: `https://m.me/${FB_PAGE_ID}`,
+    });
+  }, [sendClickEvent]);
+
+  useEffect(() => {
+    const handleTrackedClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      const trackedElement = target.closest<HTMLElement>("[data-track-click-source]");
+      if (!trackedElement) return;
+
+      const source = trackedElement.dataset.trackClickSource?.trim();
+      if (!source) return;
+
+      const label = trackedElement.dataset.trackClickLabel?.trim() || "";
+      const explicitHref = trackedElement.dataset.trackClickTarget?.trim() || "";
+      const anchorHref =
+        trackedElement instanceof HTMLAnchorElement
+          ? trackedElement.href || ""
+          : "";
+
+      sendClickEvent({
+        source,
+        label,
+        targetHref: explicitHref || anchorHref,
+      });
+    };
+
+    document.addEventListener("click", handleTrackedClick);
+    return () => document.removeEventListener("click", handleTrackedClick);
+  }, [sendClickEvent]);
 
   return (
     <>

@@ -152,7 +152,7 @@ export default function PageRenderer({ page }: { page: Page }) {
   const background = page.theme?.background;
   return (
     <div
-      className="min-h-screen text-slate-900"
+      className="page-builder-scope min-h-screen text-slate-900"
       style={background ? { background } : undefined}
     >
       {page.layout.map((block, index) => {
@@ -448,6 +448,9 @@ function HeroWith2CtaBtn(props: Record<string, any>) {
           >
             <a
               href={button1Href}
+              data-track-click-source="hero-with-2-cta-btn"
+              data-track-click-label="button1"
+              data-track-click-target={button1Href}
               className={`${hideButton1OnMobile ? "hidden md:inline-flex" : "inline-flex"} w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-lg shadow-black/30 transition sm:w-auto`}
               style={{ backgroundColor: button1BgColor, color: button1TextColor }}
             >
@@ -458,6 +461,9 @@ function HeroWith2CtaBtn(props: Record<string, any>) {
             </a>
             <a
               href={button2Href}
+              data-track-click-source="hero-with-2-cta-btn"
+              data-track-click-label="button2"
+              data-track-click-target={button2Href}
               className={`${hideButton2OnMobile ? "hidden md:inline-flex" : "inline-flex"} w-full items-center justify-center rounded-full border px-6 py-3 text-sm font-semibold backdrop-blur transition sm:w-auto`}
               style={{
                 backgroundColor: button2BgColor,
@@ -1512,12 +1518,23 @@ function WellnessFacilities(props: Record<string, any>) {
                   <h3 className="text-3xl font-semibold text-[var(--brand-navy)] font-serif">
                     {safeList(item.title)}
                   </h3>
-                  <p className="text-sm text-slate-600 whitespace-pre-line">
-                    {safeList(item.description)}
-                  </p>
+                  <div className="space-y-2 break-words text-slate-600">
+                    {safeList(item.description)
+                      .split(/\r?\n/)
+                      .map((line) => line.trim())
+                      .filter(Boolean)
+                      .map((line, lineIndex) => (
+                        <p
+                          key={`${safeList(item.title)}-${lineIndex}`}
+                          className="text-sm leading-relaxed md:text-base"
+                        >
+                          {line}
+                        </p>
+                      ))}
+                  </div>
                   <a
                     href={safeList(item.ctaHref) || "#"}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--brand-orange)]"
+                    className="inline-flex items-center gap-2 pt-1 text-sm font-semibold text-[var(--brand-orange)]"
                   >
                     {safeList(item.ctaText) || "See More"}
                     <span aria-hidden="true">›</span>
