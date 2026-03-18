@@ -85,10 +85,17 @@ type BotLevelBreakdown = {
 
 type MessengerClickLog = {
   _id: string;
+  eventType?: string;
   source?: string;
   sourceBucket?: string;
   label?: string;
   targetHref?: string;
+  visitorId?: string;
+  sessionId?: string;
+  durationMs?: number;
+  sessionStartedAt?: string | null;
+  sessionEndedAt?: string | null;
+  endReason?: string;
   ip: string;
   userAgent: string;
   referrer: string;
@@ -149,6 +156,16 @@ const normalizeSourceBucket = (value?: string): SourceFilter => {
   if (normalized === "promotion") return "promotion";
   if (normalized === "other") return "other";
   return "messenger";
+};
+
+const formatDuration = (value?: number) => {
+  const totalSeconds = Math.max(0, Math.floor(Number(value || 0) / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+  if (minutes > 0) return `${minutes}m ${seconds}s`;
+  return `${seconds}s`;
 };
 
 export default function Dashboard() {
@@ -802,6 +819,8 @@ export default function Dashboard() {
                 <th className="px-4 py-3 text-left font-medium text-slate-600">#</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Source</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Device</th>
+                <th className="px-4 py-3 text-left font-medium text-slate-600">Visitor</th>
+                <th className="px-4 py-3 text-left font-medium text-slate-600">Duration</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">IP Address</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Timestamp</th>
                 <th className="px-4 py-3 text-left font-medium text-slate-600">Warning</th>
@@ -812,13 +831,13 @@ export default function Dashboard() {
             <tbody className="divide-y divide-slate-100">
               {isLogsLoading ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={10} className="px-4 py-8 text-center text-slate-500">
                     Loading logs...
                   </td>
                 </tr>
               ) : messengerStats.clickLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
+                  <td colSpan={10} className="px-4 py-8 text-center text-slate-500">
                     No tracked click logs found for {deviceLabels[deviceFilter]} / {sourceLabels[sourceFilter]}.
                   </td>
                 </tr>
@@ -838,6 +857,12 @@ export default function Dashboard() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-slate-700">{log.device || "-"}</td>
+                    <td className="max-w-[180px] truncate px-4 py-3 font-mono text-xs text-slate-700" title={log.visitorId || "-"}>
+                      {log.visitorId || "-"}
+                    </td>
+                    <td className="px-4 py-3 text-slate-700">
+                      {formatDuration(log.durationMs)}
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs text-slate-700">
                       {log.ip || "-"}
                     </td>
@@ -954,6 +979,38 @@ export default function Dashboard() {
               <div>
                 <p className="text-slate-500">Source</p>
                 <p>{sourceLabels[normalizeSourceBucket(selectedLog.sourceBucket)]}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Visitor ID</p>
+                <p className="font-mono text-xs break-all">{selectedLog.visitorId || "-"}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Session ID</p>
+                <p className="font-mono text-xs break-all">{selectedLog.sessionId || "-"}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Duration</p>
+                <p>{formatDuration(selectedLog.durationMs)}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">End Reason</p>
+                <p>{selectedLog.endReason || "-"}</p>
+              </div>
+              <div>
+                <p className="text-slate-500">Session Start</p>
+                <p>
+                  {selectedLog.sessionStartedAt
+                    ? new Date(selectedLog.sessionStartedAt).toLocaleString()
+                    : "-"}
+                </p>
+              </div>
+              <div>
+                <p className="text-slate-500">Session End</p>
+                <p>
+                  {selectedLog.sessionEndedAt
+                    ? new Date(selectedLog.sessionEndedAt).toLocaleString()
+                    : "-"}
+                </p>
               </div>
               <div>
                 <p className="text-slate-500">Source Key</p>

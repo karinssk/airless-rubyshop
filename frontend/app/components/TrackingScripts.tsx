@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Script from "next/script";
 import GoogleAnalytics from "./GoogleAnalytics";
 import { backendBaseUrl } from "@/lib/urls";
+import {
+  inferTrackingSourceFromHref,
+  initUserTracking,
+  isExitTargetHref,
+  trackUserInteraction,
+} from "@/lib/userTracking";
 
 const META_PIXEL_ID = "1559144322039457";
 const FB_PAGE_ID = "816184855086392";
@@ -63,69 +69,61 @@ export default function TrackingScripts() {
     return () => window.removeEventListener("cookieConsentAccepted", handleConsent);
   }, [isProd]);
 
-  const sendClickEvent = useCallback((payloadInput: {
-    source: string;
-    label?: string;
-    targetHref?: string;
-  }) => {
+  useEffect(() => {
     if (!backendBaseUrl) return;
-    const payload = JSON.stringify({
-      source: payloadInput.source,
-      label: payloadInput.label || "",
-      targetHref: payloadInput.targetHref || "",
-      referrer: window.location.href,
-      jsSignals: collectJsSignals(),
+    initUserTracking({
+      backendUrl: backendBaseUrl,
+      collectJsSignals,
     });
-
-    if (navigator.sendBeacon) {
-      const blob = new Blob([payload], { type: "application/json" });
-      navigator.sendBeacon(`${backendBaseUrl}/stats/messenger-click`, blob);
-      return;
-    }
-
-    fetch(`${backendBaseUrl}/stats/messenger-click`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: payload,
-      keepalive: true,
-    }).catch(() => {});
   }, []);
-
-  const trackMessengerClick = useCallback(() => {
-    sendClickEvent({
-      source: "messenger-floating-button",
-      label: "floating-messenger",
-      targetHref: `https://m.me/${FB_PAGE_ID}`,
-    });
-  }, [sendClickEvent]);
 
   useEffect(() => {
     const handleTrackedClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
       if (!target) return;
-      const trackedElement = target.closest<HTMLElement>("[data-track-click-source]");
-      if (!trackedElement) return;
 
-      const source = trackedElement.dataset.trackClickSource?.trim();
+      let source = "";
+      let label = "";
+      let targetHref = "";
+
+      const trackedElement = target.closest<HTMLElement>("[data-track-click-source]");
+      if (trackedElement) {
+        source = trackedElement.dataset.trackClickSource?.trim() || "";
+        label = trackedElement.dataset.trackClickLabel?.trim() || "";
+        const explicitHref = trackedElement.dataset.trackClickTarget?.trim() || "";
+        const anchorHref =
+          trackedElement instanceof HTMLAnchorElement
+            ? trackedElement.href || ""
+            : "";
+        targetHref = explicitHref || anchorHref;
+      } else {
+        const clickedAnchor = target.closest<HTMLAnchorElement>("a[href]");
+        if (!clickedAnchor) return;
+        const anchorHref = clickedAnchor.href || clickedAnchor.getAttribute("href") || "";
+        source = inferTrackingSourceFromHref(anchorHref);
+        if (!source) return;
+        label =
+          clickedAnchor.getAttribute("aria-label") ||
+          clickedAnchor.textContent?.trim() ||
+          source;
+        targetHref = anchorHref;
+      }
+
       if (!source) return;
 
-      const label = trackedElement.dataset.trackClickLabel?.trim() || "";
-      const explicitHref = trackedElement.dataset.trackClickTarget?.trim() || "";
-      const anchorHref =
-        trackedElement instanceof HTMLAnchorElement
-          ? trackedElement.href || ""
-          : "";
-
-      sendClickEvent({
+      const finalizeSession = isExitTargetHref(targetHref);
+      trackUserInteraction({
         source,
         label,
-        targetHref: explicitHref || anchorHref,
+        targetHref,
+        endReason: finalizeSession ? `${source}-click` : "",
+        finalizeSession,
       });
     };
 
     document.addEventListener("click", handleTrackedClick);
     return () => document.removeEventListener("click", handleTrackedClick);
-  }, [sendClickEvent]);
+  }, []);
 
   return (
     <>
@@ -135,7 +133,9 @@ export default function TrackingScripts() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on Messenger"
-        onClick={trackMessengerClick}
+        data-track-click-source="messenger-floating-button"
+        data-track-click-label="floating-messenger"
+        data-track-click-target={`https://m.me/${FB_PAGE_ID}`}
         style={{
           position: "fixed",
           bottom: "24px",

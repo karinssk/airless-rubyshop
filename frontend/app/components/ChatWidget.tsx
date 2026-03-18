@@ -47,6 +47,9 @@ export default function ChatWidget() {
               href={quickLinks.line.href}
               target="_blank"
               rel="noreferrer"
+              data-track-click-source="quick-links-line"
+              data-track-click-label="quick-links-line"
+              data-track-click-target={quickLinks.line.href}
               className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-[#06C755] text-white shadow-lg"
               aria-label="Line OA"
               onClick={() => setIsOpen(false)}
@@ -62,6 +65,9 @@ export default function ChatWidget() {
           {quickLinks?.phone?.enabled && quickLinks.phone.href && (
             <a
               href={quickLinks.phone.href}
+              data-track-click-source="quick-links-phone"
+              data-track-click-label="quick-links-phone"
+              data-track-click-target={quickLinks.phone.href}
               className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-[var(--brand-blue)] text-white shadow-lg"
               aria-label="Phone"
               onClick={() => setIsOpen(false)}

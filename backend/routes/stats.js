@@ -29,6 +29,8 @@ const supportedSourceFilters = new Set([
   "other",
 ]);
 
+const supportedEventTypes = new Set(["click", "session-end"]);
+
 const normalizeDeviceFilter = (value) => {
   const normalized = String(value || "all").trim().toLowerCase();
   return supportedDeviceFilters.has(normalized) ? normalized : "all";
@@ -44,6 +46,11 @@ const normalizeSourceFilter = (value) => {
   return supportedSourceFilters.has(normalized) ? normalized : "all";
 };
 
+const normalizeEventType = (value) => {
+  const normalized = String(value || "click").trim().toLowerCase();
+  return supportedEventTypes.has(normalized) ? normalized : "click";
+};
+
 const parseDateInput = (value) => {
   if (!value) return null;
   const input = String(value).trim();
@@ -56,6 +63,13 @@ const parseDateInput = (value) => {
     if (!Number.isNaN(localDate.getTime())) return localDate;
   }
   const date = new Date(input);
+  if (Number.isNaN(date.getTime())) return null;
+  return date;
+};
+
+const parseDateTimeInput = (value) => {
+  if (!value) return null;
+  const date = new Date(String(value).trim());
   if (Number.isNaN(date.getTime())) return null;
   return date;
 };
@@ -192,6 +206,22 @@ const getSourceQuery = (sourceFilter) => {
   }
 };
 
+const combineQueries = (...queries) => {
+  const validQueries = queries.filter(
+    (query) => query && Object.keys(query).length > 0
+  );
+  if (validQueries.length === 0) return {};
+  if (validQueries.length === 1) return validQueries[0];
+  return { $and: validQueries };
+};
+
+const clickEventsOnlyQuery = {
+  $or: [
+    { eventType: { $exists: false } },
+    { eventType: "click" },
+  ],
+};
+
 const toSafeNumber = (value, fallback = 0) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
@@ -238,8 +268,11 @@ const sanitizeJsSignals = (signals) => {
   };
 };
 
-const assessBotSignals = ({ userAgent, jsSignals }) => {
+const assessBotSignals = ({ userAgent, jsSignals, durationMs, eventType }) => {
   const ua = String(userAgent || "").toLowerCase();
+  const normalizedEventType = normalizeEventType(eventType);
+  const safeDurationMs = Math.max(0, Math.floor(toSafeNumber(durationMs, 0)));
+  const hasDuration = safeDurationMs > 0;
   const reasons = [];
   let score = 0;
 
@@ -283,8 +316,26 @@ const assessBotSignals = ({ userAgent, jsSignals }) => {
     score += 10;
     reasons.push("Invalid screen dimensions");
   }
+  if (hasDuration && safeDurationMs < 500) {
+    score += 20;
+    reasons.push("Interaction happened extremely fast (<0.5s)");
+  } else if (hasDuration && safeDurationMs < 1500) {
+    score += 12;
+    reasons.push("Interaction happened very quickly (<1.5s)");
+  } else if (hasDuration && safeDurationMs < 4000) {
+    score += 6;
+    reasons.push("Interaction happened quickly (<4s)");
+  }
+  if (normalizedEventType === "session-end" && hasDuration && safeDurationMs < 1000) {
+    score += 12;
+    reasons.push("Session ended almost immediately");
+  }
+  if (hasDuration && safeDurationMs >= 120000) {
+    score -= 5;
+    reasons.push("Long dwell time before action (human-like)");
+  }
 
-  score = Math.min(100, score);
+  score = Math.max(0, Math.min(100, score));
   const suspected = score >= 50;
   const level = score >= 80 ? "high" : score >= 50 ? "medium" : "low";
 
@@ -322,15 +373,35 @@ router.post("/stats/messenger-click", async (req, res) => {
       "";
     const userAgent = req.headers["user-agent"] || "";
     const referrer = req.body?.referrer || "";
-    const source = normalizeSourceValue(req.body?.source) || "messenger-floating-button";
+    const eventType = normalizeEventType(req.body?.eventType);
+    const source = normalizeSourceValue(req.body?.source) ||
+      (eventType === "session-end" ? "session-exit" : "messenger-floating-button");
     const label = truncateString(req.body?.label, 120);
     const targetHref = truncateString(req.body?.targetHref, 1000);
+    const visitorId = truncateString(req.body?.visitorId, 120);
+    const sessionId = truncateString(req.body?.sessionId, 120);
+    const durationMs = Math.max(0, Math.floor(toSafeNumber(req.body?.durationMs)));
+    const sessionStartedAt = parseDateTimeInput(req.body?.sessionStartedAt);
+    const sessionEndedAt = parseDateTimeInput(req.body?.sessionEndedAt);
+    const endReason = truncateString(req.body?.endReason, 120);
     const jsSignals = sanitizeJsSignals(req.body?.jsSignals);
-    const botAssessment = assessBotSignals({ userAgent, jsSignals });
+    const botAssessment = assessBotSignals({
+      userAgent,
+      jsSignals,
+      durationMs,
+      eventType,
+    });
     await MessengerClick.create({
+      eventType,
       source,
       label,
       targetHref,
+      visitorId,
+      sessionId,
+      durationMs,
+      sessionStartedAt,
+      sessionEndedAt,
+      endReason,
       ip,
       userAgent,
       referrer,
@@ -361,32 +432,34 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
     );
     const deviceQuery = getDeviceQuery(selectedDevice);
     const sourceQuery = getSourceQuery(selectedSource);
-    const filterParts = [dateRangeQuery, deviceQuery, sourceQuery].filter(
-      (query) => Object.keys(query).length > 0
+    const logsFilterQuery = combineQueries(
+      clickEventsOnlyQuery,
+      dateRangeQuery,
+      deviceQuery,
+      sourceQuery
     );
-    const logsFilterQuery =
-      filterParts.length === 0
-        ? {}
-        : filterParts.length === 1
-          ? filterParts[0]
-          : { $and: filterParts };
+    const dateFilteredQuery = combineQueries(clickEventsOnlyQuery, dateRangeQuery);
 
-    const totalClicks = await MessengerClick.countDocuments();
+    const totalClicks = await MessengerClick.countDocuments(clickEventsOnlyQuery);
     const filteredTotalClicks = await MessengerClick.countDocuments(logsFilterQuery);
-    const dateFilteredTotalClicks = await MessengerClick.countDocuments(
-      dateRangeQuery
-    );
+    const dateFilteredTotalClicks = await MessengerClick.countDocuments(dateFilteredQuery);
 
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
-    const todayClicks = await MessengerClick.countDocuments({
-      createdAt: { $gte: todayStart },
-    });
+    const todayClicks = await MessengerClick.countDocuments(
+      combineQueries(clickEventsOnlyQuery, {
+        createdAt: { $gte: todayStart },
+      })
+    );
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const last30Days = await MessengerClick.aggregate([
-      { $match: { createdAt: { $gte: thirtyDaysAgo } } },
+      {
+        $match: combineQueries(clickEventsOnlyQuery, {
+          createdAt: { $gte: thirtyDaysAgo },
+        }),
+      },
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
@@ -448,14 +521,25 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
       device: detectDeviceFromUserAgent(log.userAgent),
       source: normalizeSourceValue(log.source) || "messenger-legacy",
       sourceBucket: getSourceBucket(log.source),
+      eventType: truncateString(log.eventType, 40) || "click",
       label: truncateString(log.label, 120),
       targetHref: truncateString(log.targetHref, 1000),
+      visitorId: truncateString(log.visitorId, 120),
+      sessionId: truncateString(log.sessionId, 120),
+      endReason: truncateString(log.endReason, 120),
+      durationMs: Math.max(0, Math.floor(toSafeNumber(log.durationMs))),
+      sessionStartedAt: log.sessionStartedAt
+        ? new Date(log.sessionStartedAt).toISOString()
+        : null,
+      sessionEndedAt: log.sessionEndedAt
+        ? new Date(log.sessionEndedAt).toISOString()
+        : null,
     }));
 
     const deviceAggregation = await MessengerClick.aggregate([
-      ...(Object.keys(dateRangeQuery).length > 0
-        ? [{ $match: dateRangeQuery }]
-        : []),
+      {
+        $match: combineQueries(clickEventsOnlyQuery, dateRangeQuery),
+      },
       {
         $project: {
           _id: 0,
@@ -577,7 +661,9 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
     };
 
     const sourceAggregation = await MessengerClick.aggregate([
-      ...(Object.keys(dateRangeQuery).length > 0 ? [{ $match: dateRangeQuery }] : []),
+      {
+        $match: combineQueries(clickEventsOnlyQuery, dateRangeQuery),
+      },
       sourceProjectStage,
       { $group: { _id: "$sourceBucket", count: { $sum: 1 } } },
     ]);
@@ -597,7 +683,11 @@ router.get("/stats/messenger-clicks", requireAdmin, async (req, res) => {
     });
 
     const todaySourceAggregation = await MessengerClick.aggregate([
-      { $match: { createdAt: { $gte: todayStart } } },
+      {
+        $match: combineQueries(clickEventsOnlyQuery, {
+          createdAt: { $gte: todayStart },
+        }),
+      },
       sourceProjectStage,
       { $group: { _id: "$sourceBucket", count: { $sum: 1 } } },
     ]);

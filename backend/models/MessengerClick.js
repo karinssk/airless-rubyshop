@@ -43,9 +43,16 @@ const botAssessmentSchema = new mongoose.Schema(
 
 const messengerClickSchema = new mongoose.Schema(
   {
+    eventType: { type: String, default: "click" },
     source: { type: String, default: "messenger-floating-button" },
     label: { type: String, default: "" },
     targetHref: { type: String, default: "" },
+    visitorId: { type: String, default: "" },
+    sessionId: { type: String, default: "" },
+    durationMs: { type: Number, default: 0 },
+    sessionStartedAt: { type: Date, default: null },
+    sessionEndedAt: { type: Date, default: null },
+    endReason: { type: String, default: "" },
     ip: { type: String, default: "" },
     userAgent: { type: String, default: "" },
     referrer: { type: String, default: "" },
