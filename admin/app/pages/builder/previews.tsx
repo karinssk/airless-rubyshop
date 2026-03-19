@@ -1660,6 +1660,58 @@ export function LivePreview({
       );
     }
 
+    if (block.type === "quick-from") {
+      const backgroundColor = safeText(props.backgroundColor) || "#ffffff";
+      return wrap(
+        <section className="py-16" style={{ backgroundColor }}>
+          <div className="mx-auto grid max-w-xl gap-6 px-6">
+            <h2 className="text-center text-2xl font-semibold text-[var(--brand-navy)]">
+              <EditableText
+                value={safeText(props.heading)}
+                onCommit={(value) => onUpdateBlock(index, { heading: value })}
+                className="text-[var(--brand-navy)]"
+              />
+            </h2>
+            <div className="grid gap-4 rounded-3xl border border-white/70 bg-white/80 p-6 shadow-xl shadow-blue-900/10 backdrop-blur">
+              <label className="grid gap-2 text-xs text-slate-700">
+                <span className="font-semibold">
+                  <EditableText
+                    value={safeText(props.phoneLabel)}
+                    onCommit={(value) =>
+                      onUpdateBlock(index, { phoneLabel: value })
+                    }
+                    className="text-slate-700"
+                  />
+                </span>
+                <input
+                  className="rounded-xl border border-slate-300 bg-white px-3 py-2 shadow-sm"
+                  placeholder={safeText(props.phoneLabel)}
+                />
+              </label>
+              <button className="rounded-2xl bg-[var(--brand-blue)] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/20">
+                <EditableText
+                  value={safeText(props.submitLabel)}
+                  onCommit={(value) =>
+                    onUpdateBlock(index, { submitLabel: value })
+                  }
+                  className="text-white"
+                />
+              </button>
+              <p className="text-center text-xs text-slate-600">
+                <EditableText
+                  value={safeText(props.successMessage)}
+                  onCommit={(value) =>
+                    onUpdateBlock(index, { successMessage: value })
+                  }
+                  className="text-slate-600"
+                />
+              </p>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
     if (block.type === "contact-channels") {
       const backgroundColor = safeText(props.backgroundColor) || "#ffe800";
       const channels = (props.channels || []) as Array<Record<string, any>>;

@@ -29,6 +29,18 @@ const formatSubmissionLineMessage = (submission) => {
     ].join("\n");
 };
 
+const formatQuickFromLineMessage = (submission) => {
+    const createdAt = new Date(submission.createdAt || Date.now()).toLocaleString("th-TH", {
+        timeZone: "Asia/Bangkok",
+    });
+    return [
+        "มีฟอร์ม Quick From ใหม่",
+        `เบอร์โทร: ${submission.phone || "-"}`,
+        `เวลา: ${createdAt}`,
+        `ID: ${submission._id || submission.id || "-"}`,
+    ].join("\n");
+};
+
 const pushLineMessage = async (messageText) => {
     const { channelAccessToken, channelSecret, reportUserId } = resolveLineConfig();
     if (!channelAccessToken || !reportUserId) {
@@ -85,6 +97,38 @@ router.post("/quotation", async (req, res) => {
     } catch (error) {
         lineNotificationError = error?.message || "Failed to send LINE notification";
         console.error("[forms] LINE notification failed", error);
+    }
+
+    res.status(201).json({
+        submission: { ...submission.toObject(), id: submission._id },
+        lineNotificationSent,
+        ...(lineNotificationError ? { lineNotificationError } : {}),
+    });
+});
+
+router.post("/quick-from", async (req, res) => {
+    const phone = String(req.body?.phone || "").trim();
+    if (!phone) {
+        return res.status(400).json({ error: "Missing required fields", missing: ["phone"] });
+    }
+
+    const submission = await QuotationRequest.create({
+        name: "Quick From",
+        company: "",
+        email: `quick-from-${Date.now()}@local.invalid`,
+        phone,
+        service: "quick-from",
+        details: "",
+    });
+
+    let lineNotificationSent = false;
+    let lineNotificationError = null;
+    try {
+        await pushLineMessage(formatQuickFromLineMessage(submission));
+        lineNotificationSent = true;
+    } catch (error) {
+        lineNotificationError = error?.message || "Failed to send LINE notification";
+        console.error("[forms] quick-from LINE notification failed", error);
     }
 
     res.status(201).json({

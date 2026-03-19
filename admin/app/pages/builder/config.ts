@@ -174,6 +174,12 @@ export const blockCatalog = [
     stripe: "bg-[var(--brand-navy)]",
   },
   {
+    type: "quick-from",
+    label: "Quick From",
+    preview: "bg-[var(--brand-yellow)]",
+    stripe: "bg-[var(--brand-navy)]",
+  },
+  {
     type: "contact-channels",
     label: "Contact Channels",
     preview: "bg-[var(--brand-yellow)]",
@@ -313,6 +319,7 @@ export const thumbnailMap: Record<string, string> = {
   "welfare-and-benefits": "/thumbnails/welfare-and-benefits.svg",
   "job-vacancies": "/thumbnails/job-vacancies.svg",
   "request-quotation-forms": "/thumbnails/request-quotation-forms.svg",
+  "quick-from": "/thumbnails/request-quotation-forms.svg",
   "contact-channels": "/thumbnails/contact-channels.svg",
   "contact-info-card": "/thumbnails/contact.svg",
   "contact-us-text": "/thumbnails/contact-us-text.svg",
@@ -1015,6 +1022,13 @@ export const defaultProps: Record<string, Record<string, unknown>> = {
       "เครื่องพ่นปูนฉาบ",
       "เครื่องตีเส้นถนน",
     ],
+  },
+  "quick-from": {
+    backgroundColor: "#ffffff",
+    heading: "ขอให้ติดต่อกลับ",
+    phoneLabel: "เบอร์โทรศัพท์",
+    submitLabel: "ส่งข้อมูล",
+    successMessage: "ขอบคุณสำหรับข้อมูล เจ้าหน้าที่จะติดต่อกลับภายใน 5 นาที",
   },
   "contact-channels": {
     backgroundColor: "#ffffff",

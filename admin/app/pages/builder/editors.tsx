@@ -183,6 +183,14 @@ type RequestQuotationProps = {
   services?: string[];
 };
 
+type QuickFromProps = {
+  backgroundColor?: string;
+  heading?: string;
+  phoneLabel?: string;
+  submitLabel?: string;
+  successMessage?: string;
+};
+
 type ContactChannel = {
   id: string;
   title: string;
@@ -4580,6 +4588,42 @@ export function BlockEditor({
             }
           />
         </label>
+      </div>
+    );
+  }
+
+  if (block.type === "quick-from") {
+    const blockProps = props as QuickFromProps;
+    return (
+      <div className="mt-3 grid gap-3 text-xs text-slate-600">
+        <label className="grid gap-1">
+          Background Color
+          <input
+            type="color"
+            className="h-10 w-24 rounded-xl border border-slate-200 bg-white px-2"
+            defaultValue={toLine(blockProps.backgroundColor as string) || "#ffffff"}
+            onChange={(event) =>
+              updateBlockProps(index, { backgroundColor: event.target.value })
+            }
+          />
+        </label>
+        {[
+          ["heading", "Heading"],
+          ["phoneLabel", "Phone Label"],
+          ["submitLabel", "Submit Button"],
+          ["successMessage", "Success Message"],
+        ].map(([key, label]) => (
+          <label key={key} className="grid gap-1">
+            {label}
+            <input
+              className="rounded-xl border border-slate-200 px-3 py-2"
+              defaultValue={toLine(props[key as string] as string)}
+              onBlur={(event) =>
+                updateBlockProps(index, { [key]: event.target.value })
+              }
+            />
+          </label>
+        ))}
       </div>
     );
   }

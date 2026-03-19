@@ -68,6 +68,11 @@ const RequestQuotationForm = dynamic(() => import("./RequestQuotationForm"), {
   ssr: true,
 });
 
+const QuickFrom = dynamic(() => import("./QuickFrom"), {
+  loading: () => <BlockSkeleton height="h-56" />,
+  ssr: true,
+});
+
 const WhyChooseUs = dynamic(() => import("./WhyChooseUs"), {
   loading: () => <BlockSkeleton height="h-64" />,
   ssr: true,
@@ -197,6 +202,8 @@ export default function PageRenderer({ page }: { page: Page }) {
             return <JobVacancies key={index} {...block.props} />;
           case "request-quotation-forms":
             return <RequestQuotationForm key={index} {...block.props} />;
+          case "quick-from":
+            return <QuickFrom key={index} {...block.props} />;
           case "contact-channels":
             return <ContactChannels key={index} {...block.props} />;
           case "contact-us-text":
