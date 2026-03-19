@@ -24,25 +24,38 @@ export default function QuickFrom({
   const [successOpen, setSuccessOpen] = useState(false);
   const phoneLabelText = phoneLabel || "เบอร์โทรศัพท์";
   const submitLabelText = submitLabel || "ส่งข้อมูล";
+  const isValidPhone = (value: string) => /^\d{10}$/.test(value);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!isValidPhone(phone)) {
+      setError("กรุณากรอกเบอร์โทรศัพท์เป็นตัวเลข 10 หลัก");
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
       const response = await fetch(`${backendBaseUrl}/forms/quick-from`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({
+          phone,
+          pageUrl: typeof window !== "undefined" ? window.location.href : "",
+        }),
       });
+      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error("Failed to submit");
+        throw new Error(data?.error || "Failed to submit");
       }
       setPhone("");
       setSuccessOpen(true);
       setTimeout(() => setSuccessOpen(false), 2500);
-    } catch {
-      setError("ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+    } catch (err) {
+      if (err instanceof Error && err.message) {
+        setError(err.message);
+      } else {
+        setError("ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -69,7 +82,12 @@ export default function QuickFrom({
               required
               type="tel"
               value={phone}
-              onChange={(event) => setPhone(event.target.value)}
+              onChange={(event) =>
+                setPhone(event.target.value.replace(/\D/g, "").slice(0, 10))
+              }
+              inputMode="numeric"
+              pattern="\d{10}"
+              maxLength={10}
               className="rounded-xl border border-slate-300 bg-white px-3 py-2 shadow-sm focus:border-red-400 focus:outline-none"
               placeholder={phoneLabelText}
             />

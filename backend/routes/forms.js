@@ -29,13 +29,14 @@ const formatSubmissionLineMessage = (submission) => {
     ].join("\n");
 };
 
-const formatQuickFromLineMessage = (submission) => {
+const formatQuickFromLineMessage = (submission, sourceUrl = "") => {
     const createdAt = new Date(submission.createdAt || Date.now()).toLocaleString("th-TH", {
         timeZone: "Asia/Bangkok",
     });
     return [
         "มีฟอร์ม Quick From ใหม่",
         `เบอร์โทร: ${submission.phone || "-"}`,
+        `ลิงก์: ${sourceUrl || "-"}`,
         `เวลา: ${createdAt}`,
         `ID: ${submission._id || submission.id || "-"}`,
     ].join("\n");
@@ -108,9 +109,10 @@ router.post("/quotation", async (req, res) => {
 
 router.post("/quick-from", async (req, res) => {
     const phone = String(req.body?.phone || "").trim();
-    if (!phone) {
-        return res.status(400).json({ error: "Missing required fields", missing: ["phone"] });
+    if (!/^\d{10}$/.test(phone)) {
+        return res.status(400).json({ error: "Phone must be exactly 10 digits", field: "phone" });
     }
+    const pageUrl = String(req.body?.pageUrl || "").trim();
 
     const submission = await QuotationRequest.create({
         name: "Quick From",
@@ -118,13 +120,13 @@ router.post("/quick-from", async (req, res) => {
         email: `quick-from-${Date.now()}@local.invalid`,
         phone,
         service: "quick-from",
-        details: "",
+        details: pageUrl ? `Source URL: ${pageUrl}` : "",
     });
 
     let lineNotificationSent = false;
     let lineNotificationError = null;
     try {
-        await pushLineMessage(formatQuickFromLineMessage(submission));
+        await pushLineMessage(formatQuickFromLineMessage(submission, pageUrl));
         lineNotificationSent = true;
     } catch (error) {
         lineNotificationError = error?.message || "Failed to send LINE notification";
